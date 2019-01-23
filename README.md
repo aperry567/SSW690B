@@ -1,2 +1,2 @@
 # SSW690B
-Team Github site
+SSW690B Spring 2019 Group Doctors Online Project by Ayana, Tianhao and John
