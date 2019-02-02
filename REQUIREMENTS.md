@@ -5,10 +5,10 @@
 1. Signup/login		
 2. Update profile		
 3. Patients List		
-3a. Patient Details/Notes 		
-3b. Treatments List		
-3c. Create apointments/tests		
-3d. File perscriptions								
+- Patient Details/Notes 		
+- Treatments List		
+- Create apointments/tests		
+- File perscriptions								
 
 **Patients Requirements**
 --- 
