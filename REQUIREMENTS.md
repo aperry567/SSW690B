@@ -1,7 +1,7 @@
 # Requirements for the Doctors OnDemand App:
 
-Doctors | Requirements
---- | ---
+**Doctors Requirements**
+---
 Signup/login		
 Update profile		
 Patients List		
@@ -10,8 +10,8 @@ Patients List
 - Create apointments/tests		
 - File perscriptions								
 
-Patients | Requirements
---- | ---
+**Patients Requirements**
+--- 
 Signup/login		
 Get a Doctor		
 Chat with Doctor		
@@ -21,8 +21,8 @@ Care History
 Docs Chatted with		
 Billing History							
 
-System Admin | Requirements
---- | ---
+**System Admin Requirements**
+--- 
 login		
 User login managements & light profile		
 Manage activation of doctors		
