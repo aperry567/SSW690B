@@ -2,13 +2,13 @@
 
 **Doctors Requirements**
 ---
-*Signup/login		
-*Update profile		
-*Patients List		
-  *Patient Details/Notes 		
-  *Treatments List		
-  *Create apointments/tests		
-  *File perscriptions								
+1. Signup/login		
+2. Update profile		
+3. Patients List		
+  -Patient Details/Notes 		
+  -Treatments List		
+  -Create apointments/tests		
+  -File perscriptions								
 
 **Patients Requirements**
 --- 
