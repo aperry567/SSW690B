@@ -61,6 +61,7 @@ Info | Details
 **UC010** | Doctor profile update					
 **Actors** | Doctor					
 **Flow** | Doctor completes her/his medical credentials and licensing criteria and waits for approval from Doctors OnDemand board.  Inserts how much the visit will cost per call				
+
 Info | Details
 --- | ---
 **UC011** | Doctor patient list					
@@ -114,6 +115,7 @@ Info | Details
 **UC019** | Usage/Income Reports					
 **Actors** | System Admin					
 **Flow** | Shows details about number of users signed up, (doctors vs patients), number of chats/perscriptions filled per day/week/month, total doctors online now, revenue per day/week/month					
+
 Info | Details
 --- | ---
 **UC020** | User Billing History					
