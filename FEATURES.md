@@ -25,6 +25,7 @@ Info | Details
 **UC004** | Patient Scheduled tests/appointments Lists					
 **Actors** | Patient					
 **Flow** | Patient is able to go into the app and see the list of appointments and tests the doctors have created for them including date/time, location, and reason for visit					
+
 Info | Details
 --- | ---
 **UC005** | Patient profile update					
