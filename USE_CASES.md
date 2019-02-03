@@ -25,6 +25,7 @@ Use Case 4 | Information
 **UC004** | Patient Scheduled tests/appointments Lists					
 **Actors** | Patient					
 **Flow** | Patient is able to go into the app and see the list of appointments and tests the doctors have created for them including date/time, location, and reason for visit					
+
 Use Case 5 | Information
 --- | ---
 **UC005** | Patient profile update					
@@ -61,6 +62,7 @@ Use Case 10 | Information
 **UC010** | Doctor profile update					
 **Actors** | Doctor					
 **Flow** | Doctor completes her/his medical credentials and licensing criteria and waits for approval from Doctors OnDemand board.  Inserts how much the visit will cost per call				
+
 Use Case 11 | Information
 --- | ---
 **UC011** | Doctor patient list					
@@ -114,6 +116,7 @@ Use Case 19 | Information
 **UC019** | Usage/Income Reports					
 **Actors** | System Admin					
 **Flow** | Shows details about number of users signed up, (doctors vs patients), number of chats/perscriptions filled per day/week/month, total doctors online now, revenue per day/week/month					
+
 Use Case 20 | Information
 --- | ---
 **UC020** | User Billing History					
