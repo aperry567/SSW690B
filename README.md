@@ -1,13 +1,12 @@
 # SSW690B
 SSW690B Spring 2019 Group Doctors Online Project by Ayana, Tianhao, John and Jinal
 
-**Requirements:** 
+[Requirements](REQUIREMENTS.md)
 
-**Milestones:**
+[Use Cases](USE_CASES.md)
 
-**UML Diagrams:**
-
-**Use Cases click the link:**
-
+[Doctors Workflow](\Screens and Flow - Doctors.svg)
+[Patient Workflow](\Screens and Flow - Patients.svg)
+[System Admin](\Screens and Flow - System Admin.svg)
 
 
