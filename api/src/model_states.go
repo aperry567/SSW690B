@@ -1,0 +1,62 @@
+/*
+ * Doctors on Demand API
+ */
+
+package main
+
+type States string
+
+// List of States
+const (
+	AK States = "ak"
+	AL States = "al"
+	AZ States = "az"
+	AR States = "ar"
+	CA States = "ca"
+	CO States = "co"
+	CT States = "ct"
+	DE States = "de"
+	DC States = "dc"
+	FL States = "fl"
+	GA States = "ga"
+	HI States = "hi"
+	ID States = "id"
+	IL States = "il"
+	IN States = "in"
+	IA States = "ia"
+	KS States = "ks"
+	KY States = "ky"
+	LA States = "la"
+	ME States = "me"
+	MD States = "md"
+	MA States = "ma"
+	MI States = "mi"
+	MN States = "mn"
+	MS States = "ms"
+	MO States = "mo"
+	MT States = "mt"
+	NE States = "ne"
+	NV States = "nv"
+	NH States = "nh"
+	NJ States = "nj"
+	NM States = "nm"
+	NY States = "ny"
+	NC States = "nc"
+	ND States = "nd"
+	OH States = "oh"
+	OK States = "ok"
+	OR States = "or"
+	PA States = "pa"
+	RI States = "ri"
+	SC States = "sc"
+	SD States = "sd"
+	TN States = "tn"
+	TX States = "tx"
+	UT States = "ut"
+	VT States = "vt"
+	VA States = "va"
+	WA States = "wa"
+	WV States = "wv"
+	WI States = "wi"
+	WY States = "wy"
+)
