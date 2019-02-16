@@ -23,6 +23,11 @@ type AuthResponse struct {
 	Role      string `json:"role"`
 }
 
+type SignupDoctorLicences struct {
+	State   *States `json:"state"`
+	License string  `json:"license"`
+}
+
 type SignupModel struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
