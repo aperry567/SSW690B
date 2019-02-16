@@ -1,0 +1,13 @@
+# Use Cases for Doctors OnDemand App
+
+**User Story ID** | **As a** <type of user> | **I want to** <perform some task> | **so that I can** <achieve some goal>
+--- | --- | --- | ---
+US001 | **Patient** | View a status report for each **doctor** | Get the availible **doctor**
+US002 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+US003 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+US004 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+US005 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+US006 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+US007 | **Patient** | View a status report from each **doctor** | Get the availible **doctor**
+			
+
