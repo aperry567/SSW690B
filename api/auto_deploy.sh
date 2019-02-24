@@ -2,7 +2,7 @@
 
 # use a cron tab with
 # */10 * * * * /home/ubuntu/SSW690B/api/auto_deploy.sh
-cd ~/SSW690B/api;
+cd ~/SSW690B;
 
 git fetch;
 LOCAL=$(git rev-parse HEAD);
@@ -13,7 +13,7 @@ if [ $LOCAL != $REMOTE ]; then
     #pull and merge changes
     git pull;
 
-    cd ~;
+    cd ~/SSW690B/api;
 
     go build -o dod-api-server src/*.go
 
