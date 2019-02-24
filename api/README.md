@@ -32,4 +32,5 @@ Go allows you the ability to run+compile on the the fly which is great for devel
 ```go run api/src/*.go```
 
 ## Documentation
+
 Go here to use the swagger ui (http://editor.swagger.io) then go to the menu File -> Import URL and enter (http://35.207.6.9:8080/swagger.yaml)
