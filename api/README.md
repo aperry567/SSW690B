@@ -15,6 +15,7 @@ Built in golang https://golang.org
   - ```go get github.com/rs/cors```
   - ```go get github.com/go-sql-driver/mysql```
   - ```go get github.com/google/uuid```
+  - ```go get golang.org/x/crypto/bcrypt```
 - Set environment variables
   - ```DOD_DB = "db_user:db_password@tcp(address:3306)/dod"```
   - ```DOD_API_ROOT_DIR = "/path/to/api/folder"```
