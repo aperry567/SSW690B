@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # use a cron tab with
-# */10 * * * * /home/ubuntu/SSW690B/api/auto_deploy.sh
+# */1 * * * * /home/ubuntu/auto_deploy.sh > /home/ubuntu/cron.log 2>&1
+# at the top of the cron tab also put some environment variables to get it working
+#SHELL=/bin/bash
+#DOD_DB=<db conn string>
+#DOD_API_ROOT_DIR=/home/ubuntu/SSW690B/api
 cd ~/SSW690B;
 
 git fetch;
@@ -19,5 +23,5 @@ if [ $LOCAL != $REMOTE ]; then
 
     kill "$(cat socket)";
 
-    ./dod-api-server & echo $! > socket
+    ./dod-api-server & echo $! > socket;
 fi
