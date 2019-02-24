@@ -53,3 +53,22 @@ func dbAuditAction(id int, action string) {
 
 	st.Exec(id, action)
 }
+
+func dbGetUserID(session string) int {
+	db := getDB()
+	if db == nil {
+		return 0
+	}
+	defer db.Close()
+
+	st, err := db.Prepare("select USER_ID from `dod`.`SESSIONS` where `SESSION_ID` = ?")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer st.Close()
+
+	var userID int
+	st.QueryRow(session).Scan(&userID)
+
+	return userID
+}

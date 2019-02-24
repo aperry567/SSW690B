@@ -92,8 +92,8 @@ paths:
             role:
               type: "string"
               enum:
-              - "patient"
               - "doctor"
+              - "patient"
             name:
               type: "string"
             address:

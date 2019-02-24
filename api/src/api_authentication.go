@@ -183,7 +183,12 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 		return AuthResponse{}, errors.New("Internal error please try again later")
 	}
 
-	return dbUserLogin(sm.Email, sm.Password), nil
+	auth := dbUserLogin(sm.Email, sm.Password)
+
+	userID := dbGetUserID(auth.SessionID)
+	dbAuditAction(userID, "Signup:Success")
+
+	return auth, nil
 }
 
 func LoginPost(w http.ResponseWriter, r *http.Request) {
