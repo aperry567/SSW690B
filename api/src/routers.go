@@ -23,7 +23,7 @@ type Routes []Route
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.Path("/swagger.yaml").Handler(http.FileServer(http.Dir("api")))
+	router.Path("/swagger.yaml").Handler(http.FileServer(http.Dir(dodAPIRootDir + "/api")))
 	router.Path("/").Handler(http.RedirectHandler("https://editor.swagger.io/#?import=http://35.207.6.9:8080/swagger.yaml", 301))
 	for _, route := range routes {
 		var handler http.Handler
