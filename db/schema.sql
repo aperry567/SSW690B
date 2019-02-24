@@ -39,9 +39,11 @@ CREATE TABLE `USERS` (
   `POSTAL_CODE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
   `PHONE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
   `LICENSES` text COLLATE utf8_unicode_ci,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `USER_ID_UNIQUE` (`USER_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 /*
  * Load sample data
