@@ -6,14 +6,13 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:8080"
+host: "35.207.6.9:8080"
 basePath: "/api"
 tags:
 - name: "authentication"
   description: "Login, Signup, Logout"
 schemes:
 - "http"
-- "https"
 consumes:
 - "application/json"
 produces:

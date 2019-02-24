@@ -14,3 +14,6 @@ Built in golang https://golang.org
 ## Running Code
 Go allows you the ability to run+compile on the the fly which is great for development.
 ```go run api/src/*.go```
+
+## Documentation
+Go here to use the swagger ui (https://editor.swagger.io/#?import=http://35.207.6.9:8080/swagger.yaml)
