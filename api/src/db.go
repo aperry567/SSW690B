@@ -9,7 +9,7 @@ import "database/sql"
 import _ "github.com/go-sql-driver/mysql"
 
 func getDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:P@ssw0rd@tcp(35.231.141.163:3306)/dod")
+	db, err := sql.Open("mysql", dodDB)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil

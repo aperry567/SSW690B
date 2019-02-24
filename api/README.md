@@ -15,8 +15,19 @@ Built in golang https://golang.org
   - ```go get github.com/rs/cors```
   - ```go get github.com/go-sql-driver/mysql```
   - ```go get github.com/google/uuid```
+- Set environment variables
+  - ```DOD_DB = "db_user:db_password@tcp(address:3306)/dod"```
+  - ```DOD_API_ROOT_DIR = "/path/to/api/folder"```
+- Setup GCP SDK for command line
+  - Download and install GCP (https://cloud.google.com/sdk/docs/#install_the_latest_cloud_tools_version_cloudsdk_current_version)
+  - Add in sql proxy component ```gcloud components install cloud_sql_proxy```
+  - Login ```gcloud auth login <account_email>```
 
-## Running Code
+## Running the API
+
+Get temporary db connection working (expires every 5 min or so)
+```gcloud sql connect dod-mysql-db```
+
 Go allows you the ability to run+compile on the the fly which is great for development.
 ```go run api/src/*.go```
 
