@@ -2,7 +2,7 @@
 
 # use a cron tab with
 # */10 * * * * /home/ubuntu/SSW690B/api/auto_deploy.sh
-cd ~/SSW690B;
+cd ~/SSW690B/api;
 
 git fetch;
 LOCAL=$(git rev-parse HEAD);
@@ -15,7 +15,7 @@ if [ $LOCAL != $REMOTE ]; then
 
     cd ~;
 
-    go build -o dod-api-server SSW690B/api/src/*.go
+    go build -o dod-api-server src/*.go
 
     kill "$(cat socket)";
 

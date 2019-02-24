@@ -5,9 +5,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/google/uuid"
 )
@@ -105,6 +108,84 @@ func dbUserLogout(s string) {
 	userIDSt.Exec(s)
 }
 
+func dbUserSignup(sm SignupModel) (AuthResponse, error) {
+	dbUserClearSessions()
+
+	db := getDB()
+	if db == nil {
+		return AuthResponse{}, errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//check signup has valid data in it
+	emailReg := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	if emailReg.MatchString(sm.Email) == false {
+		return AuthResponse{}, errors.New("Invalid Email")
+	}
+	if sm.Address == "" {
+		return AuthResponse{}, errors.New("Address is required")
+	}
+	if sm.City == "" {
+		return AuthResponse{}, errors.New("City is required")
+	}
+	if sm.State == nil {
+		return AuthResponse{}, errors.New("State is required")
+	}
+	if sm.PostalCode == "" {
+		return AuthResponse{}, errors.New("Postal Code is required")
+	}
+	if sm.Password == "" {
+		return AuthResponse{}, errors.New("Password is required")
+	}
+	if sm.Name == "" {
+		return AuthResponse{}, errors.New("Name is required")
+	}
+	if sm.Phone == "" {
+		return AuthResponse{}, errors.New("Phone is required")
+	}
+	if sm.Role == "" {
+		return AuthResponse{}, errors.New("Role is required")
+	}
+	if sm.Role != "patient" && sm.Role != "doctor" {
+		return AuthResponse{}, errors.New("Invalid Role selected")
+	}
+	if sm.DoctorLicences != nil {
+		for _, lic := range sm.DoctorLicences {
+			if lic.License == "" || lic.State == nil {
+				return AuthResponse{}, errors.New("All Doctor Licenceses must include the number and state")
+			}
+		}
+	}
+
+	//check to see if email is already in use
+	emailSt, _ := db.Prepare("select count(1) from `dod`.`USERS` u where u.`EMAIL` = ?")
+	defer emailSt.Close()
+	var emailFound int
+	emailSt.QueryRow(sm.Email).Scan(&emailFound)
+	if emailFound > 0 {
+		return AuthResponse{}, errors.New("Email already in use")
+	}
+
+	//setup data to insert
+	pHash := hashPassword(sm.Password)
+	var docLicStr sql.NullString
+	if sm.DoctorLicences != nil {
+		jsonStr, _ := json.Marshal(sm.DoctorLicences)
+		docLicStr = sql.NullString{String: string(jsonStr), Valid: true}
+	} else {
+		docLicStr = sql.NullString{String: docLicStr.String, Valid: false}
+	}
+	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`) VALUES (now(),?,?,?,?,?,?,?,?,?,?)")
+	defer signupSt.Close()
+	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.Phone, docLicStr)
+	if signupErr != nil {
+		fmt.Println(signupErr.Error())
+		return AuthResponse{}, errors.New("Internal error please try again later")
+	}
+
+	return dbUserLogin(sm.Email, sm.Password), nil
+}
+
 func LoginPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -138,9 +219,8 @@ func LogoutPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbUserLogout(input.SessionID)
-
 	w.WriteHeader(http.StatusOK)
+	dbUserLogout(input.SessionID)
 }
 
 func SignupPost(w http.ResponseWriter, r *http.Request) {
@@ -154,12 +234,12 @@ func SignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-
-	//handle login request
-	resp := AuthResponse{
-		SessionID: "12345",
-		Role:      input.Role,
+	resp, err := dbUserSignup(input)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 }
