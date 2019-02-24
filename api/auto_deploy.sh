@@ -3,6 +3,7 @@
 # use a cron tab with
 # */1 * * * * /home/ubuntu/auto_deploy.sh > /home/ubuntu/cron.log 2>&1
 # at the top of the cron tab also put some environment variables to get it working
+#PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
 #SHELL=/bin/bash
 #DOD_DB=<db conn string>
 #DOD_API_ROOT_DIR=/home/ubuntu/SSW690B/api
