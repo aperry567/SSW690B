@@ -42,7 +42,7 @@ func NewRouter() *mux.Router {
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Fprintf(w, "Doctors On Demand API")
+	fmt.Fprintf(w, "Doctors On Demand API!")
 }
 
 var routes = Routes{
