@@ -10,6 +10,11 @@ Built in golang https://golang.org
 - Install golang https://golang.org/dl/
 - IDE Visual Studios Code
   - Add Go extension
+- Get go extensions (from the api directory)
+  - ```go get github.com/gorilla/mux```
+  - ```go get github.com/rs/cors```
+  - ```go get github.com/go-sql-driver/mysql```
+  - ```go get github.com/google/uuid```
 
 ## Running Code
 Go allows you the ability to run+compile on the the fly which is great for development.
