@@ -1,6 +1,6 @@
 # Overiew
 
-Created a database script to generate tables for the project.
+Created database scripts to generate tables for the project.
 
 ## Tables
 - users
