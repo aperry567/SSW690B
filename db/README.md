@@ -1,4 +1,8 @@
 # Overiew
 
-Created a database script to generate the users table
+Created a database script to generate tables for the project.
+
+# Tables
+-users
+-sessions
 
