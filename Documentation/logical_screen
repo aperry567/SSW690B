@@ -1,0 +1,9 @@
+***SignUp:***
+
+**Inputs:**
+* Email ID
+* Password
+* Forget Password
+
+**Outputs:**
+* getsLoggedIn (gets sessionID if email id & password matched)
