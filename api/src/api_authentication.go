@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 
@@ -38,13 +37,16 @@ type SignupModel struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	// can only be patient or doctor
-	Role       string  `json:"role"`
-	Name       string  `json:"name"`
-	Address    string  `json:"address"`
-	City       string  `json:"city"`
-	State      *States `json:"state"`
-	PostalCode string  `json:"postalCode"`
-	Phone      string  `json:"phone"`
+	Role           string  `json:"role"`
+	Name           string  `json:"name"`
+	Address        string  `json:"address"`
+	City           string  `json:"city"`
+	State          *States `json:"state"`
+	PostalCode     string  `json:"postalCode"`
+	Phone          string  `json:"phone"`
+	Photo          string  `json:"photo"`
+	SecretQuestion string  `json:"secretQuestion"`
+	SecretAnswer   string  `json:"secretAnswer"`
 	// required for doctor sign-ups
 	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
 }
@@ -65,7 +67,6 @@ func dbUserLogin(e string, p string) AuthResponse {
 	var role, pHash string
 	lisrerr := userIDSt.QueryRow(e).Scan(&userID, &role, &pHash)
 	if lisrerr != nil {
-		fmt.Println("1: ", lisrerr.Error())
 		return AuthResponse{}
 	}
 
@@ -80,7 +81,6 @@ func dbUserLogin(e string, p string) AuthResponse {
 	_, sessionStErr := sessionSt.Exec(userID, sessionID)
 	defer sessionSt.Close()
 	if sessionStErr != nil {
-		fmt.Println("2: ", sessionStErr.Error())
 		return AuthResponse{}
 	}
 
@@ -137,6 +137,12 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.Password == "" {
 		return AuthResponse{}, errors.New("Password is required")
 	}
+	if sm.SecretQuestion == "" {
+		return AuthResponse{}, errors.New("Secret Question is required")
+	}
+	if sm.SecretAnswer == "" {
+		return AuthResponse{}, errors.New("Secret Answer is required")
+	}
 	if sm.Name == "" {
 		return AuthResponse{}, errors.New("Name is required")
 	}
@@ -175,11 +181,16 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	} else {
 		docLicStr = sql.NullString{String: docLicStr.String, Valid: false}
 	}
-	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`) VALUES (now(),?,?,?,?,?,?,?,?,?,?)")
+	var photo sql.NullString
+	if sm.Photo != "" {
+		photo = sql.NullString{String: sm.Photo, Valid: true}
+	} else {
+		photo = sql.NullString{String: sm.Photo, Valid: false}
+	}
+	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
-	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.Phone, docLicStr)
+	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.Phone, docLicStr, sm.SecretQuestion, sm.SecretAnswer, photo)
 	if signupErr != nil {
-		fmt.Println(signupErr.Error())
 		return AuthResponse{}, errors.New("Internal error please try again later")
 	}
 
@@ -189,6 +200,27 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	dbAuditAction(userID, "Signup:Success")
 
 	return auth, nil
+}
+
+func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	var input SignupModel
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	resp, err := dbUserSignup(input)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func LoginPost(w http.ResponseWriter, r *http.Request) {
