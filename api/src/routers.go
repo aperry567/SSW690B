@@ -68,6 +68,12 @@ var routes = Routes{
 	},
 
 	Route{
+		"PasswordResetPost",
+		strings.ToUpper("Post"),
+		"/api/passwordrest",
+		PasswordResetPost,
+	},
+	Route{
 		"SignupPost",
 		strings.ToUpper("Post"),
 		"/api/signup",

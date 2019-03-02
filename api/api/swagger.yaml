@@ -37,7 +37,7 @@ paths:
               password:
                 type: string
                 format: password
-                example: "test"
+                example: "P@ssw0rd"
       responses:
         '200':
           description: User successfully logged in
@@ -75,6 +75,50 @@ paths:
       responses:
         '200':
           description: Successfully logged out.  Only response possible for security reasons.
+  /passwordrest:
+    post:
+      tags:
+        - authentication
+      parameters: 
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: test@test.com
+              secretQuestion:
+                type: string
+                example: what is your favorite color?
+              secretAnswer:
+                type: string
+                example: blue
+              newPassword:
+                type: string
+                format: password
+                example: P@ssw0rd
+      responses:
+        '200':
+          description: "Password successfuly reset"
+          schema:
+            type: object
+            properties:
+              sessionID:
+                type: string
+                format: uuid
+              role:
+                type: string
+                enum:
+                  - patient
+                  - doctor
+                  - sysadmin
+        '400':
+          description: "Bad request"
+          schema:
+            type: string
+            example: "Bad request"
   /signup:
     post:
       tags:
@@ -120,7 +164,7 @@ paths:
               secretQuestion:
                 type: string
                 example: "what is your favorite color?"
-              secreteAnswer:
+              secretAnswer:
                 type: string
                 example: "blue"
               doctorLicences:

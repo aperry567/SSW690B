@@ -10,6 +10,7 @@ import (
 	"errors"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -26,6 +27,13 @@ type LogoutModel struct {
 type AuthResponse struct {
 	SessionID string `json:"sessionID"`
 	Role      string `json:"role"`
+}
+
+type PasswordResetModel struct {
+	Email          string `json:"email"`
+	SecretQuestion string `json:"secretQuestion"`
+	SecretAnswer   string `json:"secretAnswer"`
+	NewPassword    string `json:"newPassword"`
 }
 
 type SignupDoctorLicences struct {
@@ -108,6 +116,59 @@ func dbUserLogout(s string) {
 	userIDSt.Exec(s)
 }
 
+func dbUserPasswordReset(p PasswordResetModel) (AuthResponse, error) {
+	dbUserClearSessions()
+
+	db := getDB()
+	if db == nil {
+		return AuthResponse{}, errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	// validate inputs
+	if p.Email == "" || p.SecretAnswer == "" || p.SecretQuestion == "" || p.NewPassword == "" {
+		return AuthResponse{}, errors.New("Missing required fields")
+	}
+	if validatePassword(p.NewPassword) == false {
+		return AuthResponse{}, errors.New("Password not complex enough")
+	}
+
+	//find the user
+	userIDSt, _ := db.Prepare("select USER_ID, SECRET_Q, SECRET_A from `dod`.`USERS` u where u.`EMAIL` = ?")
+	defer userIDSt.Close()
+
+	var userID int
+	var secretQ, secretA string
+	lisrerr := userIDSt.QueryRow(p.Email).Scan(&userID, &secretQ, &secretA)
+	if lisrerr != nil {
+		dbAuditAction(userID, "ResetPassword:Failure")
+		return AuthResponse{}, errors.New("Unable to reset password")
+	}
+
+	//check the secret question and answer
+	if strings.TrimSpace(strings.ToLower(secretQ)) != strings.TrimSpace(strings.ToLower(p.SecretQuestion)) || strings.TrimSpace(strings.ToLower(secretA)) != strings.TrimSpace(strings.ToLower(p.SecretAnswer)) {
+		dbAuditAction(userID, "ResetPassword:Failure")
+		return AuthResponse{}, errors.New("Unable to reset password")
+	}
+
+	//create password hash
+	passwd := hashPassword(p.NewPassword)
+
+	//change password
+	updatePWSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `PASSW` = ? WHERE `EMAIL` = ?")
+	defer updatePWSt.Close()
+	_, err := updatePWSt.Exec(passwd, p.Email)
+	if err != nil {
+		dbAuditAction(userID, "ResetPassword:Failure")
+		return AuthResponse{}, errors.New("Internal error please try again later")
+	}
+	dbAuditAction(userID, "ResetPassword:Success")
+
+	auth := dbUserLogin(p.Email, p.NewPassword)
+
+	return auth, nil
+}
+
 func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	dbUserClearSessions()
 
@@ -136,6 +197,9 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	}
 	if sm.Password == "" {
 		return AuthResponse{}, errors.New("Password is required")
+	}
+	if validatePassword(sm.Password) == false {
+		return AuthResponse{}, errors.New("Password not complex enough")
 	}
 	if sm.SecretQuestion == "" {
 		return AuthResponse{}, errors.New("Secret Question is required")
@@ -205,7 +269,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	var input SignupModel
+	var input PasswordResetModel
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -213,9 +277,9 @@ func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := dbUserSignup(input)
+	resp, err := dbUserPasswordReset(input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), 401)
 		return
 	}
 
