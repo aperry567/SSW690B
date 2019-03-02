@@ -1,0 +1,193 @@
+swagger: "2.0"
+info:
+  description: "Doctors on Demand API"
+  version: "1.0.0"
+  title: "Doctors on Demand API"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "35.207.6.9:8080"
+basePath: "/api"
+tags:
+- name: "authentication"
+  description: "Login, Signup, Logout"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /login:
+    post:
+      tags:
+      - "authentication"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              format: "email"
+            password:
+              type: "string"
+              format: "password"
+      responses:
+        '200':
+          description: "User successfully logged in"
+          schema:
+            type: "object"
+            properties:
+              sessionID:
+                type: "string"
+                format: "uuid"
+              role:
+                type: "string"
+                enum:
+                - "patient"
+                - "doctor"
+                - "sysadmin"
+        '401':
+          description: "Invalid credentials"
+          schema:
+            type: "string"
+            example: "Invalid credentials"
+  /logout:
+    post:
+      tags:
+      - "authentication"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            sessionID:
+              type: "string"
+              format: "uuid"
+      responses:
+        '200':
+          description: "Successfully logged out.  Only response possible for security reasons."
+  /signup:
+    post:
+      tags:
+      - "authentication"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              format: "email"
+            password:
+              type: "string"
+              format: "password"
+            role:
+              type: "string"
+              enum:
+              - "doctor"
+              - "patient"
+            name:
+              type: "string"
+            address:
+              type: "string"
+            city:
+              type: "string"
+            state:
+              $ref: "#/definitions/States"
+            postalCode:
+              type: "string"
+            phone:
+              type: "string"
+              example: "123-456-7890"
+            doctorLicences:
+              description: "required for doctor sign-ups"
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  state:
+                    $ref: "#/definitions/States"
+                  license:
+                    type: "string"
+      responses:
+        '200':
+          description: "Create a new account"
+          schema:
+            type: "object"
+            properties:
+              sessionID:
+                type: "string"
+                format: "uuid"
+              role:
+                type: "string"
+                enum:
+                - "patient"
+                - "doctor"
+        '400':
+          description: "Unable to create account"
+          schema:
+            type: "string"
+            example: "Email already in use"
+definitions:
+  States:
+    type: "string"
+    enum:
+    - "ak"
+    - "al"
+    - "az"
+    - "ar"
+    - "ca"
+    - "co"
+    - "ct"
+    - "de"
+    - "dc"
+    - "fl"
+    - "ga"
+    - "hi"
+    - "id"
+    - "il"
+    - "in"
+    - "ia"
+    - "ks"
+    - "ky"
+    - "la"
+    - "me"
+    - "md"
+    - "ma"
+    - "mi"
+    - "mn"
+    - "ms"
+    - "mo"
+    - "mt"
+    - "ne"
+    - "nv"
+    - "nh"
+    - "nj"
+    - "nm"
+    - "ny"
+    - "nc"
+    - "nd"
+    - "oh"
+    - "ok"
+    - "or"
+    - "pa"
+    - "ri"
+    - "sc"
+    - "sd"
+    - "tn"
+    - "tx"
+    - "ut"
+    - "vt"
+    - "va"
+    - "wa"
+    - "wv"
+    - "wi"
+    - "wy"
