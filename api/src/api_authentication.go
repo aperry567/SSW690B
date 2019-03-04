@@ -30,20 +30,46 @@ type AuthResponse struct {
 }
 
 type ProfileModel struct {
-	Name           string  `json:"name"`
-	Address        string  `json:"address"`
-	City           string  `json:"city"`
-	State          *States `json:"state"`
-	PostalCode     string  `json:"postalCode"`
-	Phone          string  `json:"phone"`
-	Photo          string  `json:"photo"`
-	SecretQuestion string  `json:"secretQuestion"`
-	SecretAnswer   string  `json:"secretAnswer"`
+	Role             string  `json:"role"`
+	Name             string  `json:"name"`
+	Address          string  `json:"address"`
+	City             string  `json:"city"`
+	State            *States `json:"state"`
+	PostalCode       string  `json:"postalCode"`
+	PharmacyLocation string  `json:"pharmacylocation"`
+	Phone            string  `json:"phone"`
+	Photo            string  `json:"photo"`
+	SecretQuestion   string  `json:"secretQuestion"`
+	SecretAnswer     string  `json:"secretAnswer"`
 	// required for doctor sign-ups
 	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	// required for patient sign-ups
+	PatientPharmacy []SignupPatientPharmacy `json:"patientPharmacy,omitempty"`
 }
 
 type ProfileRequest struct {
+	SessionID string `json:"sessionID"`
+}
+
+type UpdateUserProfileModel struct {
+	Name             string  `json:"name"`
+	Password         string  `json:"password"`
+	Address          string  `json:"address"`
+	City             string  `json:"city"`
+	State            *States `json:"state"`
+	PostalCode       string  `json:"postalCode"`
+	PharmacyLocation string  `json:"pharmacylocation"`
+	Phone            string  `json:"phone"`
+	Photo            string  `json:"photo"`
+	SecretQuestion   string  `json:"secretQuestion"`
+	SecretAnswer     string  `json:"secretAnswer"`
+	// required for doctor sign-ups
+	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	// required for patient sign-ups
+	PatientPharmacy []SignupPatientPharmacy `json:"patientPharmacy,omitempty"`
+}
+
+type UpdateUserProfileRequest struct {
 	SessionID string `json:"sessionID"`
 }
 
@@ -52,6 +78,11 @@ type PasswordResetModel struct {
 	SecretQuestion string `json:"secretQuestion"`
 	SecretAnswer   string `json:"secretAnswer"`
 	NewPassword    string `json:"newPassword"`
+}
+
+type SignupPatientPharmacy struct {
+	State    *States `json:"state"`
+	Pharmacy string  `json:"pharmacy"`
 }
 
 type SignupDoctorLicences struct {
@@ -63,18 +94,21 @@ type SignupModel struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	// can only be patient or doctor
-	Role           string  `json:"role"`
-	Name           string  `json:"name"`
-	Address        string  `json:"address"`
-	City           string  `json:"city"`
-	State          *States `json:"state"`
-	PostalCode     string  `json:"postalCode"`
-	Phone          string  `json:"phone"`
-	Photo          string  `json:"photo"`
-	SecretQuestion string  `json:"secretQuestion"`
-	SecretAnswer   string  `json:"secretAnswer"`
+	Role             string  `json:"role"`
+	Name             string  `json:"name"`
+	Address          string  `json:"address"`
+	City             string  `json:"city"`
+	State            *States `json:"state"`
+	PostalCode       string  `json:"postalCode"`
+	PharmacyLocation string  `json:"pharmacylocation"`
+	Phone            string  `json:"phone"`
+	Photo            string  `json:"photo"`
+	SecretQuestion   string  `json:"secretQuestion"`
+	SecretAnswer     string  `json:"secretAnswer"`
 	// required for doctor sign-ups
 	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	// required for patient sign-ups
+	PatientPharmacy []SignupPatientPharmacy `json:"patientPharmacy,omitempty"`
 }
 
 func dbUserLogin(e string, p string) AuthResponse {
@@ -316,6 +350,38 @@ func dbGetProfilePost(s string) (ProfileModel, error) {
 	return profile, nil
 }
 
+func dbUpdateUserProfilePost(s string) (UpdateUserProfileModel, error) {
+	dbUserClearSessions()
+
+	var  UpdateUserProfileModel
+
+	db := getDB()
+	if db == nil {
+		return userprofile, errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//fetch profile using session dbGetUserID
+	userID := dbGetUserID(s)
+	if userID == 0 {
+		return userprofile, errors.New("Bad Session")
+	}
+
+	userprofileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	defer userprofileprofileSt.Close()
+
+	var licensesStr string
+	err := userprofileSt.QueryRow(userID).Scan(&userprofile.Name, &userprofile.Address, &userprofile.City, &userprofile.State, &userprofile.PostalCode, &userprofile.Phone, &licensesStr, &userprofile.SecretQuestion, &userprofile.SecretAnswer, &userprofile.Photo)
+	if err != nil {
+		return userprofile, errors.New("Unable to fetch profile")
+	}
+	if licensesStr != "" {
+		json.Unmarshal([]byte(licensesStr), &userprofile.DoctorLicences)
+	}
+
+	return userprofile, nil
+}
+
 func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -407,6 +473,32 @@ func GetProfilePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profile, err := dbGetProfilePost(input.SessionID)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(profile)
+}
+
+func UpdateUserProfilePost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	var input UpdateUserProfileRequest
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	profile, err := dbUpdateUserProfilePost(input.SessionID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
