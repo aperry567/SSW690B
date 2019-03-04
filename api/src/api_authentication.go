@@ -29,6 +29,24 @@ type AuthResponse struct {
 	Role      string `json:"role"`
 }
 
+type ProfileModel struct {
+	Name           string  `json:"name"`
+	Address        string  `json:"address"`
+	City           string  `json:"city"`
+	State          *States `json:"state"`
+	PostalCode     string  `json:"postalCode"`
+	Phone          string  `json:"phone"`
+	Photo          string  `json:"photo"`
+	SecretQuestion string  `json:"secretQuestion"`
+	SecretAnswer   string  `json:"secretAnswer"`
+	// required for doctor sign-ups
+	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+}
+
+type ProfileRequest struct {
+	SessionID string `json:"sessionID"`
+}
+
 type PasswordResetModel struct {
 	Email          string `json:"email"`
 	SecretQuestion string `json:"secretQuestion"`
@@ -266,6 +284,38 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	return auth, nil
 }
 
+func dbGetProfilePost(s string) (ProfileModel, error) {
+	dbUserClearSessions()
+
+	var profile ProfileModel
+
+	db := getDB()
+	if db == nil {
+		return profile, errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//fetch profile using session dbGetUserID
+	userID := dbGetUserID(s)
+	if userID == 0 {
+		return profile, errors.New("Bad Session")
+	}
+
+	profileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	defer profileSt.Close()
+
+	var licensesStr string
+	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &licensesStr, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
+	if err != nil {
+		return profile, errors.New("Unable to fetch profile")
+	}
+	if licensesStr != "" {
+		json.Unmarshal([]byte(licensesStr), &profile.DoctorLicences)
+	}
+
+	return profile, nil
+}
+
 func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -343,4 +393,30 @@ func SignupPost(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
+}
+
+func GetProfilePost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	var input ProfileRequest
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	profile, err := dbGetProfilePost(input.SessionID)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(profile)
 }

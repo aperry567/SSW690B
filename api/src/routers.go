@@ -79,4 +79,11 @@ var routes = Routes{
 		"/api/signup",
 		SignupPost,
 	},
+
+	Route{
+		"GetProfilePost",
+		strings.ToUpper("Post"),
+		"/api/getprofile",
+		GetProfilePost,
+	},
 }
