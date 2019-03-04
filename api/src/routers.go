@@ -73,11 +73,26 @@ var routes = Routes{
 		"/api/passwordrest",
 		PasswordResetPost,
 	},
+
 	Route{
 		"SignupPost",
 		strings.ToUpper("Post"),
 		"/api/signup",
 		SignupPost,
+	},
+
+	Route{
+		"GetVisitsPost",
+		strings.ToUpper("Post"),
+		"/api/getvisits",
+		GetVisitsPost,
+	},
+
+	Route{
+		"UpdateVisitPost",
+		strings.ToUpper("Post"),
+		"/api/updatevisit",
+		UpdateVisitPost,
 	},
 
 	Route{
@@ -88,23 +103,9 @@ var routes = Routes{
 	},
 
 	Route{
-		"UpdateUserProfilePost",
+		"UpdateProfilePost",
 		strings.ToUpper("Post"),
-		"/api/updateuserprofile",
-		UpdateUserProfilePost,
-	},
-
-	Route{
-		"GetExamsPost",
-		strings.ToUpper("Post"),
-		"/api/getexams",
-		GetExamsPost,
-	},
-
-	Route{
-		"GetPrescriptionsPost",
-		strings.ToUpper("Post"),
-		"/api/getprescriptions",
-		GetPrescriptionsPost,
+		"/api/updateprofile",
+		UpdateProfilePost,
 	},
 }

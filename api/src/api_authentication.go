@@ -350,10 +350,10 @@ func dbGetProfilePost(s string) (ProfileModel, error) {
 	return profile, nil
 }
 
-func dbUpdateUserProfilePost(s string) (UpdateUserProfileModel, error) {
+func dbUpdateProfilePost(s string) (UpdateUserProfileModel, error) {
 	dbUserClearSessions()
 
-	var  UpdateUserProfileModel
+	var userprofile UpdateUserProfileModel
 
 	db := getDB()
 	if db == nil {
@@ -368,7 +368,7 @@ func dbUpdateUserProfilePost(s string) (UpdateUserProfileModel, error) {
 	}
 
 	userprofileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
-	defer userprofileprofileSt.Close()
+	defer userprofileSt.Close()
 
 	var licensesStr string
 	err := userprofileSt.QueryRow(userID).Scan(&userprofile.Name, &userprofile.Address, &userprofile.City, &userprofile.State, &userprofile.PostalCode, &userprofile.Phone, &licensesStr, &userprofile.SecretQuestion, &userprofile.SecretAnswer, &userprofile.Photo)
@@ -389,7 +389,7 @@ func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
@@ -410,7 +410,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
@@ -432,7 +432,7 @@ func LogoutPost(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
@@ -447,7 +447,7 @@ func SignupPost(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
@@ -468,7 +468,7 @@ func GetProfilePost(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
@@ -487,18 +487,18 @@ func GetProfilePost(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(profile)
 }
 
-func UpdateUserProfilePost(w http.ResponseWriter, r *http.Request) {
+func UpdateProfilePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	var input UpdateUserProfileRequest
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Unable to understand request", 400)
 		return
 	}
 
-	profile, err := dbUpdateUserProfilePost(input.SessionID)
+	profile, err := dbUpdateProfilePost(input.SessionID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
