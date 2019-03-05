@@ -51,7 +51,7 @@ type ProfileRequest struct {
 	SessionID string `json:"sessionID"`
 }
 
-type UpdateUserProfileModel struct {
+type UpdateProfileModel struct {
 	Name             string  `json:"name"`
 	Password         string  `json:"password"`
 	Address          string  `json:"address"`
@@ -69,8 +69,9 @@ type UpdateUserProfileModel struct {
 	PatientPharmacy []SignupPatientPharmacy `json:"patientPharmacy,omitempty"`
 }
 
-type UpdateUserProfileRequest struct {
+type UpdateProfileRequest struct {
 	SessionID string `json:"sessionID"`
+	Password  string `json:"password"`
 }
 
 type PasswordResetModel struct {
@@ -247,6 +248,9 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.PostalCode == "" {
 		return AuthResponse{}, errors.New("Postal Code is required")
 	}
+	if sm.PharmacyLocation == "" {
+		return AuthResponse{}, errors.New("Pharmacy Location is required")
+	}
 	if sm.Password == "" {
 		return AuthResponse{}, errors.New("Password is required")
 	}
@@ -303,9 +307,9 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	} else {
 		photo = sql.NullString{String: sm.Photo, Valid: false}
 	}
-	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARMACYLOCATION`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
-	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.Phone, docLicStr, sm.SecretQuestion, sm.SecretAnswer, photo)
+	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, docLicStr, sm.SecretQuestion, sm.SecretAnswer, photo)
 	if signupErr != nil {
 		return AuthResponse{}, errors.New("Internal error please try again later")
 	}
@@ -335,11 +339,11 @@ func dbGetProfilePost(s string) (ProfileModel, error) {
 		return profile, errors.New("Bad Session")
 	}
 
-	profileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	profileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`PHARMACYLOCATION`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
 	defer profileSt.Close()
 
 	var licensesStr string
-	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &licensesStr, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
+	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &licensesStr, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
 	if err != nil {
 		return profile, errors.New("Unable to fetch profile")
 	}
@@ -350,10 +354,10 @@ func dbGetProfilePost(s string) (ProfileModel, error) {
 	return profile, nil
 }
 
-func dbUpdateProfilePost(s string) (UpdateUserProfileModel, error) {
+func dbUpdateProfilePost(s string) (UpdateProfileModel, error) {
 	dbUserClearSessions()
 
-	var userprofile UpdateUserProfileModel
+	var userprofile UpdateProfileModel
 
 	db := getDB()
 	if db == nil {
@@ -367,11 +371,11 @@ func dbUpdateProfilePost(s string) (UpdateUserProfileModel, error) {
 		return userprofile, errors.New("Bad Session")
 	}
 
-	userprofileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	userprofileSt, _ := db.Prepare("select `NAME`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`PHARMACYLOCATION`,`LICENSES`, `SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
 	defer userprofileSt.Close()
 
 	var licensesStr string
-	err := userprofileSt.QueryRow(userID).Scan(&userprofile.Name, &userprofile.Address, &userprofile.City, &userprofile.State, &userprofile.PostalCode, &userprofile.Phone, &licensesStr, &userprofile.SecretQuestion, &userprofile.SecretAnswer, &userprofile.Photo)
+	err := userprofileSt.QueryRow(userID).Scan(&userprofile.Name, &userprofile.Address, &userprofile.City, &userprofile.State, &userprofile.PostalCode, &userprofile.Phone, &userprofile.PharmacyLocation, &licensesStr, &userprofile.SecretQuestion, &userprofile.SecretAnswer, &userprofile.Photo)
 	if err != nil {
 		return userprofile, errors.New("Unable to fetch profile")
 	}
@@ -379,7 +383,13 @@ func dbUpdateProfilePost(s string) (UpdateUserProfileModel, error) {
 		json.Unmarshal([]byte(licensesStr), &userprofile.DoctorLicences)
 	}
 
-	return userprofile, nil
+	dbAuditAction(userID, "UserProfile:Success")
+
+	return userprofile{
+		SessionID: sessionID.String(),
+		Password:  password.String(),
+	}
+
 }
 
 func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
