@@ -58,7 +58,7 @@ func dbGetUserID(session string) int {
 	db := getDB()
 	if db == nil {
 		return 0
-	}
+		}
 	defer db.Close()
 
 	st, err := db.Prepare("select USER_ID from `dod`.`SESSIONS` where `SESSION_ID` = ?")
