@@ -81,17 +81,7 @@ CREATE TABLE `EXAMS` (
   UNIQUE KEY `VISIT_ID_UNIQUE` (`VISIT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `PRESCRIPTIONS` (
-  `PRESCRIPTION_ID` int(10) unsigned NOT NULL,
-  `PATIENT_USER_ID` int(10) unsigned NOT NULL,
-  `DOCTOR_USER_ID` int(10) unsigned NOT NULL,
-  `VISIT_ID` int(10) unsigned NOT NULL,
-  `CREATED_TIME` datetime NOT NULL,
-  `NAME` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `INSTRUCTIONS` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `REFILLS` int(11) NOT NULL,
-  PRIMARY KEY (`PATIENT_USER_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+PRESCRIPTION_ID
 
 /*
  * Load sample data
