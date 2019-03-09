@@ -5,7 +5,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -280,22 +279,9 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 
 	//setup data to insert
 	pHash := hashPassword(sm.Password)
-	var docLicStr sql.NullString
-	if sm.DoctorLicences != nil {
-		jsonStr, _ := json.Marshal(sm.DoctorLicences)
-		docLicStr = sql.NullString{String: string(jsonStr), Valid: true}
-	} else {
-		docLicStr = sql.NullString{String: docLicStr.String, Valid: false}
-	}
-	var photo sql.NullString
-	if sm.Photo != "" {
-		photo = sql.NullString{String: sm.Photo, Valid: true}
-	} else {
-		photo = sql.NullString{String: sm.Photo, Valid: false}
-	}
 	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
-	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, docLicStr, sm.SecretQuestion, sm.SecretAnswer, photo)
+	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, sm.SecretQuestion, sm.SecretAnswer, sm.Photo)
 	if signupErr != nil {
 		return AuthResponse{}, errors.New("Internal error please try again later")
 	}
@@ -322,7 +308,7 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 	defer db.Close()
 
 	//fetch profile using session dbGetUserID
-	userID := dbGetUserID(s)
+	userID, role := dbGetUserIDAndRole(s)
 	if userID == 0 {
 		return profile, errors.New("Bad Session")
 	}
@@ -332,15 +318,23 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 
 	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Role, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
 	if err != nil {
-		return profile, errors.New("Unable to fetch profile")
+		return profile, err //errors.New("Unable to fetch profile")
 	}
 
-	//TODO: get doctor licenses if role is doctor
+	if role == "doctor" {
+		//TODO: get doctor licenses if role is doctor
+		profile.DoctorLicences = []SignupDoctorLicences{}
+		tmpState := States("ak")
+		profile.DoctorLicences = append(profile.DoctorLicences, SignupDoctorLicences{
+			License: "CSDFLOJSDOJ123123",
+			State:   &tmpState,
+		})
+	}
 
 	return profile, nil
 }
 
-func dbUpdateProfilePost(sessionId string, profile UpdateProfileModel) error {
+func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	dbUserClearSessions()
 
 	db := getDB()
@@ -350,7 +344,7 @@ func dbUpdateProfilePost(sessionId string, profile UpdateProfileModel) error {
 	defer db.Close()
 
 	//fetch profile using session dbGetUserID
-	userID, role := dbGetUserIDAndRole(sessionId)
+	userID, role := dbGetUserIDAndRole(sessionID)
 	if userID == 0 {
 		return errors.New("Bad Session")
 	}
