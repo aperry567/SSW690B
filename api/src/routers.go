@@ -96,10 +96,10 @@ var routes = Routes{
 	},
 
 	Route{
-		"GetProfilePost",
-		strings.ToUpper("Post"),
+		"GetProfileGet",
+		strings.ToUpper("Get"),
 		"/api/getProfile",
-		GetProfilePost,
+		GetProfileGet,
 	},
 
 	Route{

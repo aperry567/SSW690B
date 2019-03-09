@@ -211,6 +211,9 @@ paths:
               schema:
                 type: object
                 properties:
+                  role:
+                    type: string
+                    example: "doctor, patient"
                   name:
                     type: string
                     example: "MR Test"
@@ -264,55 +267,56 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "MR Test"
+                address:
+                  type: string
+                  example: "1313 Mockingbird ln\nNew York, NY 12345"
+                city:
+                  type: string
+                state:
+                  $ref: '#/components/schemas/States'
+                postalCode:
+                  type: string
+                phone:
+                  type: string
+                  example: "123-456-7890"
+                photo:
+                  type: string
+                  example: ""
+                secretQuestion:
+                  type: string
+                  example: "what is your favorite color?"
+                secretAnswer:
+                  type: string
+                  example: "blue"
+                doctorLicences:
+                  description: required for doctor sign-ups
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      state:
+                        $ref: '#/components/schemas/States'
+                      license:
+                        type: string
       responses:
         '200':
-          description: Updated User Profile returned
-          content:
-            'application/json':
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MR Test"
-                  address:
-                    type: string
-                    example: "1313 Mockingbird ln\nNew York, NY 12345"
-                  city:
-                    type: string
-                  state:
-                    $ref: '#/components/schemas/States'
-                  postalCode:
-                    type: string
-                  phone:
-                    type: string
-                    example: "123-456-7890"
-                  photo:
-                    type: string
-                    example: ""
-                  secretQuestion:
-                    type: string
-                    example: "what is your favorite color?"
-                  secretAnswer:
-                    type: string
-                    example: "blue"
-                  doctorLicences:
-                    description: required for doctor sign-ups
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        state:
-                          $ref: '#/components/schemas/States'
-                        license:
-                          type: string
+          description: Updated profile
         '400':
-          description: Unable to fetch profile
+          description: Unable to update profile
           content:
             'application/json':
               schema:
                 type: string
-                example: Could not fetch profile
+                example: Could not update profile
         '401':
           description: User is not signed in.  Return to login screen.
   /getPatientHomeItems:
@@ -507,7 +511,7 @@ components:
                 type: string
               icon:
                 type: string
-                description: base64 image string
+                description: "string title from https://docs.flutter.io/flutter/material/Icons-class.html"
               apiURL:
                 type: string
               screenType:
