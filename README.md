@@ -1,6 +1,6 @@
 # Flutter
 
-![Flutter](https://flutter.dev/assets/homepage/carousel/slide_4-layer_2-7455a67b3c69f4f5f0c3f61322c5216d32ac191fa8ddb393654a87dc67c9ead2.png)
+![Flutter](https://cdn-images-1.medium.com/max/1600/1*TFZQzyVAHLVXI_wNreokGA.png)
 
 ## Environment Setup
 
