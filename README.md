@@ -1,6 +1,6 @@
 # Flutter
 
-![Flutter](https://flutter.dev/assets/homepage/carousel/phone_bezel-467ab8d838e5e2d2d3f347f766173ccc365220223692215416e4ce7342f2212f.png)
+![Flutter](https://flutter.dev/assets/homepage/carousel/slide_4-layer_2-7455a67b3c69f4f5f0c3f61322c5216d32ac191fa8ddb393654a87dc67c9ead2.png)
 
 ## Environment Setup
 
