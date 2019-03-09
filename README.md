@@ -13,3 +13,9 @@ https://flutter.dev/docs
 ## Useful Articles
 
 https://medium.com/flutter-community/flutter-listview-and-scrollphysics-a-detailed-look-7f0912df2754
+
+
+# Help to test
+
+Install the /app/app.apk to your android device or virtual device. Then, test it.
+the apk file was updated on 9/Mar
