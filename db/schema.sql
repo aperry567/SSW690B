@@ -11,7 +11,7 @@
 -- DROP TABLE `dod`.`VISITS`;
 
 
-/*CREATE TABLE `AUDIT_LOG` (
+CREATE TABLE `AUDIT_LOG` (
   `AUDIT_LOG_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `USER_ID` int(10) unsigned NOT NULL,
   `TIMESTAMP` datetime NOT NULL,
@@ -20,7 +20,7 @@
   UNIQUE KEY `AUDIT_LOG_ID_UNIQUE` (`AUDIT_LOG_ID`),
   KEY `user_fk_idx` (`USER_ID`),
   CONSTRAINT `user_fk` FOREIGN KEY (`USER_ID`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `EXAMS` (
   `EXAM_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -28,8 +28,8 @@ CREATE TABLE `EXAMS` (
   `DOCTOR_USER_ID` int(11) unsigned NOT NULL,
   `VISIT_ID` int(10) unsigned NOT NULL,
   `EXAM_TIME` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `DESC` longtext COLLATE utf8_unicode_ci,
-  `LOCATION` longtext COLLATE utf8_unicode_ci,
+  `DESC` longtext COLLATE utf8_unicode_ci NOT NULL,
+  `LOCATION` longtext COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`EXAM_ID`),
   KEY `patient_fk_idx2` (`PATIENT_USER_ID`),
   KEY `doctor_fk_idx2` (`DOCTOR_USER_ID`),
@@ -44,8 +44,7 @@ CREATE TABLE `LICENSES` (
   PRIMARY KEY (`LICENSE_ID`,`STATE`),
   KEY `lic_user_fk_idx` (`USER_ID`),
   CONSTRAINT `lic_user_fk` FOREIGN KEY (`USER_ID`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-SELECT * FROM dod.LICENSES;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;;
 
 CREATE TABLE `PRESCRIPTIONS` (
   `PRESCRIPTION_ID` int(10) unsigned NOT NULL,
@@ -84,10 +83,10 @@ CREATE TABLE `USERS` (
   `STATE` text COLLATE utf8_unicode_ci NOT NULL,
   `POSTAL_CODE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
   `PHONE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PHOTO` longtext COLLATE utf8_unicode_ci,
+  `PHOTO` longtext COLLATE utf8_unicode_ci NOT NULL,
   `SECRET_Q` text COLLATE utf8_unicode_ci NOT NULL,
   `SECRET_A` text COLLATE utf8_unicode_ci NOT NULL,
-  `PHARM_LOC` text COLLATE utf8_unicode_ci,
+  `PHARM_LOC` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `USER_ID_UNIQUE` (`USER_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -98,13 +97,13 @@ CREATE TABLE `VISITS` (
   `DOCTOR_USER_ID` int(11) unsigned NOT NULL,
   `VISIT_REASON` text COLLATE utf8_unicode_ci NOT NULL,
   `VISIT_TIME` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `NOTES` longtext COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`VISITS_ID`),
+  `NOTES` longtext COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`VISIT_ID`),
   KEY `patient_fk_idx` (`PATIENT_USER_ID`),
   KEY `doctor_fk_idx` (`DOCTOR_USER_ID`),
   CONSTRAINT `doctor_fk` FOREIGN KEY (`DOCTOR_USER_ID`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `patient_fk` FOREIGN KEY (`PATIENT_USER_ID`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*
  * Load sample data
