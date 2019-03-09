@@ -385,11 +385,7 @@ func dbUpdateProfilePost(s string) (UpdateProfileModel, error) {
 
 	dbAuditAction(userID, "UserProfile:Success")
 
-	return userprofile{
-		SessionID: sessionID.String(),
-		Password:  password.String(),
-	}
-
+	return userprofile, nil
 }
 
 func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
@@ -500,7 +496,7 @@ func GetProfilePost(w http.ResponseWriter, r *http.Request) {
 func UpdateProfilePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	var input UpdateUserProfileRequest
+	var input UpdateProfileRequest
 
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {

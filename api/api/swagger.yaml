@@ -254,7 +254,7 @@ paths:
                 example: Could not fetch profile
         '401':
           description: User is not signed in.  Return to login screen.
-  /updateprofile:
+  /updateProfile:
     post:
       tags:
         - Authentication
