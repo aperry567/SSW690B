@@ -65,7 +65,7 @@ paths:
       responses:
         '200':
           description: Successfully logged out.  Only response possible for security reasons.
-  /passwordRest:
+  /passwordReset:
     post:
       tags:
         - Authentication
