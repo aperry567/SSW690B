@@ -23,9 +23,17 @@ type LogoutModel struct {
 	SessionID string `json:"sessionID"`
 }
 
+type AuthNav struct {
+	Title      string `json:"title"`
+	Icon       string `json:"icon"`
+	APIURL     string `json:"apiURL"`
+	ScreenType string `json:"screenType"`
+}
+
 type AuthResponse struct {
-	SessionID string `json:"sessionID"`
-	Role      string `json:"role"`
+	SessionID string    `json:"sessionID"`
+	Role      string    `json:"role"`
+	Nav       []AuthNav `json:"nav"`
 }
 
 type ProfileModel struct {
@@ -134,6 +142,7 @@ func dbUserLogin(e string, p string) AuthResponse {
 	return AuthResponse{
 		SessionID: sessionID.String(),
 		Role:      role,
+		Nav:       getNav(sessionID.String(), role),
 	}
 }
 
