@@ -7,7 +7,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -260,7 +259,10 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.Role != "patient" && sm.Role != "doctor" {
 		return AuthResponse{}, errors.New("Invalid Role selected")
 	}
-	if sm.DoctorLicences != nil {
+	if sm.DoctorLicences == nil && sm.Role == "doctor" {
+		return AuthResponse{}, errors.New("Doctors must have one license")
+	}
+	if sm.DoctorLicences != nil && sm.Role == "doctor" {
 		for _, lic := range sm.DoctorLicences {
 			if lic.License == "" || lic.State == nil {
 				return AuthResponse{}, errors.New("All Doctor Licenceses must include the number and state")
@@ -318,17 +320,31 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 
 	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Role, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
 	if err != nil {
-		return profile, err //errors.New("Unable to fetch profile")
+		return profile, errors.New("Unable to fetch profile")
 	}
 
+	//get doctor licenses if role is doctor
 	if role == "doctor" {
-		//TODO: get doctor licenses if role is doctor
+		licenseSt, _ := db.Prepare("SELECT `LICENSE_ID`,`STATE` FROM `dod`.`LICENSES` WHERE `USER_ID` = ?")
+		defer licenseSt.Close()
+
+		rows, licErr := licenseSt.Query(userID)
+		if licErr != nil {
+			return profile, errors.New("Unable to fetch licenses")
+		}
 		profile.DoctorLicences = []SignupDoctorLicences{}
-		tmpState := States("ak")
-		profile.DoctorLicences = append(profile.DoctorLicences, SignupDoctorLicences{
-			License: "CSDFLOJSDOJ123123",
-			State:   &tmpState,
-		})
+		for rows.Next() {
+			var lic string
+			var state string
+			if err := rows.Scan(&lic, &state); err != nil {
+				return profile, errors.New("Unable to fetch license data")
+			}
+			tmpState := States(state)
+			profile.DoctorLicences = append(profile.DoctorLicences, SignupDoctorLicences{
+				License: lic,
+				State:   &tmpState,
+			})
+		}
 	}
 
 	return profile, nil
@@ -348,25 +364,91 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	if userID == 0 {
 		return errors.New("Bad Session")
 	}
+	if profile.Address == "" {
+		return errors.New("Address is required")
+	}
+	if profile.City == "" {
+		return errors.New("City is required")
+	}
+	if profile.State == nil {
+		return errors.New("State is required")
+	}
+	if profile.PostalCode == "" {
+		return errors.New("Postal Code is required")
+	}
+	if profile.PharmacyLocation == "" && role == "patient" {
+		return errors.New("Pharmacy Location is required")
+	}
+	if profile.Password != "" && validatePassword(profile.Password) == false {
+		return errors.New("Password not complex enough")
+	}
+	if profile.SecretQuestion == "" {
+		return errors.New("Secret Question is required")
+	}
+	if profile.SecretAnswer == "" {
+		return errors.New("Secret Answer is required")
+	}
+	if profile.Name == "" {
+		return errors.New("Name is required")
+	}
+	if profile.Phone == "" {
+		return errors.New("Phone is required")
+	}
+	if profile.DoctorLicences == nil && role == "doctor" {
+		return errors.New("Doctors must have one license")
+	}
+	if profile.DoctorLicences != nil {
+		for _, lic := range profile.DoctorLicences {
+			if lic.License == "" || lic.State == nil {
+				return errors.New("All Doctor Licenceses must include the number and state")
+			}
+		}
+	}
 
-	//TODO: update record instead of selecting it [Done]
-	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `USER_ID` = ? WHERE `ROLE` = ?")
+	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `NAME` = ?, `ADDR`= ?,`CITY`= ?,`STATE`= ?,`POSTAL_CODE`= ?,`PHARM_LOC`= ?,`PHONE`= ?,`SECRET_Q`= ?, `SECRET_A`= ?, `PHOTO`= ? WHERE `USER_ID` = ?")
 	defer profileSt.Close()
 
-	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
+	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.Phone, profile.PharmacyLocation, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, userID)
 	if err != nil {
-		return errors.New("Unable to fetch profile")
+		return errors.New("Unable to update profile")
 	}
 
-	//TODO: pull back list of doctor licenses if role doctor
+	if profile.Password != "" {
+		passwordStr := hashPassword(profile.Password)
+
+		passwordSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `PASSW`=? WHERE USER_ID = ?")
+		defer passwordSt.Close()
+
+		if _, err := profileSt.Exec(passwordStr, userID); err != nil {
+			dbAuditAction(userID, "UserProfile:Update")
+			return errors.New("Unable to update password")
+		}
+	}
+
+	//handle doctor licenses if role doctor
 	if role == "doctor" {
-		fmt.Println(role)
-		//TODO: if no licenses then delete all found licenses
-		//TODO: if all are the same then do nothing else remove or add missing ones
-		//TODO: make sure to compare both the incoming list of licenses and the existing ones to find ones that don't match
+		//delete all existing licenses for doctor
+		deleteLicenseSt, _ := db.Prepare("DELETE from `dod`.`LICENSES` WHERE `USER_ID` = ?")
+		defer deleteLicenseSt.Close()
+
+		if _, err := deleteLicenseSt.Exec(userID); err != nil {
+			dbAuditAction(userID, "UserProfile:Update")
+			return errors.New("Unable to update password")
+		}
+
+		//insert new license for doctor
+		for _, lic := range profile.DoctorLicences {
+			insertLicenseSt, _ := db.Prepare("INSERT INTO `dod`.`LICENSES` (`LICENSE_ID`,`STATE`,`USER_ID`) VALUES (?,?,?)")
+			defer insertLicenseSt.Close()
+
+			if _, err := insertLicenseSt.Exec(lic.License, lic.State, userID); err != nil {
+				dbAuditAction(userID, "UserProfile:Update")
+				return errors.New("Unable to update licenses")
+			}
+		}
 	}
 
-	dbAuditAction(userID, "UserProfile:Success")
+	dbAuditAction(userID, "UserProfile:Update")
 	return nil
 }
 
