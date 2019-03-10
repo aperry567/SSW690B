@@ -349,8 +349,8 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 		return errors.New("Bad Session")
 	}
 
-	//TODO: update record instead of selecting it
-	profileSt, _ := db.Prepare("select `ROLE`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`PHARM_LOC`,`SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	//TODO: update record instead of selecting it [Done]
+	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `USER_ID` = ? WHERE `ROLE` = ?")
 	defer profileSt.Close()
 
 	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
