@@ -1,26 +1,12 @@
-# Flutter
+# SSW690B
+SSW690B Spring 2019 Group Doctors Online Project by Ayana, Tianhao, John and Jinal
 
-![Flutter](https://cdn-images-1.medium.com/max/1600/1*TFZQzyVAHLVXI_wNreokGA.png)
+[Requirements](REQUIREMENTS.md)
 
-## Environment Setup
+[Use Cases](USE_CASES.md)
 
-https://flutter.dev/docs/get-started/install
+[Doctors Workflow](\Screens and Flow - Doctors.svg)
+[Patient Workflow](\Screens and Flow - Patients.svg)
+[System Admin](\Screens and Flow - System Admin.svg)
 
-## Documentation
-
-https://flutter.dev/docs
-
-## Tuturials
-
-https://codelabs.developers.google.com/?cat=Flutter
-
-## Super Useful Articles(please update)
-
-https://medium.com/flutter-community/flutter-listview-and-scrollphysics-a-detailed-look-7f0912df2754
-
-
-# Help to test
-
-Install the /app/app.apk to your android device or virtual device. Then, test it.
-the apk file was updated on 9/Mar
 
