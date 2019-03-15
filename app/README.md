@@ -21,6 +21,7 @@ https://medium.com/flutter-community/flutter-listview-and-scrollphysics-a-detail
 
 # Help to test
 
-All the apk files are located at /app/release
+All the apk files are located at /app/release 
+https://github.com/aperry567/SSW690B/tree/development/app/release
 Please download the latest version then test it.
 
