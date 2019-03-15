@@ -92,3 +92,22 @@ func dbGetUserIDAndRole(session string) (int, string) {
 
 	return userID, role
 }
+
+func dbGetPatientUserIDForVisitID(doctorID int, visitID string) int {
+	db := getDB()
+	if db == nil {
+		return 0
+	}
+	defer db.Close()
+
+	st, err := db.Prepare("select `PATIENT_USER_ID` from `dod`.`VISITS` where `DOCTOR_USER_ID` = ? and VISIT_ID = ?")
+	if err != nil {
+		return 0
+	}
+	defer st.Close()
+
+	var patientID int
+	st.QueryRow(doctorID, visitID).Scan(&patientID)
+
+	return patientID
+}

@@ -89,10 +89,31 @@ var routes = Routes{
 	},
 
 	Route{
-		"UpdateVisitPost",
+		"GetVisitDetail",
+		strings.ToUpper("Get"),
+		"/api/getVisitDetail",
+		GetVisitDetail,
+	},
+
+	Route{
+		"GetVisitRelatedItems",
+		strings.ToUpper("Get"),
+		"/api/getVisitRelatedItems",
+		GetVisitRelatedItems,
+	},
+
+	Route{
+		"AddVisitRelatedItems",
+		strings.ToUpper("Post"),
+		"/api/addVisitRelatedItems",
+		AddVisitRelatedItems,
+	},
+
+	Route{
+		"UpdateVisit",
 		strings.ToUpper("Post"),
 		"/api/updateVisit",
-		UpdateVisitPost,
+		UpdateVisit,
 	},
 
 	Route{

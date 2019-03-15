@@ -65,7 +65,7 @@ paths:
       responses:
         '200':
           description: Successfully logged out.  Only response possible for security reasons.
-  /passwordReset:
+  /passwordRest:
     post:
       tags:
         - Authentication
@@ -365,10 +365,10 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
-  /getPayments:
+  /getVisitDetail:
     get:
       tags:
-        - Lists
+        - Visits
       parameters:
         - in: query
           name: sessionID
@@ -377,22 +377,21 @@ paths:
             type: string
             format: uuid
         - in: query
-          name: listFilter
-          required: false
+          name: visitID
+          required: true
           schema:
             type: string
       responses:
         '200':
-          description: List of user's payments (recieved or sent)
+          description: Get Visit Details
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/ListResponse"
-  /getPatients:
-    description: List of patients for a doctor
+                $ref: "#/components/schemas/DetailsResponse"
+  /getVisitRelatedItems:
     get:
       tags:
-        - Lists
+        - Visits
       parameters:
         - in: query
           name: sessionID
@@ -401,17 +400,51 @@ paths:
             type: string
             format: uuid
         - in: query
-          name: listFilter
+          name: visitID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: filter
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: List of patients for a doctor
+          description: Get Related Items for a Visit
           content:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+  /addVisitRelatedItems:
+    post:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: filter
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/AddRelatedItemRequest"
+      responses:
+        '200':
+          description: Related Item updated
   /updateVisit:
     post:
       tags:
@@ -451,6 +484,17 @@ paths:
           description: User is not signed in.  Return to login screen.
 components:
   schemas:
+    AddRelatedItemRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        dateTime:
+          type: string
+        details:
+          type: string
     ListResponse:
       type: object
       properties:
@@ -464,6 +508,21 @@ components:
               value:
                 type: string
                 example: "listFilter=0"
+              updateURL:
+                type: string
+              addDetails:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    fieldName:
+                      type: string
+                    required:
+                      type: boolean
+                    isDataTime:
+                      type: boolean
         items:
           type: array
           items:
@@ -521,6 +580,37 @@ components:
                   - detail
                   - profile
                   - findDoctor
+    DetailsResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        titleEditable:
+          type: boolean
+        subtitle:
+          type: string
+        subtitleEditable:
+          type: boolean
+        label:
+          type: string
+        labelColor:
+          type: string
+        dateTime:
+          type: string
+        dateTimeEditable:
+          type: boolean
+        photo:
+          type: string
+        details:
+          type: string
+        detailsEditable:
+          type: boolean
+        chatURL:
+          type: string
+        relatedItemURL:
+          type: string
+        saveURL:
+          type: string
     States:
       type: string
       enum:
