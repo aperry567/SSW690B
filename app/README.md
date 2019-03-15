@@ -14,7 +14,7 @@ https://flutter.dev/docs
 
 https://codelabs.developers.google.com/?cat=Flutter
 
-## Super Useful Articles(please update)
+## Super Useful Articles
 
 https://medium.com/flutter-community/flutter-listview-and-scrollphysics-a-detailed-look-7f0912df2754
 
