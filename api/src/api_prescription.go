@@ -1,7 +1,7 @@
 //Prescription code for api_presciption.go
 /*
  * Doctors on Demand API prescriptions
- */
+*/
 package main
 
 import (
