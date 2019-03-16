@@ -308,7 +308,6 @@ func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")
-	filter := r.URL.Query().Get("filter")
 
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)

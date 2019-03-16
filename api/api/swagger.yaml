@@ -449,22 +449,28 @@ paths:
     post:
       tags:
         - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           'application/json':
             schema:
               type: object
               properties:
-                sessionID:
-                  type: string
-                visitID:
-                  type: integer
-                notes:
+                details:
                   type: string
               required:
-                - sessionID
-                - visitID
-                - notes
+                - details
       responses:
         '200':
           description: Visit updated
