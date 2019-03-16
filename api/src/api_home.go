@@ -31,28 +31,25 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	var rows *sql.Rows
 	var err error
 
-	// all
-	if filter == "" {
-		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID, userID, userID)
-		defer selectSt.Close()
-	}
 	// exam
 	if filter == "1" {
 		selectSt, _ = db.Prepare(examSelect + " ORDER BY DATETIME DESC")
 		rows, err = selectSt.Query(userID)
 		defer selectSt.Close()
-	}
-	// visit
-	if filter == "2" {
+	} else if filter == "2" {
+		// visit
 		selectSt, _ = db.Prepare(visitSelect + " ORDER BY DATETIME DESC")
 		rows, err = selectSt.Query(userID)
 		defer selectSt.Close()
-	}
-	// prescription
-	if filter == "3" {
+	} else if filter == "3" {
+		// prescription
 		selectSt, _ = db.Prepare(prescriptSelect + " ORDER BY DATETIME DESC")
 		rows, err = selectSt.Query(userID)
+		defer selectSt.Close()
+	} else {
+		// all
+		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
+		rows, err = selectSt.Query(userID, userID, userID)
 		defer selectSt.Close()
 	}
 
@@ -97,7 +94,7 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 Takes in:
 
 sessionID
-listFilter
+filter
 returns:
 List response
 
@@ -113,7 +110,7 @@ func GetPatientHomeItemsGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
-	listFilter := r.URL.Query().Get("listFilter")
+	listFilter := r.URL.Query().Get("filter")
 
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)

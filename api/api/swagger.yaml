@@ -18,8 +18,8 @@ tags:
     description: 'Login, Signup, Logout, Password Reset, Profile, Update Profile'
   - name: Visits
     description: 'Patient visits'
-  - name: Lists
-    description: 'All screens that deal with lists of data'
+  - name: Home
+    description: 'All home screens that deal with lists of data'
 paths:
   /login:
     post:
@@ -322,7 +322,7 @@ paths:
   /getPatientHomeItems:
     get:
       tags:
-        - Lists
+        - Home
       parameters:
         - in: query
           name: sessionID
@@ -331,7 +331,7 @@ paths:
             type: string
             format: uuid
         - in: query
-          name: listFilter
+          name: filter
           required: false
           schema:
             type: string
@@ -345,7 +345,7 @@ paths:
   /getDoctorHomeItems:
     get:
       tags:
-        - Lists
+        - Home
       parameters:
         - in: query
           name: sessionID
