@@ -1,1 +1,4 @@
-#API code for Exams using Visits as a guide
+//Exam code for api_exam.go
+/*
+ * Doctors on Demand API exam
+ */
