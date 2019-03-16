@@ -14,30 +14,8 @@ import (
 	"time"
 )
 
-type GetVisitsRequest struct {
-	SessionID string `json:"sessionID"`
-	PatientID int    `json:"patientID"`
-}
-
-type VisitsPersonModel struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Photo string `json:"photo"`
-}
-
-type GetVisitsResponse struct {
-	ID        int               `json:"id"`
-	VisitTime string            `json:"visitTime"`
-	Reason    string            `json:"reason"`
-	Doctor    VisitsPersonModel `json:"doctor"`
-	Patient   VisitsPersonModel `json:"patient"`
-	Notes     string            `json:"notes"`
-}
-
 type UpdateVisitRequest struct {
-	SessionID string `json:"sessionID"`
-	VisitID   int    `json:"visitID"`
-	Notes     string `json:"notes"`
+	Details string `json:"details"`
 }
 
 func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (ListResponse, error) {
@@ -295,7 +273,7 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 	return resp, nil
 }
 
-func dbUpdateVisit(req UpdateVisitRequest) error {
+func dbUpdateVisit(sessionID string, visitID string, req UpdateVisitRequest) error {
 	dbUserClearSessions()
 
 	db := getDB()
@@ -305,7 +283,7 @@ func dbUpdateVisit(req UpdateVisitRequest) error {
 	defer db.Close()
 
 	//fetch user_id and role
-	userID, role := dbGetUserIDAndRole(req.SessionID)
+	userID, role := dbGetUserIDAndRole(sessionID)
 	if userID == 0 {
 		return errors.New("Bad Session")
 	}
@@ -316,7 +294,7 @@ func dbUpdateVisit(req UpdateVisitRequest) error {
 
 	//build query string
 	visitSt, _ := db.Prepare("update dod.`VISITS` v set v.`NOTES` = ? where v.`VISIT_ID` = ? and v.DOCTOR_USER_ID = ?")
-	_, err := visitSt.Exec(req.Notes, req.VisitID, userID)
+	_, err := visitSt.Exec(req.Details, visitID, userID)
 	defer visitSt.Close()
 	if err != nil {
 		return errors.New("Unable to update visit")
@@ -328,6 +306,19 @@ func dbUpdateVisit(req UpdateVisitRequest) error {
 func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
+	sessionID := r.URL.Query().Get("sessionID")
+	visitID := r.URL.Query().Get("visitID")
+	filter := r.URL.Query().Get("filter")
+
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+	if visitID == "" {
+		http.Error(w, "Missing required visitID parameter", 400)
+		return
+	}
+
 	var input UpdateVisitRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -335,7 +326,7 @@ func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := dbUpdateVisit(input); err != nil {
+	if err := dbUpdateVisit(sessionID, visitID, input); err != nil {
 		if err.Error() == "Bad Session" {
 			http.Error(w, "Invalid credentials", 401)
 			return
