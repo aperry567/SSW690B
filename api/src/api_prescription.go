@@ -1,7 +1,7 @@
 //Prescription code for api_presciption.go
 /*
  * Doctors on Demand API prescriptions
-*/
+ */
 package main
 
 import (
@@ -13,10 +13,12 @@ import (
 )
 
 type UpdatePrescriptionRequest struct {
-	Details string `json:"details"`
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+	Details  string `json:"details"`
 }
 
-func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string, title string, subtitle string, subtitleEditable string, label string, labelColor string) (DetailResponse, error) {
+func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string) (DetailResponse, error) {
 	dbUserClearSessions()
 
 	var resp DetailResponse
@@ -39,7 +41,7 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string, title s
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, CREATED_TIME as DATETIME, CONCAT('Prescriptions ', u.NAME) as TITLE,'Prescription' as LABEL, '0xffcef7b7' as LABEL_COLOR, NOTES as `DESC`, PRESCRIPTION_REASON as SUBTITLE FROM dod.PRESCRIPTIONS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PRESCRIPTION_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO as PHOTO, CREATED_TIME as DATETIME, CONCAT('Prescriptions ', u.NAME) as TITLE,'Prescription' as LABEL, '" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, NOTES as `DESC`, PRESCRIPTION_REASON as SUBTITLE FROM dod.PRESCRIPTIONS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PRESCRIPTION_ID = ? AND v.`PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
@@ -52,18 +54,13 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string, title s
 	}
 
 	if role == "doctor" {
-		resp.title = "Name",
-		resp.TitleEditable: true,
-		resp.Subtitle = "",
-		resp.SubtitleEditable: true,
-		resp.Details = &resp.Details,
-		resp.DetailsEditable = true,
-		resp.Label = "Rx",
-		resp.LabelColor = "0xff24d622",
-		resp.photo = "",
-		resp.dateTime = &resp.DateTime,
-		resp.chatURL = "",
-		resp.RelatedItemsURL = "",
+		resp.TitleEditable = true
+		resp.SubtitleEditable = true
+		resp.DetailsEditable = true
+		resp.Label = "Rx"
+		resp.LabelColor = LABEL_COLOR_PRESCRIPTION
+		resp.ChatURL = ""
+		resp.RelatedItemsURL = ""
 		resp.UpdateURL = "/api/UpdatePrescription?sessionID=" + sessionID + "&prescriptionID=" + prescriptionIDstr
 	}
 
@@ -89,9 +86,26 @@ func dbUpdatePrescription(sessionID string, prescriptionID string, req UpdatePre
 		return errors.New("Can only be used by doctors")
 	}
 
+	if req.Title == "" {
+		return errors.New("title is required")
+	}
+
+	if req.Subtitle == "" {
+		return errors.New("Subtitle is required")
+	}
+
+	refillStr := strings.Replace(req.Subtitle, "Refills: ", "", 1)
+	refillNum, numErr := strconv.ParseInt(refillStr, 0, 64)
+	if numErr != nil {
+		return errors.New("Refills must be a number")
+	}
+	if refillNum < 0 || refillNum > 20 {
+		return errors.New("Refills must be between 0 and 20")
+	}
+
 	//build query string
-	prescriptionSt, _ := db.Prepare("update dod.`PRESCRIPTIONS` v set v.`NOTES` = ? where v.`PRESCRIPTION_ID` = ? and v.DOCTOR_USER_ID = ?")
-	_, err := prescriptionSt.Exec(req.Details, prescriptionID, userID)
+	prescriptionSt, _ := db.Prepare("update dod.`PRESCRIPTIONS` v set v.`NAME` = ?, v.`REFILLS` = ?, v.`INSTRUCTIONS` = ? where v.`PRESCRIPTION_ID` = ? and v.DOCTOR_USER_ID = ?")
+	_, err := prescriptionSt.Exec(req.Title, refillNum, req.Details, prescriptionID, userID)
 	defer prescriptionSt.Close()
 	if err != nil {
 		return errors.New("Unable to update prescription")
@@ -105,9 +119,6 @@ func UpdatePrescription(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := r.URL.Query().Get("sessionID")
 	prescriptionID := r.URL.Query().Get("prescriptionID")
-	title := .URL.Query().Get("name") //Using placeholders for now
-	subtitle := .URL.Query().Get("refills") //Using placeholders for now
-	details := .URL.Query().Get("instructions") //Using placeholders for now
 
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)
@@ -115,18 +126,6 @@ func UpdatePrescription(w http.ResponseWriter, r *http.Request) {
 	}
 	if prescriptionID == "" {
 		http.Error(w, "Missing required prescriptionID parameter", 400)
-		return
-	}
-	if title == "" {
-		http.Error(w, "Missing required name parameter", 400)
-		return
-	}
-	if subtitle == "" {
-		http.Error(w, "Missing required refills parameter", 400)
-		return
-	}
-	if details == "" {
-		http.Error(w, "Missing required instructions parameter", 400)
 		return
 	}
 
@@ -137,7 +136,7 @@ func UpdatePrescription(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := dbUpdatePrescription(Subtitle, dateTime, input); err != nil {
+	if err := dbUpdatePrescription(sessionID, prescriptionID, input); err != nil {
 		if err.Error() == "Bad Session" {
 			http.Error(w, "Invalid credentials", 401)
 			return

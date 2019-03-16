@@ -1,4 +1,3 @@
-//Exam code for api_exam.go
 /*
  * Doctors on Demand API exam
  */
@@ -16,7 +15,7 @@ type UpdateExamRequest struct {
 	Details string `json:"details"`
 }
 
-func dbGetExamDetail(sessionID string, examIDstr string, title string, subtitle string, subtitleEditable string, label string, labelColor string) (DetailResponse, error) {
+func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error) {
 	dbUserClearSessions()
 
 	var resp DetailResponse
@@ -39,7 +38,7 @@ func dbGetExamDetail(sessionID string, examIDstr string, title string, subtitle 
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, EXAM_TIME as DATETIME, CONCAT('Examed ', u.NAME) as TITLE,'Exam' as LABEL, '0xffcef7b7' as LABEL_COLOR, NOTES as `DESC`, EXAM_REASON as SUBTITLE FROM dod.EXAMS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.EXAM_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO as PHOTO, EXAM_TIME as DATETIME, CONCAT('Examed ', u.NAME) as TITLE,'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, NOTES as `DESC`, EXAM_REASON as SUBTITLE FROM dod.EXAMS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.EXAM_ID = ? AND v.`PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
@@ -52,18 +51,13 @@ func dbGetExamDetail(sessionID string, examIDstr string, title string, subtitle 
 	}
 
 	if role == "doctor" {
-		resp.title = "Exam",
-		resp.photo = "",
-		resp.Subtitle = "<Location>",
-		resp.SubtitleEditable: true,
-		resp.dateTime = &resp.DateTime,
-		resp.DateTimeEditable:true,
-		resp.Label = "Exam",
-		resp.LabelColor = "0xff227cd6",
-		resp.Details = &resp.Details,
-		resp.DetailsEditable = true,
-		resp.chatURL = "",
-		resp.RelatedItemsURL = "",
+		resp.SubtitleEditable = true
+		resp.DateTimeEditable = true
+		resp.Label = "Exam"
+		resp.LabelColor = LABEL_COLOR_EXAM
+		resp.DetailsEditable = true
+		resp.ChatURL = ""
+		resp.RelatedItemsURL = ""
 		resp.UpdateURL = "/api/UpdateExam?sessionID=" + sessionID + "&examID=" + examIDstr
 	}
 
@@ -105,23 +99,13 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := r.URL.Query().Get("sessionID")
 	examID := r.URL.Query().Get("examID")
-	Subtitle := r.URL.Query().Get("sessionID")
-	dateTime := r.URL.Query().Get("examID")
 
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)
 		return
 	}
-	if visitID == "" {
+	if examID == "" {
 		http.Error(w, "Missing required visitID parameter", 400)
-		return
-	}
-	if Subtitle == "" {
-		http.Error(w, "Missing required location parameter", 400)
-		return
-	}
-	if dateTime == "" {
-		http.Error(w, "Missing required EXAM_TIME parameter", 400)
 		return
 	}
 
@@ -132,7 +116,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := dbUpdateExam(Subtitle, dateTime, input); err != nil {
+	if err := dbUpdateExam(sessionID, examID, input); err != nil {
 		if err.Error() == "Bad Session" {
 			http.Error(w, "Invalid credentials", 401)
 			return
@@ -157,8 +141,6 @@ func GetExamDetail(w http.ResponseWriter, r *http.Request) {
 	if examID == "" {
 		http.Error(w, "Missing required examID parameter", 400)
 		return
-	}
-	return
 	}
 
 	output, err := dbGetExamDetail(sessionID, examID)

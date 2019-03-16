@@ -94,11 +94,11 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	var examSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '0xff227cd6' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, EXAM_ID as ID FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, EXAM_ID as ID FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		examSelect = strings.Replace(examSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
-	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'0xff24d622' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, PRESCRIPTION_ID as ID FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, PRESCRIPTION_ID as ID FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		prescriptSelect = strings.Replace(prescriptSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
@@ -251,7 +251,7 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '0xffcef7b7' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
