@@ -23,9 +23,9 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	var visitSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '0xff227cd6' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, EXAM_ID as ID FROM dod.EXAMS WHERE PATIENT_USER_ID = ?"
-	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '0xffcef7b7' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, VISIT_ID as ID FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ?"
-	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'0xff24d622' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, PRESCRIPTION_ID as ID FROM dod.PRESCRIPTIONS WHERE PATIENT_USER_ID = ?"
+	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '0xff227cd6' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, '' as `DETAIL_LINK` FROM dod.EXAMS WHERE PATIENT_USER_ID = ?"
+	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '0xffcef7b7' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ?"
+	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'0xff24d622' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, '' as `DETAIL_LINK` FROM dod.PRESCRIPTIONS WHERE PATIENT_USER_ID = ?"
 
 	var selectSt *sql.Stmt
 	var rows *sql.Rows
@@ -39,7 +39,7 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	} else if filter == "2" {
 		// visit
 		selectSt, _ = db.Prepare(visitSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID)
+		rows, err = selectSt.Query(sessionID, userID)
 		defer selectSt.Close()
 	} else if filter == "3" {
 		// prescription
@@ -49,7 +49,7 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	} else {
 		// all
 		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID, userID, userID)
+		rows, err = selectSt.Query(userID, userID, sessionID, userID)
 		defer selectSt.Close()
 	}
 
@@ -60,8 +60,7 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	response.Items = []ListItem{}
 	for rows.Next() {
 		var item ListItem
-		var id string
-		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &id); err != nil {
+		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}
 		response.Items = append(response.Items, item)
