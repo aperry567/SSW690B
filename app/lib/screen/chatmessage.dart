@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-const String _name = "Anonymous";
+const String _name = "Liu Cixin";
 
 class ChatMessage extends StatelessWidget {
   final String text;
@@ -27,7 +27,7 @@ class ChatMessage extends StatelessWidget {
               children: <Widget>[
                 new Text(_name, style: Theme.of(context).textTheme.subhead),
                 new Container(
-                  margin: const EdgeInsets.only(top: 5.0),
+                  width: 310,
                   child: new Text(text),
 
                 )

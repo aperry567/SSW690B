@@ -96,12 +96,16 @@ class _SignUpPageState extends State<SignUpPage> {
     List<int> imageBytes = _image.readAsBytesSync();
     String base64Image = base64.encode(imageBytes);
 
-    _doctorLicences_value =  [
-      {
-        "state": _doctor_state_value.name,
-        "license": _doctor_ID_value,
-      }
-    ];
+
+    if(_switchSelected){
+      _doctorLicences_value =  [
+        {
+          "state": _doctor_state_value.name,
+          "license": _doctor_ID_value,
+        }
+      ];
+    }
+
 
     Map json = {
       "email": _email_value,
@@ -245,6 +249,14 @@ class _SignUpPageState extends State<SignUpPage> {
       },
     );
 
+    final confirm_error_ = new Offstage(
+      offstage: errorComfirmPassword,
+      child:Text(
+        "      Password doesn't match",
+        style: style_invalid,
+
+      )
+      ,);
 
 
 
@@ -496,10 +508,12 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(height: 12.0),
             confirmPassword,
             SizedBox(height: 5.0),
-            Text("       Password doesn't match! ", style: errorComfirmPassword? style_valid : style_invalid),
+            confirm_error_,
             new Divider(indent: 0, color: Colors.black,),
             SizedBox(height: 8.0),
             name,
+            SizedBox(height: 8.0),
+            photoButton,
             SizedBox(height: 8.0),
             state,
             SizedBox(height: 8.0),
@@ -515,11 +529,12 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(height: 8.0),
             secretAnwser,
             SizedBox(height: 5.0),
+            pharmacyLocation,
+            SizedBox(height: 5.0),
             new Divider(indent: 0, color: Colors.black,),
             ifDoctorSwitch,
             doctorOptions,
             signUpButton,
-            photoButton,
           ],
         ),
       ),

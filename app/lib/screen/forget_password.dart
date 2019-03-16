@@ -44,14 +44,12 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
 
     Map json = {
       "email": _email_value,
-      "password": _password_value,
-
       "secretQuestion": _secret_question_value.name,
       "secretAnswer": _secret_anwser_value,
-
+      "password": _password_value,
     };
 
-    var url = "http://35.207.6.9:8080/api/signup";
+    var url = "http://35.207.6.9:8080/api/passwordRest";
     var res = await http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -141,7 +139,7 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
         autofocus: false,
         obscureText: true,
         decoration: InputDecoration(
-          hintText: 'Password',
+          hintText: 'New Password',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
         ),
@@ -175,7 +173,14 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
       },
     );
 
+    final confirm_error_ = new Offstage(
+      offstage: errorComfirmPassword,
+      child:Text(
+        "      Password doesn't match",
+        style: style_invalid,
 
+      )
+      ,);
 
     final secretQuestion = new Row(children: <Widget>[
       SizedBox(width: 8.0,),
@@ -225,7 +230,7 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
         },
         padding: EdgeInsets.all(12),
         color: Colors.lightBlueAccent,
-        child: Text('Sign Up', style: TextStyle(color: Colors.white)),
+        child: Text('Reset', style: TextStyle(color: Colors.white)),
       ),
     );
 
@@ -252,7 +257,7 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
             SizedBox(height: 12.0),
             confirmPassword,
             SizedBox(height: 5.0),
-            Text("       Password doesn't match! ", style: errorComfirmPassword? style_valid : style_invalid),
+            confirm_error_,
             new Divider(indent: 0, color: Colors.black,),
             SizedBox(height: 8.0),
 

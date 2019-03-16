@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> _children = [
       HomeListPage(sessionID),
-      InboxPage(),
+      InboxPage(sessionID),
       ProfilePage(sessionID),
     ];
     final logo = Hero(
