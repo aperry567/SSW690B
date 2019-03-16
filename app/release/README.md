@@ -1,4 +1,4 @@
-# Version Format
+## Version Format
 0.milestone.subversion
 
 ## Update log
