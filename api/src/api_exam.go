@@ -2,7 +2,6 @@
 /*
  * Doctors on Demand API exam
  */
-
 package main
 
 import (
