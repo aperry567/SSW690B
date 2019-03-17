@@ -20,6 +20,8 @@ tags:
     description: 'Patient visits'
   - name: Home
     description: 'All home screens that deal with lists of data'
+  - name: Patients
+    description: 'Patient lists and related itemes for doctors only'
 paths:
   /login:
     post:
@@ -353,14 +355,73 @@ paths:
           schema:
             type: string
             format: uuid
+      responses:
+        '200':
+          description: List of doctor home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getPatients:
+    get:
+      tags:
+        - Patients
+      parameters:
         - in: query
-          name: listFilter
-          required: false
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of patient home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getPatientDetail:
+    get:
+      tags:
+        - Patients
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: patientID
+          required: true
           schema:
             type: string
       responses:
         '200':
-          description: List of doctor home screen data
+          description: Get Patient Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /getPatientRelatedItems:
+    get:
+      tags:
+        - Patients
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: patientID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of patient home screen data
           content:
             'application/json':
               schema:

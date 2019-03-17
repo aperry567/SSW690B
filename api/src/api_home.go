@@ -11,13 +11,17 @@ import (
 	"net/http"
 )
 
-func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, error) {
+func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error) {
 	dbUserClearSessions()
 
 	db := getDB()
-	userID := dbGetUserID(sessionID)
+	userID, role := dbGetUserIDAndRole(sessionID)
 
 	var response ListResponse
+
+	if role != "patient" {
+		return response, errors.New("Must be a patient to use")
+	}
 
 	var examSelect string
 	var visitSelect string
@@ -89,23 +93,48 @@ func dbGetPatientHomeItemsGet(sessionID string, filter string) (ListResponse, er
 	return response, nil
 }
 
-/*GetPatientHomeItemsGet details
-Takes in:
+func dbGetDoctorHomeItems(sessionID string) (ListResponse, error) {
+	dbUserClearSessions()
 
-sessionID
-filter
-returns:
-List response
+	db := getDB()
+	userID, role := dbGetUserIDAndRole(sessionID)
 
-List will be comprised of exam, visit and prescription items sorted date desc.
-List items must have labels and colors (colors must look good with white text)
-visit: blue
-exams: red
-prescription: black
+	var response ListResponse
 
-Filters for each type with default to a
-*/
-func GetPatientHomeItemsGet(w http.ResponseWriter, r *http.Request) {
+	if role != "doctor" {
+		return response, errors.New("Must be a doctor to use")
+	}
+
+	var visitSelect string
+
+	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.PATIENT_USER_ID = u.USER_ID WHERE v.DOCTOR_USER_ID = ?"
+
+	var selectSt *sql.Stmt
+	var rows *sql.Rows
+	var err error
+
+	// visit
+	selectSt, _ = db.Prepare(visitSelect + " ORDER BY DATETIME DESC")
+	rows, err = selectSt.Query(sessionID, userID)
+	defer selectSt.Close()
+
+	if err != nil {
+		return response, errors.New("Unable to fetch home items")
+	}
+
+	response.Items = []ListItem{}
+	for rows.Next() {
+		var item ListItem
+		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
+			return response, errors.New("Unable to fetch home item")
+		}
+		response.Items = append(response.Items, item)
+	}
+
+	return response, nil
+}
+
+func GetPatientHomeItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
@@ -116,7 +145,32 @@ func GetPatientHomeItemsGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := dbGetPatientHomeItemsGet(sessionID, listFilter)
+	output, err := dbGetPatientHomeItems(sessionID, listFilter)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(output)
+}
+
+func GetDoctorHomeItems(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	sessionID := r.URL.Query().Get("sessionID")
+
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+
+	output, err := dbGetDoctorHomeItems(sessionID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {

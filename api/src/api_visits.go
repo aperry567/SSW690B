@@ -260,7 +260,7 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 
 	err := visitSt.QueryRow(visitID, userID).Scan(&resp.Photo, &resp.DateTime, &resp.Title, &resp.Label, &resp.LabelColor, &resp.Details, &resp.Subtitle)
 	if err != nil {
-		return resp, err //errors.New("Unable to find visit")
+		return resp, errors.New("Unable to find visit")
 	}
 
 	resp.RelatedItemsURL = "/api/getVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitIDstr

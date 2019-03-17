@@ -82,10 +82,38 @@ var routes = Routes{
 	},
 
 	Route{
-		"GetPatientHomeItemsGet",
+		"GetPatientHomeItems",
 		strings.ToUpper("Get"),
 		"/api/getPatientHomeItems",
-		GetPatientHomeItemsGet,
+		GetPatientHomeItems,
+	},
+
+	Route{
+		"GetDoctorHomeItems",
+		strings.ToUpper("Get"),
+		"/api/getDoctorHomeItems",
+		GetDoctorHomeItems,
+	},
+
+	Route{
+		"GetPatients",
+		strings.ToUpper("Get"),
+		"/api/getPatients",
+		GetPatients,
+	},
+
+	Route{
+		"GetPatientDetail",
+		strings.ToUpper("Get"),
+		"/api/getPatientDetail",
+		GetPatientDetail,
+	},
+
+	Route{
+		"GetPatientRelatedItems",
+		strings.ToUpper("Get"),
+		"/api/getPatientRelatedItems",
+		GetPatientRelatedItems,
 	},
 
 	Route{
