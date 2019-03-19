@@ -10,10 +10,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type UpdateExamRequest struct {
-	Details string `json:"details"`
+	Details  string `json:"details"`
+	Subtitle string `json:"subtitle"`
+	DateTime string `json:"dateTime"`
 }
 
 func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error) {
@@ -68,6 +71,8 @@ func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error)
 func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error {
 	dbUserClearSessions()
 
+	var err error
+
 	db := getDB()
 	if db == nil {
 		return errors.New("Unable to connect to db")
@@ -84,9 +89,26 @@ func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error 
 		return errors.New("Can only be used by doctors")
 	}
 
+	if req.Details == "" {
+		return errors.New("Details cannot be empty")
+	}
+
+	if req.DateTime == "" {
+		return errors.New("DateTime cannot be empty")
+	}
+
+	if req.Subtitle == "" {
+		return errors.New("Subtitle cannot be empty")
+	}
+
+	_, err = time.Parse("2006-01-02 15:04:05", req.DateTime)
+	if err != nil {
+		return errors.New("Invalid Exam Time format YYYY-MM-DD hh:mm:ss")
+	}
+
 	//build query string
-	examSt, _ := db.Prepare("update dod.`EXAMS` v set v.`NOTES` = ? where v.`EXAM_ID` = ? and v.DOCTOR_USER_ID = ?")
-	_, err := examSt.Exec(req.Details, examID, userID)
+	examSt, _ := db.Prepare("update dod.`EXAMS` set `NOTES` = ?, set LOCATION = ?, set EXAM_TIME = ? where `EXAM_ID` = ? and DOCTOR_USER_ID = ?")
+	_, err = examSt.Exec(req.Details, req.Subtitle, req.DateTime, examID, userID)
 	defer examSt.Close()
 	if err != nil {
 		return errors.New("Unable to update exam")

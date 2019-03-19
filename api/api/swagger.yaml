@@ -22,6 +22,10 @@ tags:
     description: 'All home screens that deal with lists of data'
   - name: Patients
     description: 'Patient lists and related itemes for doctors only'
+  - name: Prescriptions
+    description: 'Prescriptions for a patient'
+  - name: Exams
+    description: 'Exams for a patient'
 paths:
   /login:
     post:
@@ -547,6 +551,156 @@ paths:
               schema:
                 type: string
                 example: Could not update visit
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getExamDetail:
+    get:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Exam Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /updateExam:
+    post:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+                  example: 'get an x-ray'
+                dateTime:
+                  type: string
+                  example: '2019-01-03 13:12:00'
+                subtitle:
+                  type: string
+                  example: '100 penn ave, new york, new york 12004'
+              required:
+                - details
+                - dateTime
+                - subtitle
+      responses:
+        '200':
+          description: Exam updated
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Unable to update exam
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: Could not update exam
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getPrescriptionDetail:
+    get:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Prescriptions Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /updatePrescription:
+    post:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+                  example: 'Take two a day'
+                title:
+                  type: string
+                  example: 'Aspirin'
+                subtitle:
+                  type: string
+                  example: 'Refills: 2'
+              required:
+                - details
+                - title
+                - subtitle
+      responses:
+        '200':
+          description: Prescription updated
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Unable to update prescription
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: Could not update prescription
         '401':
           description: User is not signed in.  Return to login screen.
 components:
