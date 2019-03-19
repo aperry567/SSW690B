@@ -94,11 +94,11 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	var examSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, EXAM_ID as ID FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		examSelect = strings.Replace(examSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
-	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, PRESCRIPTION_ID as ID FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=',PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		prescriptSelect = strings.Replace(prescriptSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
@@ -133,7 +133,7 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	for rows.Next() {
 		var item ListItem
 		var id string
-		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &id); err != nil {
+		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}
 		response.Items = append(response.Items, item)
