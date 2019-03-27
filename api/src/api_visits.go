@@ -132,7 +132,7 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 
 	for rows.Next() {
 		var item ListItem
-		var id string
+		item.ScreenType = "list"
 		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}

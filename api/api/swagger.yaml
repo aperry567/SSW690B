@@ -770,13 +770,13 @@ components:
               details:
                 type: string
                 example: 'YYYY-MM-DD HH:MM:SS'
+              screenType:
+                type: string
+                example: 'list'
               detailLink:
                 type: string
                 description: indicates when there's a detail page
                 example: 'http://123.123.123/api/getVisit?id=1'
-            required:
-              - title
-              - dateTime
     AuthResponse:
       type: object
       properties:

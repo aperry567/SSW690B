@@ -26,6 +26,7 @@ type ListItem struct {
 	Subtitle   string `json:"subtitle,omitempty"`
 	DateTime   string `json:"dateTime"`
 	Details    string `json:"details,omitempty"`
+	ScreenType string `json:"screenType,omitempty"`
 	DetailLink string `json:"detailLink,omitempty"`
 }
 
