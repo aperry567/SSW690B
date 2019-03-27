@@ -49,7 +49,8 @@ type ProfileModel struct {
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
 	// required for doctor sign-ups
-	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
 }
 
 type UpdateProfileModel struct {
@@ -65,7 +66,8 @@ type UpdateProfileModel struct {
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
 	// required for doctor sign-ups
-	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
 }
 
 type PasswordResetModel struct {
@@ -101,7 +103,8 @@ type SignupModel struct {
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
 	// required for doctor sign-ups
-	DoctorLicences []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
 }
 
 func dbUserLogin(e string, p string) AuthResponse {
@@ -278,6 +281,13 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 			}
 		}
 	}
+	if sm.DoctorSpecialities != nil && sm.Role == "doctor" {
+		for _, spec := range sm.DoctorSpecialities {
+			if spec == 0 {
+				return AuthResponse{}, errors.New("Doctor Speciality ids must be greater than 0")
+			}
+		}
+	}
 
 	//check to see if email is already in use
 	emailSt, _ := db.Prepare("select count(1) from `dod`.`USERS` u where u.`EMAIL` = ?")
@@ -292,16 +302,66 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	pHash := hashPassword(sm.Password)
 	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
-	_, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, sm.SecretQuestion, sm.SecretAnswer, sm.Photo)
+	signupRes, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, sm.SecretQuestion, sm.SecretAnswer, sm.Photo)
 	if signupErr != nil {
 		return AuthResponse{}, errors.New("Internal error please try again later")
 	}
+	userIDInt, signupResErr := signupRes.LastInsertId()
+	userID := int(userIDInt)
+	if signupResErr != nil {
+		return AuthResponse{}, errors.New("Internal error for id please try again later")
+	}
 
-	//TODO: push doctor licenses if role is doctor
+	//rollback handling
+	rollback := false
+	var errMsg error
 
+	//handle doctor licenses if role doctor
+	if sm.Role == "doctor" {
+		//insert new license for doctor
+		for _, lic := range sm.DoctorLicences {
+			insertLicenseSt, _ := db.Prepare("INSERT INTO `dod`.`LICENSES` (`LICENSE_ID`,`STATE`,`USER_ID`) VALUES (?,?,?)")
+			defer insertLicenseSt.Close()
+
+			if _, err := insertLicenseSt.Exec(lic.License, lic.State, userID); err != nil {
+				//rollback
+				errMsg = errors.New("Unable to update licenses")
+				rollback = true
+			}
+		}
+	}
+	if !rollback && sm.Role == "doctor" {
+		for _, spec := range sm.DoctorSpecialities {
+			insertSpecSt, _ := db.Prepare("INSERT INTO `dod`.`USERS_DOCTOR_SPECIALITIES` (`DOCTOR_SPECIALITIES_ID`,`USER_ID`) VALUES (?,?)")
+			defer insertSpecSt.Close()
+
+			if _, err := insertSpecSt.Exec(spec, userID); err != nil {
+				//rollback
+				errMsg = errors.New("Unable to update licenses")
+				rollback = true
+			}
+		}
+	}
+
+	if rollback {
+		if sm.Role == "doctor" {
+			//delete doc specs
+			docSpecRmSt, _ := db.Prepare("DELETE FROM `dod`.`USERS_DOCTOR_SPECIALITIES` WHERE USER_ID = ?")
+			defer docSpecRmSt.Close()
+			docSpecRmSt.Exec(userID)
+			//delete doc lics
+			docLicRmSt, _ := db.Prepare("DELETE FROM `dod`.`LICENSES` WHERE USER_ID = ?")
+			defer docLicRmSt.Close()
+			docLicRmSt.Exec(userID)
+		}
+		//delete user
+		userRmSt, _ := db.Prepare("DELETE FROM `dod`.`USERS` WHERE USER_ID = ?")
+		defer userRmSt.Close()
+		userRmSt.Exec(userID)
+		return AuthResponse{}, errMsg
+	}
 	auth := dbUserLogin(sm.Email, sm.Password)
 
-	userID := dbGetUserID(auth.SessionID)
 	dbAuditAction(userID, "Signup:Success")
 
 	return auth, nil
@@ -332,20 +392,20 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 		return profile, errors.New("Unable to fetch profile")
 	}
 
-	//get doctor licenses if role is doctor
+	//get doctor licenses & specialities if role is doctor
 	if role == "doctor" {
+		//licenses
 		licenseSt, _ := db.Prepare("SELECT `LICENSE_ID`,`STATE` FROM `dod`.`LICENSES` WHERE `USER_ID` = ?")
 		defer licenseSt.Close()
-
-		rows, licErr := licenseSt.Query(userID)
+		licRows, licErr := licenseSt.Query(userID)
 		if licErr != nil {
 			return profile, errors.New("Unable to fetch licenses")
 		}
 		profile.DoctorLicences = []SignupDoctorLicences{}
-		for rows.Next() {
+		for licRows.Next() {
 			var lic string
 			var state string
-			if err := rows.Scan(&lic, &state); err != nil {
+			if err := licRows.Scan(&lic, &state); err != nil {
 				return profile, errors.New("Unable to fetch license data")
 			}
 			tmpState := States(state)
@@ -353,6 +413,21 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 				License: lic,
 				State:   &tmpState,
 			})
+		}
+
+		//specialities
+		specialitiesSt, _ := db.Prepare("select DOCTOR_SPECIALITIES_ID from `dod`.`USERS_DOCTOR_SPECIALITIES` where USER_ID = ?")
+		defer specialitiesSt.Close()
+		specRows, specErr := specialitiesSt.Query(userID)
+		if specErr != nil {
+			return profile, errors.New("Unable to fetch specalities")
+		}
+		for specRows.Next() {
+			var speciality int
+			if err := specRows.Scan(&speciality); err != nil {
+				return profile, errors.New("Unable to fetch speciality data")
+			}
+			profile.DoctorSpecialities = append(profile.DoctorSpecialities, speciality)
 		}
 	}
 
@@ -417,7 +492,7 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `NAME` = ?, `ADDR`= ?,`CITY`= ?,`STATE`= ?,`POSTAL_CODE`= ?,`PHARM_LOC`= ?,`PHONE`= ?,`SECRET_Q`= ?, `SECRET_A`= ?, `PHOTO`= ? WHERE `USER_ID` = ?")
 	defer profileSt.Close()
 
-	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.Phone, profile.PharmacyLocation, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, userID)
+	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.PharmacyLocation, profile.Phone, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, userID)
 	if err != nil {
 		return errors.New("Unable to update profile")
 	}
@@ -444,7 +519,6 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 			dbAuditAction(userID, "UserProfile:Update")
 			return errors.New("Unable to update password")
 		}
-
 		//insert new license for doctor
 		for _, lic := range profile.DoctorLicences {
 			insertLicenseSt, _ := db.Prepare("INSERT INTO `dod`.`LICENSES` (`LICENSE_ID`,`STATE`,`USER_ID`) VALUES (?,?,?)")
@@ -453,6 +527,25 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 			if _, err := insertLicenseSt.Exec(lic.License, lic.State, userID); err != nil {
 				dbAuditAction(userID, "UserProfile:Update")
 				return errors.New("Unable to update licenses")
+			}
+		}
+
+		//delete all existing specialities for doctor
+		deleteSpecialitiesSt, _ := db.Prepare("DELETE from `dod`.`USERS_DOCTOR_SPECIALITIES` WHERE `USER_ID` = ?")
+		defer deleteSpecialitiesSt.Close()
+
+		if _, err := deleteSpecialitiesSt.Exec(userID); err != nil {
+			dbAuditAction(userID, "UserProfile:Update")
+			return errors.New("Unable to update password")
+		}
+		//insert new specialities for doctor
+		for _, spec := range profile.DoctorSpecialities {
+			insertLicenseSt, _ := db.Prepare("INSERT INTO `dod`.`USERS_DOCTOR_SPECIALITIES` (`DOCTOR_SPECIALITIES_ID`,`USER_ID`) VALUES (?,?)")
+			defer insertLicenseSt.Close()
+
+			if _, err := insertLicenseSt.Exec(spec, userID); err != nil {
+				dbAuditAction(userID, "UserProfile:Update")
+				return errors.New("Unable to update specialities")
 			}
 		}
 	}

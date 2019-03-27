@@ -172,6 +172,12 @@ paths:
                         $ref: '#/components/schemas/States'
                       license:
                         type: string
+                doctorSpecialities:
+                  description: required for doctor sign-ups
+                  type: array
+                  items:
+                    type: integer
+                    example: 1
               required:
                 - email
                 - password
@@ -184,7 +190,7 @@ paths:
                 - phone
                 - photo
                 - secretQuestion
-                - secretAnsswer
+                - secretAnswer
       responses:
         '200':
           description: Create a new account
@@ -245,7 +251,7 @@ paths:
                     type: string
                     example: "blue"
                   doctorLicences:
-                    description: required for doctor sign-ups
+                    description: one required for doctors
                     type: array
                     items:
                       type: object
@@ -254,6 +260,12 @@ paths:
                           $ref: '#/components/schemas/States'
                         license:
                           type: string
+                  doctorSpecialities:
+                    description: one required for doctors
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
         '400':
           description: Unable to fetch profile
           content:
@@ -313,6 +325,12 @@ paths:
                         $ref: '#/components/schemas/States'
                       license:
                         type: string
+                doctorSpecialities:
+                    description: one required for doctors
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
       responses:
         '200':
           description: Updated profile
