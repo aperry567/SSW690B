@@ -8,6 +8,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,26 +43,28 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string) (Detail
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, CREATED_TIME as DATETIME, CONCAT('Prescriptions ', u.NAME) as TITLE,'Prescription' as LABEL, '" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, NOTES as `DESC`, PRESCRIPTION_REASON as SUBTITLE FROM dod.PRESCRIPTIONS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PRESCRIPTION_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT CREATED_TIME, `NAME`, `INSTRUCTIONS`, CONCAT('Refills: ', REFILLS) FROM dod.PRESCRIPTIONS WHERE `PRESCRIPTION_ID` = ? AND `PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
-	prescriptionSt, _ := db.Prepare(getQueryStr)
+	prescriptionSt, errSt := db.Prepare(getQueryStr)
 	defer prescriptionSt.Close()
-
-	err := prescriptionSt.QueryRow(prescriptionID, userID).Scan(&resp.Photo, &resp.DateTime, &resp.Title, &resp.Label, &resp.LabelColor, &resp.Details, &resp.Subtitle)
-	if err != nil {
-		return resp, err //errors.New("Unable to find prescription")
+	if errSt != nil {
+		fmt.Println(errSt.Error())
 	}
+
+	err := prescriptionSt.QueryRow(prescriptionID, userID).Scan(&resp.DateTime, &resp.Title, &resp.Details, &resp.Subtitle)
+	if err != nil {
+		return resp, errors.New("Unable to find prescription")
+	}
+
+	resp.Label = "Rx"
+	resp.LabelColor = LABEL_COLOR_PRESCRIPTION
 
 	if role == "doctor" {
 		resp.TitleEditable = true
 		resp.SubtitleEditable = true
 		resp.DetailsEditable = true
-		resp.Label = "Rx"
-		resp.LabelColor = LABEL_COLOR_PRESCRIPTION
-		resp.ChatURL = ""
-		resp.RelatedItemsURL = ""
 		resp.UpdateURL = "/api/UpdatePrescription?sessionID=" + sessionID + "&prescriptionID=" + prescriptionIDstr
 	}
 
@@ -110,6 +113,37 @@ func dbUpdatePrescription(sessionID string, prescriptionID string, req UpdatePre
 	defer prescriptionSt.Close()
 	if err != nil {
 		return errors.New("Unable to update prescription")
+	}
+
+	return nil
+}
+
+func dbDeletePrescription(sessionID string, prescriptionID string) error {
+	dbUserClearSessions()
+
+	var err error
+
+	db := getDB()
+	if db == nil {
+		return errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//fetch user_id and role
+	userID, role := dbGetUserIDAndRole(sessionID)
+	if userID == 0 {
+		return errors.New("Bad Session")
+	}
+
+	if role != "doctor" {
+		return errors.New("Can only be used by doctors")
+	}
+
+	examSt, _ := db.Prepare("DELETE FROM `dod`.`PRESCRIPTIONS` WHERE PRESCRIPTION_ID = ? AND DOCTOR_USER_ID = ?")
+	_, err = examSt.Exec(prescriptionID, userID)
+	defer examSt.Close()
+	if err != nil {
+		return errors.New("Unable to delete prescription")
 	}
 
 	return nil
@@ -177,4 +211,31 @@ func GetPrescriptionDetail(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(output)
+}
+
+func DeletePrescription(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	sessionID := r.URL.Query().Get("sessionID")
+	prescriptionID := r.URL.Query().Get("prescriptionID")
+
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+	if prescriptionID == "" {
+		http.Error(w, "Missing required prescriptionID parameter", 400)
+		return
+	}
+
+	if err := dbDeletePrescription(sessionID, prescriptionID); err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

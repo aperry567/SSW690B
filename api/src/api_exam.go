@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,27 +43,32 @@ func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error)
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, EXAM_TIME as DATETIME, CONCAT('Examed ', u.NAME) as TITLE,'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, NOTES as `DESC`, EXAM_REASON as SUBTITLE FROM dod.EXAMS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.EXAM_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT `EXAM_TIME`, `DESC`, `LOCATION` FROM dod.EXAMS WHERE `EXAM_ID` = ? AND `PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
-	examSt, _ := db.Prepare(getQueryStr)
+	examSt, errSt := db.Prepare(getQueryStr)
 	defer examSt.Close()
 
-	err := examSt.QueryRow(examID, userID).Scan(&resp.Photo, &resp.DateTime, &resp.Title, &resp.Label, &resp.LabelColor, &resp.Details, &resp.Subtitle)
-	if err != nil {
-		return resp, err //errors.New("Unable to find exam")
+	if errSt != nil {
+		fmt.Println(errSt.Error())
 	}
+
+	err := examSt.QueryRow(examID, userID).Scan(&resp.DateTime, &resp.Details, &resp.Subtitle)
+	if err != nil {
+		return resp, errors.New("Unable to find exam")
+	}
+
+	resp.Title = "Exam"
+	resp.Label = "Exam"
+	resp.LabelColor = LABEL_COLOR_EXAM
 
 	if role == "doctor" {
 		resp.SubtitleEditable = true
 		resp.DateTimeEditable = true
-		resp.Label = "Exam"
-		resp.LabelColor = LABEL_COLOR_EXAM
 		resp.DetailsEditable = true
-		resp.ChatURL = ""
-		resp.RelatedItemsURL = ""
-		resp.UpdateURL = "/api/UpdateExam?sessionID=" + sessionID + "&examID=" + examIDstr
+		resp.UpdateURL = "/api/updateExam?sessionID=" + sessionID + "&examID=" + examIDstr
+		resp.DeleteURL = "/api/deleteExam?sessionID=" + sessionID + "&examID=" + examIDstr
 	}
 
 	return resp, nil
@@ -107,11 +113,42 @@ func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error 
 	}
 
 	//build query string
-	examSt, _ := db.Prepare("update dod.`EXAMS` set `NOTES` = ?, set LOCATION = ?, set EXAM_TIME = ? where `EXAM_ID` = ? and DOCTOR_USER_ID = ?")
+	examSt, _ := db.Prepare("update dod.`EXAMS` set `DESC` = ?, LOCATION = ?, EXAM_TIME = ? where `EXAM_ID` = ? and DOCTOR_USER_ID = ?")
 	_, err = examSt.Exec(req.Details, req.Subtitle, req.DateTime, examID, userID)
 	defer examSt.Close()
 	if err != nil {
 		return errors.New("Unable to update exam")
+	}
+
+	return nil
+}
+
+func dbDeleteExam(sessionID string, examID string) error {
+	dbUserClearSessions()
+
+	var err error
+
+	db := getDB()
+	if db == nil {
+		return errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//fetch user_id and role
+	userID, role := dbGetUserIDAndRole(sessionID)
+	if userID == 0 {
+		return errors.New("Bad Session")
+	}
+
+	if role != "doctor" {
+		return errors.New("Can only be used by doctors")
+	}
+
+	examSt, _ := db.Prepare("DELETE FROM `dod`.`EXAMS` WHERE EXAM_ID = ? AND DOCTOR_USER_ID = ?")
+	_, err = examSt.Exec(examID, userID)
+	defer examSt.Close()
+	if err != nil {
+		return errors.New("Unable to delete exam")
 	}
 
 	return nil
@@ -179,4 +216,33 @@ func GetExamDetail(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(output)
+}
+
+func DeleteExam(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	sessionID := r.URL.Query().Get("sessionID")
+	examID := r.URL.Query().Get("examID")
+
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+	if examID == "" {
+		http.Error(w, "Missing required examID parameter", 400)
+		return
+	}
+
+	err := dbDeleteExam(sessionID, examID)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

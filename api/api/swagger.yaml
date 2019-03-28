@@ -664,6 +664,27 @@ paths:
                 example: Could not update exam
         '401':
           description: User is not signed in.  Return to login screen.
+  /deleteExam:
+    get:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':  
+          description: exam deleted
+        '401':
+          description: User is not signed in.  Return to login screen.
   /getPrescriptionDetail:
     get:
       tags:
@@ -737,6 +758,27 @@ paths:
               schema:
                 type: string
                 example: Could not update prescription
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /deletePrescription:
+    get:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':  
+          description: prescription deleted
         '401':
           description: User is not signed in.  Return to login screen.
 components:
@@ -866,7 +908,9 @@ components:
           type: string
         relatedItemURL:
           type: string
-        saveURL:
+        updateURL:
+          type: string
+        deleteURL:
           type: string
     States:
       type: string

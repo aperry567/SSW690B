@@ -164,4 +164,46 @@ var routes = Routes{
 		"/api/updateProfile",
 		UpdateProfilePost,
 	},
+
+	Route{
+		"GetPrescriptionDetail",
+		strings.ToUpper("Get"),
+		"/api/getPrescriptionDetail",
+		GetPrescriptionDetail,
+	},
+
+	Route{
+		"UpdatePrescription",
+		strings.ToUpper("Post"),
+		"/api/updatePrescription",
+		UpdatePrescription,
+	},
+
+	Route{
+		"DeletePrescription",
+		strings.ToUpper("Get"),
+		"/api/deletePrescription",
+		DeletePrescription,
+	},
+
+	Route{
+		"GetExamDetail",
+		strings.ToUpper("Get"),
+		"/api/getExamDetail",
+		GetExamDetail,
+	},
+
+	Route{
+		"UpdateExam",
+		strings.ToUpper("Post"),
+		"/api/updateExam",
+		UpdateExam,
+	},
+
+	Route{
+		"DeleteExam",
+		strings.ToUpper("Get"),
+		"/api/deleteExam",
+		DeleteExam,
+	},
 }
