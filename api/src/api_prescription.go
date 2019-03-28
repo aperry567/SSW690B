@@ -8,7 +8,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -47,11 +46,8 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string) (Detail
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}
-	prescriptionSt, errSt := db.Prepare(getQueryStr)
+	prescriptionSt, _ := db.Prepare(getQueryStr)
 	defer prescriptionSt.Close()
-	if errSt != nil {
-		fmt.Println(errSt.Error())
-	}
 
 	err := prescriptionSt.QueryRow(prescriptionID, userID).Scan(&resp.DateTime, &resp.Title, &resp.Details, &resp.Subtitle)
 	if err != nil {
