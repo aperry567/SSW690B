@@ -111,6 +111,7 @@ func dbUpdatePrescription(sessionID string, prescriptionID string, req UpdatePre
 		return errors.New("Unable to update prescription")
 	}
 
+	dbAuditAction(userID, "Prescription:Updated")
 	return nil
 }
 
@@ -142,6 +143,7 @@ func dbDeletePrescription(sessionID string, prescriptionID string) error {
 		return errors.New("Unable to delete prescription")
 	}
 
+	dbAuditAction(userID, "Prescription:Deleted")
 	return nil
 }
 

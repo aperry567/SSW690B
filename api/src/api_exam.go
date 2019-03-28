@@ -120,6 +120,8 @@ func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error 
 		return errors.New("Unable to update exam")
 	}
 
+	dbAuditAction(userID, "Exam:Updated")
+
 	return nil
 }
 
@@ -151,6 +153,7 @@ func dbDeleteExam(sessionID string, examID string) error {
 		return errors.New("Unable to delete exam")
 	}
 
+	dbAuditAction(userID, "Exam:Deleted")
 	return nil
 }
 

@@ -193,6 +193,7 @@ func dbAddVisitRelatedItems(sessionID string, visitID string, filter string, req
 		if err != nil {
 			return errors.New("Unable to save Exam")
 		}
+		dbAuditAction(userID, "Exam:Added")
 	}
 	// save new prescription
 	if filter == "2" {
@@ -223,6 +224,7 @@ func dbAddVisitRelatedItems(sessionID string, visitID string, filter string, req
 		if err != nil {
 			return errors.New("Unable to save Exam")
 		}
+		dbAuditAction(userID, "Prescription:Added")
 	}
 
 	return nil
@@ -300,6 +302,7 @@ func dbUpdateVisit(sessionID string, visitID string, req UpdateVisitRequest) err
 		return errors.New("Unable to update visit")
 	}
 
+	dbAuditAction(userID, "Visit:Updated")
 	return nil
 }
 

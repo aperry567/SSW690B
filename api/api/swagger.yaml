@@ -26,6 +26,8 @@ tags:
     description: 'Prescriptions for a patient'
   - name: Exams
     description: 'Exams for a patient'
+  - name: Questionnaire
+    description: 'Questionnaire for finding a doctor'
 paths:
   /login:
     post:
@@ -779,6 +781,39 @@ paths:
       responses:
         '200':  
           description: prescription deleted
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getQuestionnaire:
+    get:
+      tags:
+        - Questionnaire
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: questionID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: questions returned
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question:
+                      type: string
+                    moreQuestionsURL:
+                      type: string
+                    findDoctorURL:
+                      type: string
         '401':
           description: User is not signed in.  Return to login screen.
 components:

@@ -206,4 +206,11 @@ var routes = Routes{
 		"/api/deleteExam",
 		DeleteExam,
 	},
+
+	Route{
+		"GetQuestionnaire",
+		strings.ToUpper("Get"),
+		"/api/getQuestionnaire",
+		GetQuestionnaire,
+	},
 }
