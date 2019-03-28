@@ -138,6 +138,13 @@ var routes = Routes{
 	},
 
 	Route{
+		"GetDoctorSpecialities",
+		strings.ToUpper("Get"),
+		"/api/getDoctorSpecialities",
+		GetDoctorSpecialities,
+	},
+
+	Route{
 		"UpdateVisit",
 		strings.ToUpper("Post"),
 		"/api/updateVisit",

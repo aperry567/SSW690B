@@ -107,6 +107,11 @@ type SignupModel struct {
 	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
 }
 
+type DoctorSpecialities struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func dbUserLogin(e string, p string) AuthResponse {
 	dbUserClearSessions()
 
@@ -216,6 +221,36 @@ func dbUserPasswordReset(p PasswordResetModel) (AuthResponse, error) {
 	auth := dbUserLogin(p.Email, p.NewPassword)
 
 	return auth, nil
+}
+
+func dbGetDoctorSpecialities() ([]DoctorSpecialities, error) {
+	dbUserClearSessions()
+
+	var resp []DoctorSpecialities
+	db := getDB()
+	if db == nil {
+		return resp, errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	specSt, _ := db.Prepare("SELECT `DOCTOR_SPECIALITY_ID`, `SPECIALITY` FROM `dod`.`DOCTOR_SPECIALITIES` ORDER BY `SPECIALITY` ASC")
+	defer specSt.Close()
+	rows, err := specSt.Query()
+	if err != nil {
+		return resp, errors.New("Unable to fetch doctor specialities")
+	}
+	for rows.Next() {
+		var id int
+		var name string
+		if err := rows.Scan(&id, &name); err != nil {
+			return resp, errors.New("Unable to fetch doctor speciality")
+		}
+		resp = append(resp, DoctorSpecialities{
+			ID:   id,
+			Name: name,
+		})
+	}
+	return resp, nil
 }
 
 func dbUserSignup(sm SignupModel) (AuthResponse, error) {
@@ -686,4 +721,18 @@ func UpdateProfilePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func GetDoctorSpecialities(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	specialities, err := dbGetDoctorSpecialities()
+
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(specialities)
 }

@@ -528,6 +528,24 @@ paths:
       responses:
         '200':
           description: Related Item updated
+  /getDoctorSpecialities:
+    get:
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: list of doctor specialities
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
   /updateVisit:
     post:
       tags:
