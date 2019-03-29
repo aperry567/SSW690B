@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -38,7 +39,7 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 	// exam
 	if filter == "1" {
 		selectSt, _ = db.Prepare(examSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID)
+		rows, err = selectSt.Query(sessionID, userID)
 		defer selectSt.Close()
 	} else if filter == "2" {
 		// visit
@@ -48,16 +49,17 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 	} else if filter == "3" {
 		// prescription
 		selectSt, _ = db.Prepare(prescriptSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID)
+		rows, err = selectSt.Query(sessionID, userID)
 		defer selectSt.Close()
 	} else {
 		// all
 		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(userID, userID, sessionID, userID)
+		rows, err = selectSt.Query(sessionID, userID, sessionID, userID, sessionID, userID)
 		defer selectSt.Close()
 	}
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return response, errors.New("Unable to fetch home items")
 	}
 
