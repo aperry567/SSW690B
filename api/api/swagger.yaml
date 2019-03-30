@@ -1037,6 +1037,34 @@ paths:
           description: Invalid request data or internal error
         '401':
           description: User is not signed in.  Return to login screen.
+  /addVisitChat:
+    post:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          'text/plain':
+              schema:
+                type: string
+      responses:
+        '200':
+          description: chat message added to visit
+        '400':
+          description: Invalid request data or internal error
+        '401':
+          description: User is not signed in.  Return to login screen.
 components:
   schemas:
     AddRelatedItemRequest:
