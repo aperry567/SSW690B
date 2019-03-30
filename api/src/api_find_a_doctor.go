@@ -5,6 +5,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -41,8 +42,8 @@ func dbGetDoctorRelatedItems(sessionID string, doctortID string, filter string) 
 	if role != "doctor" {
 		return response, errors.New("Must be a Doctor to use")
 	}
-
-	/*var examSelect string
+/*
+	var examSelect string
 	var prescriptSelect string
 	var visitSelect string
 
@@ -77,7 +78,7 @@ func dbGetDoctorRelatedItems(sessionID string, doctortID string, filter string) 
 
 	defer selectSt.Close()
 	defer rows.Close()
-	*/
+
 	if err != nil {
 		return response, errors.New("Unable to fetch home items")
 	}
@@ -93,8 +94,8 @@ func dbGetDoctorRelatedItems(sessionID string, doctortID string, filter string) 
 
 	return response, nil
 }
-
-func dbGetPatientDetail(sessionID string, patientID string) (DetailResponse, error) {
+*/
+func dbGetDoctorDetail(sessionID string, doctorID string) (DetailResponse, error) {
 	dbUserClearSessions()
 
 	var resp DetailResponse
@@ -116,23 +117,23 @@ func dbGetPatientDetail(sessionID string, patientID string) (DetailResponse, err
 
 	//build query string
 	getQueryStr := "select u.PHOTO, u.NAME, u.EMAIL, CONCAT(u.CITY,', ',u.STATE) from dod.VISITS v left outer join dod.USERS u on v.PATIENT_USER_ID = u.USER_ID where v.DOCTOR_USER_ID = ? and v.PATIENT_USER_ID = ?"
-	patientSt, _ := db.Prepare(getQueryStr)
-	defer patientSt.Close()
+	doctorSt, _ := db.Prepare(getQueryStr)
+	defer doctorSt.Close()
 
-	err := patientSt.QueryRow(patientID, userID).Scan(&resp.Photo, &resp.Title, &resp.Details, &resp.Subtitle)
+	err := doctorSt.QueryRow(doctorID, userID).Scan(&resp.Photo, &resp.Title, &resp.Details, &resp.Subtitle)
 	if err != nil {
-		return resp, errors.New("Unable to find Patient")
+		return resp, errors.New("Unable to find Doctor")
 	}
 
-	resp.Label = "Patient"
-	resp.LabelColor = LABEL_COLOR_PATIENT
+	resp.Label = "Doctor"
+	resp.LabelColor = LABEL_COLOR_DOCTOR
 
-	resp.RelatedItemsURL = "/api/getVisitRelatedItems?sessionID=" + sessionID + "&patientID=" + patientID
+	resp.RelatedItemsURL = "/api/getVisitRelatedItems?sessionID=" + sessionID + "&doctorID=" + doctorID
 
 	return resp, nil
 }
 
-func dbGetPatients(sessionID string) (ListResponse, error) {
+func dbGetDoctors(sessionID string) (ListResponse, error) {
 	dbUserClearSessions()
 
 	var resp ListResponse
@@ -154,21 +155,21 @@ func dbGetPatients(sessionID string) (ListResponse, error) {
 	}
 
 	//build query string
-	getQueryStr := "select distinct u.USER_ID, u.PHOTO, u.NAME, u.EMAIL, CONCAT(u.CITY,', ',u.STATE), CONCAT('/api/getPatientDetail?sessionID=',?,'&patientID=',u.USER_ID) from dod.VISITS v left outer join dod.USERS u on v.PATIENT_USER_ID = u.USER_ID where v.DOCTOR_USER_ID = ?"
+	getQueryStr := "select distinct u.USER_ID, u.PHOTO, u.NAME, u.EMAIL, CONCAT(u.CITY,', ',u.STATE), CONCAT('/api/getDoctorDetail?sessionID=',?,'&doctorID=',u.USER_ID) from dod.VISITS v left outer join dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID where v.PATIENT_USER_ID = ?"
 	visitSt, _ := db.Prepare(getQueryStr)
 	defer visitSt.Close()
 
 	rows, err := visitSt.Query(sessionID, userID)
 	if err != nil {
-		return resp, errors.New("Unable to find Patient")
+		return resp, errors.New("Unable to find Doctor")
 	}
 
 	for rows.Next() {
 		var item ListItem
 		var id string
-		item.Label = "Patient"
-		item.LabelColor = LABEL_COLOR_PATIENT
-		item.DetailLink = "/api/getPatientDetail"
+		item.Label = "Doctor"
+		item.LabelColor = LABEL_COLOR_DOCTOR
+		item.DetailLink = "/api/getDoctorDetail"
 		item.ScreenType = "list"
 		if err := rows.Scan(&id, &item.Photo, &item.Title, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return resp, errors.New("Unable to fetch patient item")
@@ -178,7 +179,7 @@ func dbGetPatients(sessionID string) (ListResponse, error) {
 	return resp, nil
 }
 
-func GetPatientRelatedItems(w http.ResponseWriter, r *http.Request) {
+func GetDoctorRelatedItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
@@ -209,22 +210,22 @@ func GetPatientRelatedItems(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func GetPatientDetail(w http.ResponseWriter, r *http.Request) {
+func GetDoctorDetail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
-	patientID := r.URL.Query().Get("patientID")
+	doctorID := r.URL.Query().Get("doctorID")
 
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)
 		return
 	}
-	if patientID == "" {
-		http.Error(w, "Missing required patientID parameter", 400)
+	if doctorID == "" {
+		http.Error(w, "Missing required docotorID parameter", 400)
 		return
 	}
 
-	output, err := dbGetPatientDetail(sessionID, patientID)
+	output, err := dbGetDoctorDetail(sessionID, doctorID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
@@ -239,7 +240,7 @@ func GetPatientDetail(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func GetPatients(w http.ResponseWriter, r *http.Request) {
+func GetDoctors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
@@ -249,7 +250,7 @@ func GetPatients(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := dbGetPatients(sessionID)
+	output, err := dbGetDoctors(sessionID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
