@@ -153,6 +153,13 @@ paths:
                 phone:
                   type: string
                   example: "123-456-7890"
+                dob:
+                  type: string
+                  example: "2000-12-30"
+                gender:
+                  type: string
+                  description: Can be "Female", "Male" or "Other"
+                  example: "Female"
                 photo:
                   type: string
                   example: ""
@@ -193,6 +200,8 @@ paths:
                 - photo
                 - secretQuestion
                 - secretAnswer
+                - dob
+                - gender
       responses:
         '200':
           description: Create a new account
@@ -243,6 +252,13 @@ paths:
                   phone:
                     type: string
                     example: "123-456-7890"
+                  dob:
+                    type: string
+                    example: "2000-12-30"
+                  gender:
+                    type: string
+                    description: Can be "Female", "Male" or "Other"
+                    example: "Female"
                   photo:
                     type: string
                     example: ""
@@ -308,6 +324,13 @@ paths:
                 phone:
                   type: string
                   example: "123-456-7890"
+                dob:
+                  type: string
+                  example: "2000-12-30"
+                gender:
+                  type: string
+                  description: Can be "Female", "Male" or "Other"
+                  example: "Female"
                 photo:
                   type: string
                   example: ""

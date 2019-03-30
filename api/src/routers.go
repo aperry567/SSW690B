@@ -62,7 +62,7 @@ var routes = Routes{
 
 	Route{
 		"LogoutPost",
-		strings.ToUpper("Post"),
+		strings.ToUpper("Get"),
 		"/api/logout",
 		LogoutPost,
 	},
