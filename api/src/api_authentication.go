@@ -1,6 +1,6 @@
 /*
  * Doctors on Demand API
- */    
+ */
 
 package main
 
@@ -14,6 +14,16 @@ import (
 
 	"github.com/google/uuid"
 )
+
+var GenderEnum = struct {
+	Male   string
+	Female string
+	Other  string
+}{
+	"Male",
+	"Female",
+	"Other",
+}
 
 type LoginModel struct {
 	Email    string `json:"email"`
@@ -310,15 +320,18 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.DOB == "" {
 		return AuthResponse{}, errors.New("DOB is required")
 	}
-	if req.DateTime == "" {
-		return errors.New("DOB is required")
+	if sm.DOB == "" {
+		return AuthResponse{}, errors.New("DOB is required")
 	}
-	_, err = time.Parse("2006-01-02", req.DateTime)
+	_, err := time.Parse("2006-01-02", sm.DOB)
 	if err != nil {
-		return errors.New("Invalid DOB format YYYY-MM-DD")
+		return AuthResponse{}, errors.New("Invalid DOB format YYYY-MM-DD")
 	}
 	if sm.Gender == "" {
 		return AuthResponse{}, errors.New("Gender is required")
+	}
+	if sm.Gender != GenderEnum.Female || sm.Gender != GenderEnum.Male || sm.Gender != GenderEnum.Other {
+		return AuthResponse{}, errors.New("Gender can only be " + GenderEnum.Male + ", " + GenderEnum.Female + " or " + GenderEnum.Other)
 	}
 	if sm.Role == "" {
 		return AuthResponse{}, errors.New("Role is required")
@@ -536,8 +549,15 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	if profile.DOB == "" {
 		return errors.New("DOB is required")
 	}
+	_, err := time.Parse("2006-01-02", profile.DOB)
+	if err != nil {
+		return errors.New("Invalid DOB format YYYY-MM-DD")
+	}
 	if profile.Gender == "" {
 		return errors.New("Gender is required")
+	}
+	if profile.Gender != GenderEnum.Female || profile.Gender != GenderEnum.Male || profile.Gender != GenderEnum.Other {
+		return errors.New("Gender can only be " + GenderEnum.Male + ", " + GenderEnum.Female + " or " + GenderEnum.Other)
 	}
 	if profile.DoctorLicences == nil && role == "doctor" {
 		return errors.New("Doctors must have one license")
