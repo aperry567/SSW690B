@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -330,7 +331,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.Gender == "" {
 		return AuthResponse{}, errors.New("Gender is required")
 	}
-	if sm.Gender != GenderEnum.Female || sm.Gender != GenderEnum.Male || sm.Gender != GenderEnum.Other {
+	if sm.Gender != GenderEnum.Female && sm.Gender != GenderEnum.Male && sm.Gender != GenderEnum.Other {
 		return AuthResponse{}, errors.New("Gender can only be " + GenderEnum.Male + ", " + GenderEnum.Female + " or " + GenderEnum.Other)
 	}
 	if sm.Role == "" {
@@ -457,6 +458,7 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 
 	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Role, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo, &profile.DOB, &profile.Gender)
 	if err != nil {
+		fmt.Println(err.Error())
 		return profile, errors.New("Unable to fetch profile")
 	}
 
@@ -556,7 +558,7 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	if profile.Gender == "" {
 		return errors.New("Gender is required")
 	}
-	if profile.Gender != GenderEnum.Female || profile.Gender != GenderEnum.Male || profile.Gender != GenderEnum.Other {
+	if profile.Gender != GenderEnum.Female && profile.Gender != GenderEnum.Male && profile.Gender != GenderEnum.Other {
 		return errors.New("Gender can only be " + GenderEnum.Male + ", " + GenderEnum.Female + " or " + GenderEnum.Other)
 	}
 	if profile.DoctorLicences == nil && role == "doctor" {
