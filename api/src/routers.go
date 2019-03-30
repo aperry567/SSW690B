@@ -220,4 +220,11 @@ var routes = Routes{
 		"/api/getVisitChat",
 		GetVisitChat,
 	},
+
+	Route{
+		"FindADoctor",
+		strings.ToUpper("Get"),
+		"/api/findADoctor",
+		FindADoctor,
+	},
 }
