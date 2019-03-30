@@ -48,6 +48,8 @@ type ProfileModel struct {
 	Photo            string  `json:"photo"`
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
+	DOB              string  `json:"dob"`
+	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
 	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
 	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
@@ -65,6 +67,8 @@ type UpdateProfileModel struct {
 	Photo            string  `json:"photo"`
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
+	DOB              string  `json:"dob"`
+	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
 	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
 	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
@@ -102,6 +106,8 @@ type SignupModel struct {
 	Photo            string  `json:"photo"`
 	SecretQuestion   string  `json:"secretQuestion"`
 	SecretAnswer     string  `json:"secretAnswer"`
+	DOB              string  `json:"dob"`
+	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
 	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
 	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
@@ -419,10 +425,10 @@ func dbGetProfileGet(s string) (ProfileModel, error) {
 		return profile, errors.New("Bad Session")
 	}
 
-	profileSt, _ := db.Prepare("select `NAME`,`ROLE`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`PHARM_LOC`,`SECRET_Q`, `SECRET_A`, `PHOTO` from `dod`.`USERS` u where u.`USER_ID` = ?")
+	profileSt, _ := db.Prepare("select `NAME`,`ROLE`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHONE`,`PHARM_LOC`,`SECRET_Q`, `SECRET_A`, `PHOTO` , `DOB` , `GENDER` from `dod`.`USERS` u where u.`USER_ID` = ?")
 	defer profileSt.Close()
 
-	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Role, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo)
+	err := profileSt.QueryRow(userID).Scan(&profile.Name, &profile.Role, &profile.Address, &profile.City, &profile.State, &profile.PostalCode, &profile.Phone, &profile.PharmacyLocation, &profile.SecretQuestion, &profile.SecretAnswer, &profile.Photo, &profile.DOB, &profile.Gender)
 	if err != nil {
 		return profile, errors.New("Unable to fetch profile")
 	}
@@ -513,6 +519,12 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	if profile.Phone == "" {
 		return errors.New("Phone is required")
 	}
+	if profile.DOB == "" {
+		return errors.New("DOB is required")
+	}
+	if profile.Gender == "" {
+		return errors.New("Gender is required")
+	}
 	if profile.DoctorLicences == nil && role == "doctor" {
 		return errors.New("Doctors must have one license")
 	}
@@ -524,10 +536,10 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 		}
 	}
 
-	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `NAME` = ?, `ADDR`= ?,`CITY`= ?,`STATE`= ?,`POSTAL_CODE`= ?,`PHARM_LOC`= ?,`PHONE`= ?,`SECRET_Q`= ?, `SECRET_A`= ?, `PHOTO`= ? WHERE `USER_ID` = ?")
+	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `NAME` = ?, `ADDR`= ?,`CITY`= ?,`STATE`= ?,`POSTAL_CODE`= ?,`PHARM_LOC`= ?,`PHONE`= ?,`SECRET_Q`= ?, `SECRET_A`= ?, `PHOTO`= ?, `DOB`= ?, `GENDER`= ? WHERE `USER_ID` = ?")
 	defer profileSt.Close()
 
-	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.PharmacyLocation, profile.Phone, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, userID)
+	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.PharmacyLocation, profile.Phone, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, profile.DOB, profile.Gender, userID)
 	if err != nil {
 		return errors.New("Unable to update profile")
 	}
