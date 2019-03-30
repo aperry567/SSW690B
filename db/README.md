@@ -7,8 +7,10 @@ Created database scripts to generate tables for the project.
 - exams
 - licenses
 - prescriptions
-- users
 - sessions
+- users
+- users_doctor_specialities
 - visits
+- visits_chat
 - example for inserting data into a table
 
