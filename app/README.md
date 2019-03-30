@@ -1,7 +1,30 @@
-# Login UI
+# Flutter
 
-A clean and simple login UI screen with a basic hero animation in Flutter, a mobile sdk framework by Google.
+![Flutter](https://cdn-images-1.medium.com/max/1600/1*TFZQzyVAHLVXI_wNreokGA.png)
 
-[Watch this video tutorial on Youtube](https://youtu.be/efbB8-x9T2c)
+## Help to test
 
-![Login UI Flutter](https://raw.githubusercontent.com/putraxor/flutter-login-ui/master/art/thumbnail.png)
+All the apk files are located at [/app/release/](/app/release/) folder
+
+Please download the latest version then test it.
+
+## Environment Setup
+
+https://flutter.dev/docs/get-started/install
+
+## Documentation
+
+https://flutter.dev/docs
+
+## Tuturials
+
+https://codelabs.developers.google.com/?cat=Flutter
+
+## Super Useful Articles
+
+[Scroll Physics](https://medium.com/flutter-community/flutter-listview-and-scrollphysics-a-detailed-look-7f0912df2754)
+
+[PageView](https://medium.com/flutter-community/a-deep-dive-into-pageview-in-flutter-with-custom-transitions-581d9ea6dded)
+
+
+

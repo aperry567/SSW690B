@@ -1,193 +1,1026 @@
-swagger: "2.0"
+openapi: '3.0.0'
 info:
-  description: "Doctors on Demand API"
-  version: "1.0.0"
-  title: "Doctors on Demand API"
+  description: Doctors on Demand API
+  version: 1.0.0
+  title: Doctors on Demand API
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "35.207.6.9:8080"
-basePath: "/api"
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: http://35.207.6.9:8080/api
+    description: Development server
+  - url: http://35.193.54.177:8080/api
+    description: UAT server
+  - url: http://localhost:8080/api
+    description: Local server
 tags:
-- name: "authentication"
-  description: "Login, Signup, Logout"
-schemes:
-- "http"
-consumes:
-- "application/json"
-produces:
-- "application/json"
+  - name: Authentication
+    description: 'Login, Signup, Logout, Password Reset, Profile, Update Profile'
+  - name: Visits
+    description: 'Patient visits'
+  - name: Home
+    description: 'All home screens that deal with lists of data'
+  - name: Patients
+    description: 'Patient lists and related itemes for doctors only'
+  - name: Prescriptions
+    description: 'Prescriptions for a patient'
+  - name: Exams
+    description: 'Exams for a patient'
+  - name: Questionnaire
+    description: 'Questionnaire for finding a doctor'
 paths:
   /login:
     post:
       tags:
-      - "authentication"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: "object"
-          properties:
-            email:
-              type: "string"
-              format: "email"
-            password:
-              type: "string"
-              format: "password"
+        - Authentication
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
       responses:
         '200':
-          description: "User successfully logged in"
-          schema:
-            type: "object"
-            properties:
-              sessionID:
-                type: "string"
-                format: "uuid"
-              role:
-                type: "string"
-                enum:
-                - "patient"
-                - "doctor"
-                - "sysadmin"
+          description: login response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
         '401':
-          description: "Invalid credentials"
-          schema:
-            type: "string"
-            example: "Invalid credentials"
+          description: user is not logged in
+          content:
+            'text/plain':
+              schema:
+                type: string
+              example: Invalid credentials
   /logout:
+    get:
+      tags:
+        - Authentication
+      parameters: 
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully logged out.  Only response possible for security reasons.
+  /passwordRest:
     post:
       tags:
-      - "authentication"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: "object"
-          properties:
-            sessionID:
-              type: "string"
-              format: "uuid"
+        - Authentication
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: test@test.com
+                secretQuestion:
+                  type: string
+                  example: what is your favorite color?
+                secretAnswer:
+                  type: string
+                  example: blue
+                newPassword:
+                  type: string
+                  format: password
+                  example: P@ssw0rd
+              required:
+                - email
+                - secretQuestion
+                - secretAnswer
+                - newPassword
       responses:
         '200':
-          description: "Successfully logged out.  Only response possible for security reasons."
+          description: Password successfuly reset
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad request
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Bad request
   /signup:
     post:
       tags:
-      - "authentication"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: "object"
-          properties:
-            email:
-              type: "string"
-              format: "email"
-            password:
-              type: "string"
-              format: "password"
-            role:
-              type: "string"
-              enum:
-              - "doctor"
-              - "patient"
-            name:
-              type: "string"
-            address:
-              type: "string"
-            city:
-              type: "string"
-            state:
-              $ref: "#/definitions/States"
-            postalCode:
-              type: "string"
-            phone:
-              type: "string"
-              example: "123-456-7890"
-            doctorLicences:
-              description: "required for doctor sign-ups"
-              type: "array"
-              items:
-                type: "object"
-                properties:
-                  state:
-                    $ref: "#/definitions/States"
-                  license:
-                    type: "string"
+        - Authentication
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "test@test.com"
+                password:
+                  type: string
+                  format: password
+                  example: "P@ssw0rd"
+                role:
+                  type: string
+                  enum:
+                    - patient
+                    - doctor
+                name:
+                  type: string
+                  example: "MR Test"
+                address:
+                  type: string
+                  example: "1313 Mockingbird ln\nNew York, NY 12345"
+                city:
+                  type: string
+                state:
+                  $ref: '#/components/schemas/States'
+                postalCode:
+                  type: string
+                phone:
+                  type: string
+                  example: "123-456-7890"
+                dob:
+                  type: string
+                  example: "2000-12-30"
+                gender:
+                  type: string
+                  description: Can be "Female", "Male" or "Other"
+                  example: "Female"
+                photo:
+                  type: string
+                  example: ""
+                secretQuestion:
+                  type: string
+                  example: "what is your favorite color?"
+                secretAnswer:
+                  type: string
+                  example: "blue"
+                pharmacyLocation:
+                  type: string
+                doctorLicences:
+                  description: required for doctor sign-ups
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      state:
+                        $ref: '#/components/schemas/States'
+                      license:
+                        type: string
+                doctorSpecialities:
+                  description: required for doctor sign-ups
+                  type: array
+                  items:
+                    type: integer
+                    example: 1
+              required:
+                - email
+                - password
+                - role
+                - name
+                - address
+                - city
+                - state
+                - postalCode
+                - phone
+                - photo
+                - secretQuestion
+                - secretAnswer
+                - dob
+                - gender
       responses:
         '200':
-          description: "Create a new account"
-          schema:
-            type: "object"
-            properties:
-              sessionID:
-                type: "string"
-                format: "uuid"
-              role:
-                type: "string"
-                enum:
-                - "patient"
-                - "doctor"
+          description: Create a new account
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: "Unable to create account"
+          description: Unable to create account
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Email already in use
+  /getProfile:
+    get:
+      tags:
+        - Authentication
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
           schema:
-            type: "string"
-            example: "Email already in use"
-definitions:
-  States:
-    type: "string"
-    enum:
-    - "ak"
-    - "al"
-    - "az"
-    - "ar"
-    - "ca"
-    - "co"
-    - "ct"
-    - "de"
-    - "dc"
-    - "fl"
-    - "ga"
-    - "hi"
-    - "id"
-    - "il"
-    - "in"
-    - "ia"
-    - "ks"
-    - "ky"
-    - "la"
-    - "me"
-    - "md"
-    - "ma"
-    - "mi"
-    - "mn"
-    - "ms"
-    - "mo"
-    - "mt"
-    - "ne"
-    - "nv"
-    - "nh"
-    - "nj"
-    - "nm"
-    - "ny"
-    - "nc"
-    - "nd"
-    - "oh"
-    - "ok"
-    - "or"
-    - "pa"
-    - "ri"
-    - "sc"
-    - "sd"
-    - "tn"
-    - "tx"
-    - "ut"
-    - "vt"
-    - "va"
-    - "wa"
-    - "wv"
-    - "wi"
-    - "wy"
+            type: string
+      responses:
+        '200':
+          description: Profile returned
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    example: "doctor, patient"
+                  name:
+                    type: string
+                    example: "MR Test"
+                  address:
+                    type: string
+                    example: "1313 Mockingbird ln\nNew York, NY 12345"
+                  city:
+                    type: string
+                  state:
+                    $ref: '#/components/schemas/States'
+                  postalCode:
+                    type: string
+                  phone:
+                    type: string
+                    example: "123-456-7890"
+                  dob:
+                    type: string
+                    example: "2000-12-30"
+                  gender:
+                    type: string
+                    description: Can be "Female", "Male" or "Other"
+                    example: "Female"
+                  photo:
+                    type: string
+                    example: ""
+                  secretQuestion:
+                    type: string
+                    example: "what is your favorite color?"
+                  secretAnswer:
+                    type: string
+                    example: "blue"
+                  doctorLicences:
+                    description: one required for doctors
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        state:
+                          $ref: '#/components/schemas/States'
+                        license:
+                          type: string
+                  doctorSpecialities:
+                    description: one required for doctors
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
+        '400':
+          description: Unable to fetch profile
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Could not fetch profile
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /updateProfile:
+    post:
+      tags:
+        - Authentication
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "MR Test"
+                address:
+                  type: string
+                  example: "1313 Mockingbird ln\nNew York, NY 12345"
+                city:
+                  type: string
+                state:
+                  $ref: '#/components/schemas/States'
+                postalCode:
+                  type: string
+                phone:
+                  type: string
+                  example: "123-456-7890"
+                dob:
+                  type: string
+                  example: "2000-12-30"
+                gender:
+                  type: string
+                  description: Can be "Female", "Male" or "Other"
+                  example: "Female"
+                photo:
+                  type: string
+                  example: ""
+                secretQuestion:
+                  type: string
+                  example: "what is your favorite color?"
+                secretAnswer:
+                  type: string
+                  example: "blue"
+                doctorLicences:
+                  description: required for doctor sign-ups
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      state:
+                        $ref: '#/components/schemas/States'
+                      license:
+                        type: string
+                doctorSpecialities:
+                    description: one required for doctors
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
+      responses:
+        '200':
+          description: Updated profile
+        '400':
+          description: Unable to update profile
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Could not update profile
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getPatientHomeItems:
+    get:
+      tags:
+        - Home
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: filter
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of patient home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getDoctorHomeItems:
+    get:
+      tags:
+        - Home
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of doctor home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getPatients:
+    get:
+      tags:
+        - Patients
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of patient home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getPatientDetail:
+    get:
+      tags:
+        - Patients
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: patientID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Patient Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /getPatientRelatedItems:
+    get:
+      tags:
+        - Patients
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: patientID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of patient home screen data
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /getVisitDetail:
+    get:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Visit Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /getVisitRelatedItems:
+    get:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: filter
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Related Items for a Visit
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+  /addVisitRelatedItems:
+    post:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: filter
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/AddRelatedItemRequest"
+      responses:
+        '200':
+          description: Related Item updated
+  /getDoctorSpecialities:
+    get:
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: list of doctor specialities
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+  /updateVisit:
+    post:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+              required:
+                - details
+      responses:
+        '200':
+          description: Visit updated
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Unable to update visit
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: Could not update visit
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getExamDetail:
+    get:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Exam Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /updateExam:
+    post:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+                  example: 'get an x-ray'
+                dateTime:
+                  type: string
+                  example: '2019-01-03 13:12:00'
+                subtitle:
+                  type: string
+                  example: '100 penn ave, new york, new york 12004'
+              required:
+                - details
+                - dateTime
+                - subtitle
+      responses:
+        '200':
+          description: Exam updated
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Unable to update exam
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: Could not update exam
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /deleteExam:
+    get:
+      tags:
+        - Exams
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: examID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':  
+          description: exam deleted
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getPrescriptionDetail:
+    get:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Prescriptions Details
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+  /updatePrescription:
+    post:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+                  example: 'Take two a day'
+                title:
+                  type: string
+                  example: 'Aspirin'
+                subtitle:
+                  type: string
+                  example: 'Refills: 2'
+              required:
+                - details
+                - title
+                - subtitle
+      responses:
+        '200':
+          description: Prescription updated
+          content:
+            'application/json':
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Unable to update prescription
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: Could not update prescription
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /deletePrescription:
+    get:
+      tags:
+        - Prescriptions
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: prescriptionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':  
+          description: prescription deleted
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getQuestionnaire:
+    get:
+      tags:
+        - Questionnaire
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: questionID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: questions returned
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question:
+                      type: string
+                    moreQuestionsURL:
+                      type: string
+                    findDoctorURL:
+                      type: string
+        '401':
+          description: User is not signed in.  Return to login screen.
+components:
+  schemas:
+    AddRelatedItemRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        dateTime:
+          type: string
+        details:
+          type: string
+    ListResponse:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              value:
+                type: string
+                example: "listFilter=0"
+              updateURL:
+                type: string
+              addDetails:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    fieldName:
+                      type: string
+                    required:
+                      type: boolean
+                    isDataTime:
+                      type: boolean
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                example: 'visit'
+              labelColor:
+                type: string
+                example: '0xFFFFFFFF'
+              photo:
+                type: string
+                example: base64 encoded image
+              title:
+                type: string
+                example: Persistent Headaches
+              subtitle:
+                type: string
+                example: Dr. Cid Caesar
+              dateTime:
+                type: string
+                example: 'Patient exhibited symptoms for migraines.  Recommending over the counter migraine medication and meditation to reduce migraines.'
+              details:
+                type: string
+                example: 'YYYY-MM-DD HH:MM:SS'
+              screenType:
+                type: string
+                example: 'list'
+              detailLink:
+                type: string
+                description: indicates when there's a detail page
+                example: 'http://123.123.123/api/getVisit?id=1'
+    AuthResponse:
+      type: object
+      properties:
+        sessionID:
+          type: string
+        nav:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              icon:
+                type: string
+                description: "string title from https://docs.flutter.io/flutter/material/Icons-class.html"
+              apiURL:
+                type: string
+              screenType:
+                type: string
+                enum:
+                  - list
+                  - detail
+                  - profile
+                  - findDoctor
+    DetailsResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        titleEditable:
+          type: boolean
+        subtitle:
+          type: string
+        subtitleEditable:
+          type: boolean
+        label:
+          type: string
+        labelColor:
+          type: string
+        dateTime:
+          type: string
+        dateTimeEditable:
+          type: boolean
+        photo:
+          type: string
+        details:
+          type: string
+        detailsEditable:
+          type: boolean
+        chatURL:
+          type: string
+        relatedItemURL:
+          type: string
+        updateURL:
+          type: string
+        deleteURL:
+          type: string
+    States:
+      type: string
+      enum:
+        - ak
+        - al
+        - az
+        - ar
+        - ca
+        - co
+        - ct
+        - de
+        - dc
+        - fl
+        - ga
+        - hi
+        - id
+        - il
+        - in
+        - ia
+        - ks
+        - ky
+        - la
+        - me
+        - md
+        - ma
+        - mi
+        - mn
+        - ms
+        - mo
+        - mt
+        - ne
+        - nv
+        - nh
+        - nj
+        - nm
+        - ny
+        - nc
+        - nd
+        - oh
+        - ok
+        - or
+        - pa
+        - ri
+        - sc
+        - sd
+        - tn
+        - tx
+        - ut
+        - vt
+        - va
+        - wa
+        - wv
+        - wi
+        - wy

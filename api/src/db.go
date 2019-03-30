@@ -63,7 +63,7 @@ func dbGetUserID(session string) int {
 
 	st, err := db.Prepare("select USER_ID from `dod`.`SESSIONS` where `SESSION_ID` = ?")
 	if err != nil {
-		fmt.Println(err.Error())
+		return 0
 	}
 	defer st.Close()
 
@@ -71,4 +71,43 @@ func dbGetUserID(session string) int {
 	st.QueryRow(session).Scan(&userID)
 
 	return userID
+}
+
+func dbGetUserIDAndRole(session string) (int, string) {
+	db := getDB()
+	if db == nil {
+		return 0, ""
+	}
+	defer db.Close()
+
+	st, err := db.Prepare("select u.`USER_ID`, u.`ROLE` from `dod`.`SESSIONS` s left outer join `dod`.`USERS` u on u.`USER_ID` = s.`USER_ID` where s.`SESSION_ID` = ?")
+	if err != nil {
+		return 0, ""
+	}
+	defer st.Close()
+
+	var userID int
+	var role string
+	st.QueryRow(session).Scan(&userID, &role)
+
+	return userID, role
+}
+
+func dbGetPatientUserIDForVisitID(doctorID int, visitID string) int {
+	db := getDB()
+	if db == nil {
+		return 0
+	}
+	defer db.Close()
+
+	st, err := db.Prepare("select `PATIENT_USER_ID` from `dod`.`VISITS` where `DOCTOR_USER_ID` = ? and VISIT_ID = ?")
+	if err != nil {
+		return 0
+	}
+	defer st.Close()
+
+	var patientID int
+	st.QueryRow(doctorID, visitID).Scan(&patientID)
+
+	return patientID
 }
