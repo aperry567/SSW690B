@@ -647,16 +647,14 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 func LogoutPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	var input LogoutModel
-
-	err := json.NewDecoder(r.Body).Decode(&input)
-	if err != nil {
-		http.Error(w, "Unable to understand request", 400)
+	sessionID := r.URL.Query().Get("sessionID")
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	dbUserLogout(input.SessionID)
+	dbUserLogout(sessionID)
 }
 
 func SignupPost(w http.ResponseWriter, r *http.Request) {

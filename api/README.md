@@ -32,6 +32,10 @@ Get temporary db connection working (expires every 5 min or so)
 Go allows you the ability to run+compile on the the fly which is great for development.
 ```go run api/src/*.go```
 
+Windows: 
+1): go build
+2): Run the executable as src.exe
+
 ## Documentation
 
 Go here to use the swagger ui (http://editor.swagger.io) then go to the menu File -> Import URL and enter (http://35.207.6.9:8080/swagger.yaml)
