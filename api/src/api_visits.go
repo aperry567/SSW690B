@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -306,6 +307,52 @@ func dbUpdateVisit(sessionID string, visitID string, req UpdateVisitRequest) err
 	return nil
 }
 
+func dbAddVisitChat(sessionID string, visitID string, message string) error {
+	dbUserClearSessions()
+
+	var err error
+
+	db := getDB()
+	if db == nil {
+		return errors.New("Unable to connect to db")
+	}
+	defer db.Close()
+
+	//fetch user_id and role
+	userID, role := dbGetUserIDAndRole(sessionID)
+	if userID == 0 {
+		return errors.New("Bad Session")
+	}
+
+	if role != "patient" {
+		return errors.New("Can only be used by patients")
+	}
+
+	//validate visit for user
+	var id string
+	visitSt, _ := db.Prepare("SELECT VISIT_ID FROM dod.VISITS where VISIT_ID = ? and PATIENT_USER_ID = ?")
+	defer visitSt.Close()
+	err = visitSt.QueryRow(visitID, userID).Scan(&id)
+	if err != nil && err == sql.ErrNoRows {
+		return errors.New("You cannot chat on this visit")
+	}
+	if err != nil {
+		return errors.New("Unable to find chat visit")
+	}
+
+	//insert chat message
+	chatSt, _ := db.Prepare("INSERT INTO `dod`.`VISITS_CHAT` (`VISIT_ID`,`USER_ID`,	`MSG`,`IS_READ`) VALUES (?,?,?,0)")
+	_, err = chatSt.Exec(visitID, userID, message)
+	defer chatSt.Close()
+	if err != nil {
+		return errors.New("Unable to add chat")
+	}
+
+	dbAuditAction(userID, "Chat:Added")
+
+	return nil
+}
+
 func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -438,4 +485,38 @@ func GetVisitDetail(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(output)
+}
+
+func AddVisitChat(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	sessionID := r.URL.Query().Get("sessionID")
+	visitID := r.URL.Query().Get("visitID")
+	tempStr, _ := ioutil.ReadAll(r.Body)
+	message := string(tempStr)
+
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+	if visitID == "" {
+		http.Error(w, "Missing required visitID parameter", 400)
+		return
+	}
+	if message == "" {
+		http.Error(w, "Missing message in body", 400)
+		return
+	}
+	err := dbAddVisitChat(sessionID, visitID, message)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

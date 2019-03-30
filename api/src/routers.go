@@ -227,4 +227,11 @@ var routes = Routes{
 		"/api/findADoctor",
 		FindADoctor,
 	},
+
+	Route{
+		"AddVisitChat",
+		strings.ToUpper("Post"),
+		"/api/addVisitChat",
+		AddVisitChat,
+	},
 }
