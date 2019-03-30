@@ -573,7 +573,7 @@ func dbUpdateProfilePost(sessionID string, profile UpdateProfileModel) error {
 	profileSt, _ := db.Prepare("UPDATE `dod`.`USERS` SET `NAME` = ?, `ADDR`= ?,`CITY`= ?,`STATE`= ?,`POSTAL_CODE`= ?,`PHARM_LOC`= ?,`PHONE`= ?,`SECRET_Q`= ?, `SECRET_A`= ?, `PHOTO`= ?, `DOB`= ?, `GENDER`= ? WHERE `USER_ID` = ?")
 	defer profileSt.Close()
 
-	_, err := profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.PharmacyLocation, profile.Phone, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, profile.DOB, profile.Gender, userID)
+	_, err = profileSt.Exec(profile.Name, profile.Address, profile.City, profile.State, profile.PostalCode, profile.PharmacyLocation, profile.Phone, profile.SecretQuestion, profile.SecretAnswer, profile.Photo, profile.DOB, profile.Gender, userID)
 	if err != nil {
 		return errors.New("Unable to update profile")
 	}
