@@ -129,18 +129,16 @@ CREATE TABLE `VISITS` (
 
 CREATE TABLE `VISITS_CHAT` (
   `visits_chat_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `visit_id` int(10) unsigned DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `msg` longtext COLLATE utf8_unicode_ci,
-  `is_read` tinyint(4) DEFAULT NULL,
+  `visit_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `msg` longtext COLLATE utf8_unicode_ci NOT NULL,
+  `is_read` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`visits_chat_id`),
-  KEY `visit_id _idx` (`visit_id`),
   KEY `user_id_fk_idx` (`visit_id`,`user_id`),
   KEY `user_id_fk_idx1` (`user_id`),
   CONSTRAINT `user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `visit_id_fk` FOREIGN KEY (`visit_id`) REFERENCES `USERS` (`USER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `visit_id_fk` FOREIGN KEY (`visit_id`) REFERENCES `VISITS` (`VISIT_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-SELECT * FROM dod.VISITS_CHAT;
 
 CREATE TABLE `QUESTIONNAIRE` (
   `QUESTION_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
