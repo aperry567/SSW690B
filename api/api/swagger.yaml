@@ -218,6 +218,8 @@ paths:
               schema:
                 type: string
                 example: Email already in use
+        '401':
+          description: User is not signed in.  Return to login screen.
   /getProfile:
     get:
       tags:
@@ -393,6 +395,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getDoctorHomeItems:
     get:
       tags:
@@ -411,6 +421,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getPatients:
     get:
       tags:
@@ -429,6 +447,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getPatientDetail:
     get:
       tags:
@@ -452,6 +478,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/DetailsResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getPatientRelatedItems:
     get:
       tags:
@@ -475,6 +509,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getVisitDetail:
     get:
       tags:
@@ -498,6 +540,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/DetailsResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getVisitRelatedItems:
     get:
       tags:
@@ -526,6 +576,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/ListResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /addVisitRelatedItems:
     post:
       tags:
@@ -555,6 +613,14 @@ paths:
       responses:
         '200':
           description: Related Item updated
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getDoctorSpecialities:
     get:
       tags:
@@ -573,6 +639,14 @@ paths:
                       type: integer
                     name:
                       type: string
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /updateVisit:
     post:
       tags:
@@ -639,6 +713,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/DetailsResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /updateExam:
     post:
       tags:
@@ -712,6 +794,12 @@ paths:
           description: exam deleted
         '401':
           description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getPrescriptionDetail:
     get:
       tags:
@@ -735,6 +823,14 @@ paths:
             'application/json':
               schema:
                 $ref: "#/components/schemas/DetailsResponse"
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /updatePrescription:
     post:
       tags:
@@ -808,6 +904,12 @@ paths:
           description: prescription deleted
         '401':
           description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getQuestionnaire:
     get:
       tags:
@@ -841,6 +943,12 @@ paths:
                       type: string
         '401':
           description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+          content:
+            'text/plain':
+              schema:
+                type: string
   /getVisitChat:
     get:
       tags:
@@ -898,6 +1006,35 @@ paths:
                           type: string
                         isCurrentUser:
                           type: boolean
+        '401':
+          description: User is not signed in.  Return to login screen.
+        '400':
+          description: Invalid request data or internal error
+  /findADoctor:
+    get:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: questionID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get Related Items for a Visit
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+        '400':
+          description: Invalid request data or internal error
         '401':
           description: User is not signed in.  Return to login screen.
 components:
