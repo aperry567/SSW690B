@@ -199,5 +199,7 @@ VALUES (2, '2019-02-01 01:01:00', 'doctor', '$2a$04$cvoT.AnFW8kNY2R9tsghxe533MCx
 
 INSERT INTO `dod`.`VISITS` (`PATIENT_USER_ID`, `DOCTOR_USER_ID`, `VISIT_REASON`, `NOTES`) VALUES (1, 2, 'Headache', 'Patient had a low grade fever.  Headache for less than 24 hours.  Recommending rest and have them call back in a week if persists.');
 
+INSERT INTO `dod`.`VISITS_CHAT`(`visits_chat_id`,`visit_id`,`user_id`,`msg`,`is_read`)VALUES (1, 1, 1, 'I need a doctor referral', 1);
+
 INSERT INTO `dod`.`USERS_DOCTOR_SPECIALITIES` (`DOCTOR_SPECIALITIES_ID`, `USER_ID`) VALUES ('1', '2');
 INSERT INTO `dod`.`USERS_DOCTOR_SPECIALITIES` (`DOCTOR_SPECIALITIES_ID`, `USER_ID`) VALUES ('7', '2');
