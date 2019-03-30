@@ -28,6 +28,8 @@ tags:
     description: 'Exams for a patient'
   - name: Questionnaire
     description: 'Questionnaire for finding a doctor'
+  - name: Chat
+    description: 'Chats associated to a visit'
 paths:
   /login:
     post:
@@ -837,6 +839,65 @@ paths:
                       type: string
                     findDoctorURL:
                       type: string
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getVisitChat:
+    get:
+      tags:
+        - Chat
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: visitID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: timeLastRead
+          schema:
+            type: string
+            example: "2019-03-30 13:13:00"
+      responses:
+        '200':
+          description: chats for the visit returned
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userID:
+                          type: string
+                        msg:
+                          type: string
+                        isRead:
+                          type: boolean
+                        createdDateTime:
+                          type: string
+                          example: '2010-12-30 12:12:00'
+                  photos:
+                    type: array
+                    description: Omitted if using timeLastRead parameter
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        photo:
+                          type: string
+                        name:
+                          type: string
+                        isCurrentUser:
+                          type: boolean
         '401':
           description: User is not signed in.  Return to login screen.
 components:

@@ -213,4 +213,11 @@ var routes = Routes{
 		"/api/getQuestionnaire",
 		GetQuestionnaire,
 	},
+
+	Route{
+		"GetVisitChat",
+		strings.ToUpper("Get"),
+		"/api/getVisitChat",
+		GetVisitChat,
+	},
 }
