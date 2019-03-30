@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -309,6 +310,13 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.DOB == "" {
 		return AuthResponse{}, errors.New("DOB is required")
 	}
+	if req.DateTime == "" {
+		return errors.New("DOB is required")
+	}
+	_, err = time.Parse("2006-01-02", req.DateTime)
+	if err != nil {
+		return errors.New("Invalid DOB format YYYY-MM-DD")
+	}
 	if sm.Gender == "" {
 		return AuthResponse{}, errors.New("Gender is required")
 	}
@@ -347,7 +355,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 
 	//setup data to insert
 	pHash := hashPassword(sm.Password)
-	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`, `DOB`, `GENDER`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`, `DOB`, `GENDER`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
 	signupRes, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, sm.SecretQuestion, sm.SecretAnswer, sm.Photo, sm.DOB, sm.Gender)
 	if signupErr != nil {
