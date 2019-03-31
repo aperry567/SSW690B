@@ -22,6 +22,11 @@ func patientNav(s string) []AuthNav {
 		APIURL:     "/api/getPatientHomeItems?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{
+		Title:      "Messages",
+		Icon:       "mail",
+		APIURL:     "/api/getUnreadChats?sessionID=" + s,
+		ScreenType: "list",
+	}, AuthNav{
 		Title:      "Profile",
 		Icon:       "person",
 		APIURL:     "/api/getProfile?sessionID=" + s,
@@ -37,6 +42,16 @@ func doctorNav(s string) []AuthNav {
 		Title:      "All",
 		Icon:       "home",
 		APIURL:     "/api/getDoctorHomeItems?sessionID=" + s,
+		ScreenType: "list",
+	}, AuthNav{
+		Title:      "Messages",
+		Icon:       "mail",
+		APIURL:     "/api/getUnreadChats?sessionID=" + s,
+		ScreenType: "list",
+	}, AuthNav{
+		Title:      "Patients",
+		Icon:       "people",
+		APIURL:     "/api//getPatients?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{
 		Title:      "Profile",
