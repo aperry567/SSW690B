@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -233,7 +232,7 @@ func dbAddVisitRelatedItems(sessionID string, visitID string, filter string, req
 	return nil
 }
 
-func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, error) {
+func dbGetVisitDetail(sessionID string, visitID string) (DetailResponse, error) {
 	dbUserClearSessions()
 
 	var resp DetailResponse
@@ -250,11 +249,6 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 		return resp, errors.New("Bad Session")
 	}
 
-	visitID, numErr := strconv.ParseInt(visitIDstr, 0, 64)
-	if numErr != nil {
-		return resp, errors.New("Refills must be a number")
-	}
-
 	//build query string
 	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
 	if role == "doctor" {
@@ -268,14 +262,14 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 		return resp, errors.New("Unable to find visit")
 	}
 
-	resp.RelatedItemsURL = "/api/getVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitIDstr
+	resp.RelatedItemsURL = "/api/getVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID
 
 	if role == "doctor" {
 		resp.DetailsEditable = true
-		resp.UpdateURL = "/api/updateVisit?sessionID=" + sessionID + "&visitID=" + strconv.Itoa(int(visitID))
+		resp.UpdateURL = "/api/updateVisit?sessionID=" + sessionID + "&visitID=" + visitID
 	}
 
-	resp.ChatURL = "/api/getVisitChat?sessionID=" + sessionID + "&visitID=" + strconv.Itoa(int(visitID))
+	resp.ChatURL = "/api/getVisitChat?sessionID=" + sessionID + "&visitID=" + visitID
 
 	return resp, nil
 }
@@ -311,50 +305,59 @@ func dbUpdateVisit(sessionID string, visitID string, req UpdateVisitRequest) err
 	return nil
 }
 
-func dbAddVisitChat(sessionID string, visitID string, message string) error {
+func dbCreateVisit(sessionID string, questionID string, doctorID string) (DetailResponse, error) {
 	dbUserClearSessions()
 
-	var err error
+	var resp DetailResponse
 
 	db := getDB()
 	if db == nil {
-		return errors.New("Unable to connect to db")
+		return resp, errors.New("Unable to connect to db")
 	}
 	defer db.Close()
 
 	//fetch user_id and role
 	userID, role := dbGetUserIDAndRole(sessionID)
 	if userID == 0 {
-		return errors.New("Bad Session")
+		return resp, errors.New("Bad Session")
 	}
 
 	if role != "patient" {
-		return errors.New("Can only be used by patients")
+		return resp, errors.New("Can only be used by patients")
 	}
 
-	//validate visit for user
+	//check that doctor matches for question and user (doctor_speciality_id and user state) and get the question's reason
+	doctorSt, _ := db.Prepare("select distinct d.USER_ID, q.REASON from dod.QUESTIONNAIRE q left outer join dod.USERS_DOCTOR_SPECIALITIES uds ON uds.DOCTOR_SPECIALITIES_ID = q.DOCTOR_SPECIALTY_ID left outer join dod.USERS d ON d.USER_ID = uds.USER_ID left outer join dod.LICENSES l ON l.USER_ID = d.USER_ID left outer join dod.USERS p ON p.STATE = l.STATE where q.QUESTION_ID = ? and p.USER_ID = ? and d.USER_ID = ?")
+	defer doctorSt.Close()
+
 	var id string
-	visitSt, _ := db.Prepare("SELECT VISIT_ID FROM dod.VISITS where VISIT_ID = ? and PATIENT_USER_ID = ?")
-	defer visitSt.Close()
-	err = visitSt.QueryRow(visitID, userID).Scan(&id)
-	if err != nil && err == sql.ErrNoRows {
-		return errors.New("You cannot chat on this visit")
-	}
+	var reason string
+	err := doctorSt.QueryRow(questionID, userID, doctorID).Scan(&id, &reason)
 	if err != nil {
-		return errors.New("Unable to find chat visit")
+		return resp, errors.New("Doctor is not a valid option for the patients health question")
 	}
 
-	//insert chat message
-	chatSt, _ := db.Prepare("INSERT INTO `dod`.`VISITS_CHAT` (`VISIT_ID`,`USER_ID`,	`MSG`,`IS_READ`) VALUES (?,?,?,0)")
-	_, err = chatSt.Exec(visitID, userID, message)
-	defer chatSt.Close()
-	if err != nil {
-		return errors.New("Unable to add chat")
+	//create visit with required info
+	visitSt, _ := db.Prepare("INSERT INTO `dod`.`VISITS` (`PATIENT_USER_ID`, `DOCTOR_USER_ID`, `VISIT_REASON`, `NOTES`) VALUES (?,?,?,'')")
+	visitResp, visitErr := visitSt.Exec(userID, doctorID, reason)
+	if visitErr != nil {
+		return resp, errors.New("Unable to create visit")
+	}
+	visitID, visitRespErr := visitResp.LastInsertId()
+	if visitRespErr != nil {
+		return resp, errors.New("Internal error for id please try again later")
 	}
 
-	dbAuditAction(userID, "Chat:Added")
+	//add chat message "Hello doctor, I am having an issue with " to visit
+	msg := "Hello doctor, this patient " + strings.ToLower(reason) + " and needs your expert help"
+	chatSt, _ := db.Prepare("INSERT INTO `dod`.`VISITS_CHAT` (`VISIT_ID`, `USER_ID`, `MSG`, `IS_READ`) VALUES (?,?,?,0)")
+	_, chatErr := chatSt.Exec(visitID, userID, msg)
+	if chatErr != nil {
+		return resp, errors.New("Unable to create chat")
+	}
 
-	return nil
+	//return visit details
+	return dbGetVisitDetail(sessionID, strconv.FormatInt(visitID, 10))
 }
 
 func UpdateVisit(w http.ResponseWriter, r *http.Request) {
@@ -491,27 +494,28 @@ func GetVisitDetail(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func AddVisitChat(w http.ResponseWriter, r *http.Request) {
+func CreateVisit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	sessionID := r.URL.Query().Get("sessionID")
-	visitID := r.URL.Query().Get("visitID")
-	tempStr, _ := ioutil.ReadAll(r.Body)
-	message := string(tempStr)
-
 	if sessionID == "" {
 		http.Error(w, "Missing required sessionID parameter", 400)
 		return
 	}
-	if visitID == "" {
-		http.Error(w, "Missing required visitID parameter", 400)
+
+	questionID := r.URL.Query().Get("questionID")
+	if questionID == "" {
+		http.Error(w, "Missing required questionID parameter", 400)
 		return
 	}
-	if message == "" {
-		http.Error(w, "Missing message in body", 400)
+
+	doctorID := r.URL.Query().Get("doctorID")
+	if doctorID == "" {
+		http.Error(w, "Missing required doctorID parameter", 400)
 		return
 	}
-	err := dbAddVisitChat(sessionID, visitID, message)
+
+	output, err := dbCreateVisit(sessionID, questionID, doctorID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
@@ -523,4 +527,5 @@ func AddVisitChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(output)
 }
