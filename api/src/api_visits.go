@@ -270,10 +270,10 @@ func dbGetVisitDetail(sessionID string, visitIDstr string) (DetailResponse, erro
 
 	if role == "doctor" {
 		resp.DetailsEditable = true
-		resp.UpdateURL = "/api/updateVisit?sessionID=" + sessionID + "&visitID=" + visitID
+		resp.UpdateURL = "/api/updateVisit?sessionID=" + sessionID + "&visitID=" + strconv.Itoa(int(visitID))
 	}
 
-	resp.ChatURL = "/api/getVisitChat?sessionID=" + sessionID + "&visitID=" + visitID
+	resp.ChatURL = "/api/getVisitChat?sessionID=" + sessionID + "&visitID=" + strconv.Itoa(int(visitID))
 
 	return resp, nil
 }

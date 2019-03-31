@@ -10,11 +10,11 @@ type DetailResponse struct {
 	LabelColor       string `json:"labelColor"`
 	DateTime         string `json:"datetime"`
 	DateTimeEditable bool   `json:"datetimeEditable"`
-	Photo            string `json:"photo"`
 	Details          string `json:"details"`
 	DetailsEditable  bool   `json:"detailsEditable"`
 	ChatURL          string `json:"chatURL,omitempty"`
 	RelatedItemsURL  string `json:"relatedItemsURL,omitempty"`
 	UpdateURL        string `json:"updateURL,omitempty"`
 	DeleteURL        string `json:"deleteURL,omitempty"`
+	Photo            string `json:"photo"`
 }
