@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -111,23 +112,24 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	// all
 	if filter == "" {
 		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(visitID, userID, visitID, userID)
+		rows, err = selectSt.Query(sessionID, visitID, userID, sessionID, visitID, userID)
 	}
 	// exam
 	if filter == "1" {
 		selectSt, _ = db.Prepare(examSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(visitID, userID)
+		rows, err = selectSt.Query(sessionID, visitID, userID)
 	}
 	// prescription
 	if filter == "2" {
 		selectSt, _ = db.Prepare(prescriptSelect + " ORDER BY DATETIME DESC")
-		rows, err = selectSt.Query(visitID, userID)
+		rows, err = selectSt.Query(sessionID, visitID, userID)
 	}
 
 	defer selectSt.Close()
 	defer rows.Close()
 
 	if err != nil {
+		fmt.Println(filter, err.Error())
 		return response, errors.New("Unable to fetch home items")
 	}
 
