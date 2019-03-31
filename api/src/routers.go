@@ -234,4 +234,11 @@ var routes = Routes{
 		"/api/addVisitChat",
 		AddVisitChat,
 	},
+
+	Route{
+		"GetUnreadChats",
+		strings.ToUpper("Get"),
+		"/api/getUnreadChats",
+		GetUnreadChats,
+	},
 }

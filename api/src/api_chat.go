@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -99,6 +100,42 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	return response, nil
 }
 
+func dbGetUnreadChats(sessionID string) (ListResponse, error) {
+	dbUserClearSessions()
+
+	db := getDB()
+	userID, role := dbGetUserIDAndRole(sessionID)
+
+	var response ListResponse
+
+	// get visit user photos and name
+	// this ensures the user is a part of the visit for security
+	queryStr := "SELECT distinct v.VISIT_ID, u.PHOTO, v.VISIT_TIME, CONCAT('Visited ', u.NAME),'Visit', '" + LABEL_COLOR_VISIT + "', v.NOTES, v.VISIT_REASON, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',v.VISIT_ID) FROM dod.VISITS v left outer join dod.VISITS_CHAT c on v.VISIT_ID = c.VISIT_ID left outer join dod.USERS u on u.USER_ID = v.PATIENT_USER_ID where c.USER_ID = ? and c.IS_READ = 0"
+	if role == "doctor" {
+		queryStr = strings.Replace(queryStr, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
+	}
+	visitSt, _ := db.Prepare(queryStr)
+
+	// get visit chat
+	var rows *sql.Rows
+	var err error
+	rows, err = visitSt.Query(sessionID, userID)
+	defer visitSt.Close()
+	if err != nil {
+		return response, errors.New("Unable to fetch messages")
+	}
+	for rows.Next() {
+		var item ListItem
+		var id string
+		if err := rows.Scan(&id, &item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
+			return response, errors.New("Unable to fetch chat message")
+		}
+		response.Items = append(response.Items, item)
+	}
+
+	return response, nil
+}
+
 func GetVisitChat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -123,6 +160,30 @@ func GetVisitChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	output, err := dbGetVisitChat(sessionID, visitID, timeLastRead)
+
+	if err != nil {
+		if err.Error() == "Bad Session" {
+			http.Error(w, "Invalid credentials", 401)
+			return
+		}
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(output)
+}
+
+func GetUnreadChats(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	sessionID := r.URL.Query().Get("sessionID")
+	if sessionID == "" {
+		http.Error(w, "Missing required sessionID parameter", 400)
+		return
+	}
+
+	output, err := dbGetUnreadChats(sessionID)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
