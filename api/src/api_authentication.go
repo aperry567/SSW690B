@@ -369,7 +369,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 
 	//setup data to insert
 	pHash := hashPassword(sm.Password)
-	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`, `DOB`, `GENDER`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	signupSt, _ := db.Prepare("INSERT INTO `dod`.`USERS` (`CREATED_DT`,`ROLE`,`PASSW`,`NAME`,`EMAIL`,`ADDR`,`CITY`,`STATE`,`POSTAL_CODE`,`PHARM_LOC`,`PHONE`,`SECRET_Q`, `SECRET_A`, `PHOTO`, `DOB`, `GENDER`) VALUES (now(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	defer signupSt.Close()
 	signupRes, signupErr := signupSt.Exec(sm.Role, pHash, sm.Name, sm.Email, sm.Address, sm.City, sm.State, sm.PostalCode, sm.PharmacyLocation, sm.Phone, sm.SecretQuestion, sm.SecretAnswer, sm.Photo, sm.DOB, sm.Gender)
 	if signupErr != nil {
