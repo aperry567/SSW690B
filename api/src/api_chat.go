@@ -28,7 +28,7 @@ type ChatPhoto struct {
 }
 type ChatResponse struct {
 	Chats  []Chat      `json:"chats"`
-	Photos []ChatPhoto `json:"photos,omitempty"`
+	Photos []ChatPhoto `json:"photos"`
 }
 
 /**dbGetVisitChat

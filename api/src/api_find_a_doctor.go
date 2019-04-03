@@ -14,8 +14,8 @@ import (
 
 type QuestionnaireResponse struct {
 	Question         string `json:"question"`
-	MoreQuestionsURL string `json:"moreQuestionsURL,omitempty"`
-	FindDoctorURL    string `json:"findDoctorURL,omitempty"`
+	MoreQuestionsURL string `json:"moreQuestionsURL"`
+	FindDoctorURL    string `json:"findDoctorURL"`
 }
 
 func dbGetQuestionnaire(sessionID string, questionID string) ([]QuestionnaireResponse, error) {

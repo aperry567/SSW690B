@@ -63,8 +63,8 @@ type ProfileModel struct {
 	DOB              string  `json:"dob"`
 	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
-	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
-	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities"`
 }
 
 type UpdateProfileModel struct {
@@ -82,8 +82,8 @@ type UpdateProfileModel struct {
 	DOB              string  `json:"dob"`
 	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
-	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
-	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities"`
 }
 
 type PasswordResetModel struct {
@@ -121,8 +121,8 @@ type SignupModel struct {
 	DOB              string  `json:"dob"`
 	Gender           string  `json:"gender"`
 	// required for doctor sign-ups
-	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences,omitempty"`
-	DoctorSpecialities []int                  `json:"doctorSpecialities,omitempty"`
+	DoctorLicences     []SignupDoctorLicences `json:"doctorLicences"`
+	DoctorSpecialities []int                  `json:"doctorSpecialities"`
 }
 
 type DoctorSpecialities struct {

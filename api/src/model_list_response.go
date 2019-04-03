@@ -8,29 +8,29 @@ type ListFilterAddDetails struct {
 	Label      string `json:"label"`
 	FieldName  string `json:"fieldName"`
 	Required   bool   `json:"required"`
-	IsDateTime bool   `json:"isDateTime`
+	IsDateTime bool   `json:"isDateTime"`
 }
 
 type ListFilter struct {
 	Title      string                 `json:"title"`
 	Value      string                 `json:"value"`
 	AddURL     string                 `json:"addURL"`
-	AddDetails []ListFilterAddDetails `json:"addDetails,omitempty"`
+	AddDetails []ListFilterAddDetails `json:"addDetails"`
 }
 
 type ListItem struct {
-	Label      string `json:"label,omitempty"`
-	LabelColor string `json:"labelColor,omitempty"`
+	Label      string `json:"label"`
+	LabelColor string `json:"labelColor"`
 	Title      string `json:"title"`
-	Subtitle   string `json:"subtitle,omitempty"`
+	Subtitle   string `json:"subtitle"`
 	DateTime   string `json:"dateTime"`
-	Details    string `json:"details,omitempty"`
-	ScreenType string `json:"screenType,omitempty"`
-	DetailLink string `json:"detailLink,omitempty"`
-	Photo      string `json:"photo,omitempty"`
+	Details    string `json:"details"`
+	ScreenType string `json:"screenType"`
+	DetailLink string `json:"detailLink"`
+	Photo      string `json:"photo"`
 }
 
 type ListResponse struct {
-	Filters []ListFilter `json:"filters,omitempty"`
+	Filters []ListFilter `json:"filters"`
 	Items   []ListItem   `json:"items"`
 }

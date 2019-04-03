@@ -12,9 +12,9 @@ type DetailResponse struct {
 	DateTimeEditable bool   `json:"datetimeEditable"`
 	Details          string `json:"details"`
 	DetailsEditable  bool   `json:"detailsEditable"`
-	ChatURL          string `json:"chatURL,omitempty"`
-	RelatedItemsURL  string `json:"relatedItemsURL,omitempty"`
-	UpdateURL        string `json:"updateURL,omitempty"`
-	DeleteURL        string `json:"deleteURL,omitempty"`
+	ChatURL          string `json:"chatURL"`
+	RelatedItemsURL  string `json:"relatedItemsURL"`
+	UpdateURL        string `json:"updateURL"`
+	DeleteURL        string `json:"deleteURL"`
 	Photo            string `json:"photo"`
 }
