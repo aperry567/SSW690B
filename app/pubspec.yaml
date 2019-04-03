@@ -5,16 +5,28 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.0
+  http: ^0.12.0
+  image_picker: ^0.4.5
+  rocket_chat_dart: ^0.0.38
+  liquid_pull_to_refresh: ^1.1.0
+  square_in_app_payments: ^1.1.0
+  flutter_fab_dialer: ^0.1.1
+  intl: 0.15.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
 flutter:
   uses-material-design: true
   assets:
     - assets/logo.png
     - assets/alucard.jpg
+    - assets/profile.jpg
+    - assets/iconCookie.png
+    - assets/googlePayLogo.png
+    - assets/applePayLogo.png
   fonts:
       - family: Nunito
         fonts:
