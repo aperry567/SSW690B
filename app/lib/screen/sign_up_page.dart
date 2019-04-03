@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:login/component/enum_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 
 class SignUpPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String _conmfirm_password_value;
   String _role_value;
   String _name_value = "default";
+  String _gender;
   String _address_value = "default";
   String _city_value = "default";
   USState _state_value;
@@ -44,7 +46,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String _doctor_ID_value;
   USState _doctor_state_value;
 
-
+  DateTime _selectedDate = DateTime.now();
 
   var _doctorLicences_value;
 
@@ -82,11 +84,23 @@ class _SignUpPageState extends State<SignUpPage> {
     Navigator.of(context, rootNavigator: true).pop('dialog');
   }
 
-  openGallery() async{
+  Future openGallery() async{
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = image;
     });
+  }
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: _selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
   }
 
   Future<void> signup() async {
@@ -123,8 +137,9 @@ class _SignUpPageState extends State<SignUpPage> {
       "secretAnswer": _secret_anwser_value,
       "pharmacyLocation" : _pharmacy_location_value,
       "doctorLicences": _doctorLicences_value,
+      "dob": DateFormat('yyyy-MM-dd').format(_selectedDate),
+      "gender": _gender,
     };
-
     var url = "http://35.207.6.9:8080/api/signup";
     var res = await http.post(url, body: encoder.convert(json))
         .then((response) {
@@ -160,8 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
     TextStyle style_valid = TextStyle(color: Colors.green, fontSize: 11);
     TextStyle style_invalid = TextStyle(color: Colors.red, fontSize: 11);
 
-    final logo = Hero(
-      tag: 'hero',
+    final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 48.0,
@@ -274,6 +288,27 @@ class _SignUpPageState extends State<SignUpPage> {
       },
     );
 
+    final genderSelection = new Row(children: <Widget>[
+      SizedBox(width: 8.0,),
+      new DropdownButton<String>(
+        hint: new Text("Select your gender ", style: new TextStyle(fontSize: 14),),
+        value: _gender,
+        onChanged: (String newValue) {
+          setState(() {
+            _gender = newValue;
+          });
+        },
+        items: <String>['Male', 'Female', 'Other']
+            .map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        })
+            .toList(),
+      ),
+    ],);
+
     final state = new Row(children: <Widget>[
       SizedBox(width: 18.0,),
       new DropdownButton<USState>(
@@ -359,6 +394,17 @@ class _SignUpPageState extends State<SignUpPage> {
       onChanged: (text)  {
         _pharmacy_location_value = text;
       },
+    );
+
+    final dobSelection = Column(
+      children: <Widget>[
+        Text("${_selectedDate.toLocal()}"),
+        SizedBox(height: 20.0,),
+        RaisedButton(
+          onPressed: () => _selectDate(context),
+          child: Text('Select date'),
+        ),
+      ],
     );
 
     final secretQuestion = new Row(children: <Widget>[
@@ -512,6 +558,10 @@ class _SignUpPageState extends State<SignUpPage> {
             new Divider(indent: 0, color: Colors.black,),
             SizedBox(height: 8.0),
             name,
+            SizedBox(height: 8.0),
+            dobSelection,
+            SizedBox(height: 8.0),
+            genderSelection,
             SizedBox(height: 8.0),
             photoButton,
             SizedBox(height: 8.0),

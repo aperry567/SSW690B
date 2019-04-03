@@ -84,8 +84,7 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
     TextStyle style_valid = TextStyle(color: Colors.green, fontSize: 11);
     TextStyle style_invalid = TextStyle(color: Colors.red, fontSize: 11);
 
-    final logo = Hero(
-      tag: 'hero',
+    final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 48.0,

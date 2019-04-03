@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'forget_password.dart';
 
 class LoginPage extends StatefulWidget {
-  static String tag = 'login-page';
+  static const routeName = "/login";
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
@@ -32,7 +32,6 @@ class _LoginPageState extends State<LoginPage> {
       else if(response.statusCode == 200){
 
         Map<String, dynamic> result = jsonDecode(response.body);
-
         Navigator.push(context, new MaterialPageRoute(
             builder: (context) =>
             new HomePage(result['sessionID']))
@@ -43,8 +42,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final logo = Hero(
-      tag: 'hero',
+    final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 48.0,

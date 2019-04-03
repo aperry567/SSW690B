@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/login_page.dart';
 import 'package:login/screen/home_page.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+
+void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(new MyApp());
+  });
+}
 
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
-    LoginPage.tag: (context) => LoginPage(),
+    '/login': (context) => LoginPage(),
   };
 
   @override

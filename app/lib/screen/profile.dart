@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:login/component/enum_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:login/screen/login_page.dart';
 
 
 
@@ -103,6 +104,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
   }
 
+  logout() async {
+    JsonEncoder encoder = new JsonEncoder();
+    var url = "http://35.207.6.9:8080/api/logout?sessionID=" + sessionID;
+    await http.get(url)
+        .then((response) {
+      if(response.statusCode == 400)
+        setState(() {
+          _is_loading = false;
+        });
+      else if(response.statusCode == 200){
+        if (this.mounted){
+          setState(() {
+          });
+        }
+      }
+    });
+  }
+
   Widget build(BuildContext context) {
 
     _controller_name = new TextEditingController(text: _name_value);
@@ -117,8 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
 
-    final photo = Hero(
-      tag: 'photo',
+    final photo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 48.0,
@@ -266,6 +284,22 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
 
+    final loginButton = Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        onPressed: () {
+          var response = logout();
+          Navigator.popUntil(context, ModalRoute.withName('/'));
+          //TODO
+        },
+        padding: EdgeInsets.all(12),
+        color: Colors.red,
+        child: Text('Logout', style: TextStyle(color: Colors.white, backgroundColor: Colors.red)),
+      ),
+    );
 
     Stack(
       children: widgetList,
@@ -297,6 +331,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 5,),
             phone_row,
             SizedBox(height: 5,),
+            loginButton,
           ]
         )
         ),

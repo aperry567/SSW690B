@@ -7,12 +7,12 @@ import 'dart:convert';
 import 'profile.dart';
 import 'inbox.dart';
 import 'home_list.dart';
-
+import 'payment.dart';
 
 class HomePage extends StatefulWidget {
+  static const routeName = "/home";
   final String sessionID;
   HomePage(this.sessionID);
-  static String tag = 'login-page';
   @override
   _HomePageState createState() => new _HomePageState(sessionID);
 }
@@ -38,11 +38,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> _children = [
       HomeListPage(sessionID),
-      InboxPage(sessionID),
+      PaymentPage(sessionID),
       ProfilePage(sessionID),
     ];
-    final logo = Hero(
-      tag: 'hero',
+    final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         radius: 48.0,
@@ -58,10 +57,13 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.home),
           title: Text('Home'),
         ),
+
         new BottomNavigationBarItem(
-          icon: Icon(Icons.mail),
-          title: Text('Messages'),
+          icon: Icon(Icons.payment),
+          title: Text('Payment'),
         ),
+
+
         new BottomNavigationBarItem(
             icon: Icon(Icons.person),
             title: Text('Profile')

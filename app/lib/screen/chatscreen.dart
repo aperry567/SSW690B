@@ -6,22 +6,21 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 class ChatScreen extends StatefulWidget {
-  final sessionID;
-  ChatScreen(this.sessionID);
+  final chatURL;
+  ChatScreen(this.chatURL);
   @override
-  State createState() => new ChatScreenState(sessionID);
+  State createState() => new ChatScreenState(chatURL);
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  final sessionID;
+  final chatURL;
   final TextEditingController _chatController = new TextEditingController();
   final List<ChatMessage> _messages = <ChatMessage>[];
-  ChatScreenState(this.sessionID);
+  ChatScreenState(this.chatURL);
 
   Future<Null> getProfile() async {
-    var url = "http://35.207.6.9:8080/api//getPatientHomeItems?sessionID=" + sessionID;
 
-    await http.get(url)
+    await http.get(chatURL)
         .then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -103,27 +102,9 @@ class ChatScreenState extends State<ChatScreen> {
     _addSomeMessage();
     return Column(
       children: <Widget>[
-        Container(
-          color: Colors.blue,
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: 30,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    child: Text('Inbox', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
-                  ),
-                ],
-              )
-            ],
-          )
-        ),
         Flexible(
           child: LiquidPullToRefresh(
-            color:Colors.blue,
+            color:Color(0xff0277bd),
             showChildOpacityTransition: false,
             backgroundColor:Colors.white,
             onRefresh: getProfile,	// refresh callback

@@ -23,6 +23,7 @@ class HomeListPage extends StatefulWidget {
 class _HomeListPageState extends State<HomeListPage> {
     static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
     final String sessionID;
+    static const apiAddress = "http://35.207.6.9:8080";
     _HomeListPageState(this.sessionID){
 
       getProfile();
@@ -41,7 +42,7 @@ class _HomeListPageState extends State<HomeListPage> {
       visit_card_list = [];
       exam_card_list = [];
       rx_card_list = [];
-      var url = "http://35.207.6.9:8080/api//getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
+      var url = apiAddress + "/api//getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
       await http.get(url)
             .then((response) {
           print("Response status: ${response.statusCode}");
@@ -52,7 +53,7 @@ class _HomeListPageState extends State<HomeListPage> {
             });
           }
           else if(response.statusCode == 200){
-            Image _image = Image.asset('assets/logo.png', width: 100,);
+            Image _image = Image.asset('assets/alucard.jpg', width: 100,height: 100,fit: BoxFit.fill,);
             Map<String, dynamic> result = jsonDecode(response.body);
             if (this.mounted){
               setState(() {
@@ -65,26 +66,25 @@ class _HomeListPageState extends State<HomeListPage> {
                   if(_base64Imag != null){
                     const Base64Codec base64 = Base64Codec();
                     var _imageBytes = base64.decode(_base64Imag);
-                    _image = Image.memory(_imageBytes, width: 100);
+                    _image = Image.memory(_imageBytes, width: 100, height: 100,fit: BoxFit.fill,);
                   }
                   card_list.add(SizedBox(height: 10,));
-                  card_list.add(ListCard(item['label'], item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor']));
+                  card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
                   switch(item['label']){
                     case 'Visit':
                       visit_card_list.add(SizedBox(height: 10,));
-                      visit_card_list.add(ListCard(item['label'], item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor']));
+                      visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
                       break;
                     case 'Exam':
                       exam_card_list.add(SizedBox(height: 10,));
-                      exam_card_list.add(ListCard(item['label'], item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor']));
+                      exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
                       break;
                     case 'Rx':
                       rx_card_list.add(SizedBox(height: 10,));
-                      rx_card_list.add(ListCard(item['label'], item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor']));
+                      rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
                       break;
                   }
                   //print(item['label']);
-
                 }
                 _is_loading = false;
               });
