@@ -43,8 +43,7 @@ type AuthNav struct {
 }
 
 type AuthResponse struct {
-	SessionID string    `json:"sessionID"`
-	Role      string    `json:"role"`
+	LogoutURL string    `json:"logoutURL"`
 	Nav       []AuthNav `json:"nav"`
 }
 
@@ -166,9 +165,8 @@ func dbUserLogin(e string, p string) AuthResponse {
 	dbAuditAction(userID, "Login:Success")
 
 	return AuthResponse{
-		SessionID: sessionID.String(),
-		Role:      role,
-		Nav:       getNav(sessionID.String(), role),
+		LogoutURL: logoutURL.String(),
+		Nav:       getNav(logoutURL.String(), role),
 	}
 }
 
@@ -427,7 +425,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 		userRmSt, _ := db.Prepare("DELETE FROM `dod`.`USERS` WHERE USER_ID = ?")
 		defer userRmSt.Close()
 		userRmSt.Exec(userID)
-		return AuthResponse{}, errMsg
+		return f{}, errMsg
 	}
 	auth := dbUserLogin(sm.Email, sm.Password)
 
@@ -671,7 +669,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	auth := dbUserLogin(input.Email, input.Password)
 
-	if auth.SessionID == "" {
+	if auth.LogoutURL == "" {
 		http.Error(w, "Invalid credentials", 401)
 		return
 	}

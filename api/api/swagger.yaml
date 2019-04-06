@@ -1142,7 +1142,7 @@ components:
     AuthResponse:
       type: object
       properties:
-        sessionID:
+        logoutURL:
           type: string
         nav:
           type: array
