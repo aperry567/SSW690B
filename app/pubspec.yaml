@@ -10,7 +10,7 @@ dependencies:
   rocket_chat_dart: ^0.0.38
   liquid_pull_to_refresh: ^1.1.0
   square_in_app_payments: ^1.1.0
-  flutter_fab_dialer: ^0.1.1
+  unicorndial: ^1.1.5
   intl: 0.15.7
 
 dev_dependencies:
