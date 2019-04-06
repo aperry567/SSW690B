@@ -8,21 +8,25 @@ import 'package:login/models/list_response.dart';
 
 
 class HomeListPage extends StatefulWidget {
-  final String sessionID;
-  HomeListPage(this.sessionID);
+  final String url;
+  
+  
+  HomeListPage(
+    this.url
+  ) : super(key: ValueKey([url])) {
+    print('==================');
+  }
   static String tag = 'profile-page';
+
   @override
-  _HomeListPageState createState() => new _HomeListPageState(sessionID);
+  _HomeListPageState createState() => new _HomeListPageState(url);
 }
-
-
 
 class _HomeListPageState extends State<HomeListPage> {
     static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
     final String apiURL;
     static const apiAddress = "http://35.207.6.9:8080";
     _HomeListPageState(this.apiURL){
-
       getProfile();
       print(apiURL);
     }
