@@ -63,6 +63,7 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 		return response, errors.New("Unable to fetch home items")
 	}
 
+	
 	response.Items = []ListItem{}
 	for rows.Next() {
 		var item ListItem

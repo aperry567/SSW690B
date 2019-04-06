@@ -4,6 +4,7 @@ import 'package:login/screen/sign_up_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'forget_password.dart';
+import 'package:login/models/auth_response.dart';
 
 class LoginPage extends StatefulWidget {
   static const routeName = "/login";
@@ -31,10 +32,11 @@ class _LoginPageState extends State<LoginPage> {
       }
       else if(response.statusCode == 200){
 
-        Map<String, dynamic> result = jsonDecode(response.body);
+        final json = jsonDecode(response.body);
+        AuthResponse authResponse = new AuthResponse.fromJson(json);
         Navigator.push(context, new MaterialPageRoute(
             builder: (context) =>
-            new HomePage(result['sessionID']))
+            new HomePage(authResponse))
         );
       }
     });

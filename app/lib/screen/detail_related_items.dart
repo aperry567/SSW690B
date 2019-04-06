@@ -7,7 +7,7 @@ import 'package:login/component/enum_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
-import 'package:flutter_fab_dialer/flutter_fab_dialer.dart';
+import 'package:unicorndial/unicorndial.dart';
 
 
 class DetailRelatedItemsPage extends StatefulWidget {
@@ -36,6 +36,7 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
   List<Widget> exam_card_list = [];
   List<Widget> rx_card_list = [];
   String list_filter = '';
+  var _updateURL = '';
   static const apiAddress = "http://35.207.6.9:8080";
 
   Future<Null> getDetail() async {
@@ -59,6 +60,7 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
         if (this.mounted){
           setState(() {
             //_doctorLicences_value = result['doctorLicences'];
+            _updateURL = result['updateURL'];
             var list_itesms = result['items'];
             //card_list.add(SizedBox(height: 10,));
             for(var i = 0; i < list_itesms.length; i++){
@@ -99,6 +101,32 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
 
   List<Widget> widgetList = [];
   Widget build(BuildContext context) {
+    var childButtons = List<UnicornButton>();
+    childButtons.add(UnicornButton(
+        hasLabel: true,
+        labelText: "Prescription",
+        currentButton: FloatingActionButton(
+          heroTag: null,
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          mini: true,
+          child: Icon(Icons.description),
+          onPressed: () {
+
+          },
+        )));
+
+
+    childButtons.add(UnicornButton(
+        hasLabel: true,
+        labelText: "Exam",
+        currentButton: FloatingActionButton(
+            heroTag: null,
+            backgroundColor: Colors.brown,
+            foregroundColor: Colors.white,
+            mini: true,
+            child: Icon(Icons.airline_seat_flat_angled))));
+
     Stack(
       children: widgetList,
     );
@@ -159,9 +187,18 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
 
 
 
+
     final tabbar = DefaultTabController(
       length: 4,
       child: new Scaffold(
+        floatingActionButton: UnicornDialer(
+            //onMainButtonPressed: ,
+            backgroundColor: Color.fromRGBO(255, 255, 255, 0.6),
+            parentButtonBackground: _updateURL == '' ? Colors.grey : _labelColor,
+            parentHeroTag: null,
+            orientation: UnicornOrientation.VERTICAL,
+            parentButton: Icon(Icons.add),
+            childButtons: childButtons),
         appBar: new PreferredSize(
             preferredSize: Size.fromHeight(35),
             child:  Column(
@@ -213,8 +250,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
     }
 
 
-    List<FabMiniMenuItem> _fabMiniMenuItemList = <FabMiniMenuItem>[];
-    widgetList.add(new FabDialer(_fabMiniMenuItemList, Colors.grey, new Icon(Icons.add)),);
     return stack;
   }
 

@@ -9,7 +9,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
 import 'package:login/screen/chatscreen.dart';
 import 'package:login/screen/detail_related_items.dart';
-import 'package:flutter_fab_dialer/flutter_fab_dialer.dart';
+import 'item_detail.dart';
 
 class ItemPage extends StatefulWidget {
   final String detailUrl;
@@ -23,7 +23,7 @@ class ItemPage extends StatefulWidget {
 
 class _ItemPageState extends State<ItemPage> {
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
-  TextStyle _text_style_type;
+
   TabController _tabController;
   final String detailUrl;
 
@@ -37,7 +37,6 @@ class _ItemPageState extends State<ItemPage> {
   List<Widget> tabHead = [];
   List<Widget> tabBody = [];
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
-
   bool is_editing = false;
   var _relatedItemsURL = '';
   var _chatURL = '';
@@ -54,6 +53,7 @@ class _ItemPageState extends State<ItemPage> {
   var _details = '';
   var _detailsEditable = false;
   static const apiAddress = "http://35.207.6.9:8080";
+  Map<String, dynamic> result;
 
   Future<Null> getDetail() async {
     await http.get(detailUrl)
@@ -66,34 +66,12 @@ class _ItemPageState extends State<ItemPage> {
         });
       }
       else if(response.statusCode == 200){
-        Map<String, dynamic> result = jsonDecode(response.body);
         if (this.mounted){
           setState(() {
-            if(result['relatedItemsURL'] != null){
-              _relatedItemsURL = apiAddress + result['relatedItemsURL'];
-            }
-            if(result['chatURL'] != null){
-              _chatURL = apiAddress + result['chatURL'];
-            }
-            _title = result['title'];
-            _titleEditable = result['titleEditable'];
-            _subtitle = result['subtitle'];
-            _subtitleEditable = result['subtitleEditable'];
-            _label = result['label'];
-            _labelEditable = result['labelEditable'];
+            result = jsonDecode(response.body);
             _labelColor = Color(int.parse(result['labelColor']));
-            _datetime = result['datetime'];
-            _datetimeEditable = result['datetimeEditable'];
-            _details = result['details'];
-            _detailsEditable = result['detailsEditable'];
-            _text_style_type = TextStyle(backgroundColor: _labelColor, color: Colors.white,fontWeight: FontWeight.bold);
-            var _base64Imag = result['photo'];
-            if(_base64Imag != ''){
-              const Base64Codec base64 = Base64Codec();
-              var _imageBytes = base64.decode(_base64Imag);
-              _image = Image.memory(_imageBytes, width: 200, height: 200,);
-            }
-
+            _relatedItemsURL = result['relatedItemsURL'];
+            _chatURL = result['chatURL'];
             _is_loading = false;
           });
         }
@@ -102,23 +80,11 @@ class _ItemPageState extends State<ItemPage> {
 
   }
 
-  Editing(){
-    setState(() {
-      is_editing = ! is_editing;
-    });
-  }
-
-
-
-
-
   List<Widget> widgetList = [];
 
   Widget build(BuildContext context) {
     tabHead = [];
     tabBody = [];
-
-
 
     final title_row = new Row(
         children: <Widget>[
@@ -220,64 +186,14 @@ class _ItemPageState extends State<ItemPage> {
           ),//container
         ]
     );
-    var _fabMiniMenuItemList = [
-      new FabMiniMenuItem.noText(new Icon(Icons.edit), (_titleEditable || _subtitleEditable || _labelEditable || _detailsEditable) ? Colors.cyan : Colors.grey, 6.0,
-          "Button menu", Editing, false),
-      new FabMiniMenuItem.noText(new Icon(Icons.delete_forever), (_titleEditable || _subtitleEditable || _labelEditable || _detailsEditable) ? Colors.cyan : Colors.grey, 6.0,
-          "Button menu", getDetail, false),
-    ];
-    final detailTab = Tab(
 
-      child: Card(
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Text('${_label}',style: _text_style_type),
-                ],
-              ),
-              _image,
-              SizedBox(height: 20,),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-
-                  SizedBox(width: 30,),
-                  Container(
-                    width: 350,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        title_row,
-                        SizedBox(height: 10),
-                        subtitle_row,
-                        SizedBox(height: 10),
-                        datetime_row,
-                        SizedBox(height: 10),
-                        detail_row,
-                        SizedBox(height: 50),
-                        FabDialer(_fabMiniMenuItemList, _labelColor, new Icon(Icons.add),AnimationStyle.fadeIn),
-                      ],
-                    ),
-                  ),
-
-
-
-
-                ],
-              ),
-            ],)
-      ),
-
-
-    );
 
     tabHead.add(Text('Detail'));
-    tabBody.add(detailTab);
+    tabBody.add(ItemDetailPage(result));
 
     if(_relatedItemsURL !=  ''){
+      //print("aaaaaaaaaaa: " + _relatedItemsURL);
+      _relatedItemsURL = apiAddress + _relatedItemsURL;
       tabHead.add(Text('Related Items'));
       tabBody.add(
         //cards page
@@ -285,6 +201,7 @@ class _ItemPageState extends State<ItemPage> {
       );
     }
     if(_chatURL !=  ''){
+      _chatURL = apiAddress + _chatURL;
       tabHead.add(Text('Chat'));
       tabBody.add(
         //cards page
@@ -337,10 +254,6 @@ class _ItemPageState extends State<ItemPage> {
         child: CircularProgressIndicator(),
       ));
     }
-
-
-
-
     return stack;
 
   }

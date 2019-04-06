@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'sign_up_page.dart';
-import 'login_page.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'profile.dart';
-import 'inbox.dart';
 import 'home_list.dart';
-import 'payment.dart';
+import 'package:login/models/auth_response.dart';
+import 'package:icons_helper/icons_helper.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = "/home";
-  final String sessionID;
-  HomePage(this.sessionID);
+  final AuthResponse authNav;
+  HomePage(this.authNav);
   @override
-  _HomePageState createState() => new _HomePageState(sessionID);
+  _HomePageState createState() => new _HomePageState(authNav);
 }
 
 class _HomePageState extends State<HomePage> {
-  final String sessionID;
-  _HomePageState(this.sessionID);
+  final AuthResponse authNav;
+  _HomePageState(this.authNav);
   int _currentIndex = 0;
-
-
-
-
 
   void onTabTapped(int index) {
     setState(() {
@@ -33,14 +24,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _children = [
-      HomeListPage(sessionID),
-      PaymentPage(sessionID),
-      ProfilePage(sessionID),
-    ];
+    final List<Widget> _children = [];
+    final List<BottomNavigationBarItem> _barNav = [];
+    authNav.nav.forEach((nav){
+      switch(nav.screenType) {
+        case 'list': {
+          _children.add(new HomeListPage(nav.apiURL)); //needs updating to use api url instead of session
+          _barNav.add(new BottomNavigationBarItem(
+            icon: Icon(getIconGuessFavorMaterial(name: nav.icon)), //fix to use dynamic icons
+            title: Text(nav.title),
+          ));
+        }
+        break;
+
+        case 'profile': {
+          _children.add(ProfilePage(nav.apiURL)); //needs updating to use api url instead of session
+          _barNav.add(new BottomNavigationBarItem(
+            icon: Icon(getIconGuessFavorMaterial(name: nav.icon)), //fix to use dynamic icons
+            title: Text(nav.title),
+          ));
+        }
+        break;
+      }
+    });
     final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
@@ -52,24 +60,7 @@ class _HomePageState extends State<HomePage> {
     final bottomNavigationBar = new BottomNavigationBar(
       onTap: onTabTapped, // new
       currentIndex: _currentIndex, // new
-      items: [
-        new BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          title: Text('Home'),
-        ),
-
-        new BottomNavigationBarItem(
-          icon: Icon(Icons.payment),
-          title: Text('Payment'),
-        ),
-
-
-        new BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            title: Text('Profile')
-        )
-      ],
-
+      items: _barNav,
     );
 
 

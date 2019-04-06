@@ -7,11 +7,13 @@ dependencies:
   cupertino_icons: ^0.1.0
   http: ^0.12.0
   image_picker: ^0.4.5
-  rocket_chat_dart: ^0.0.38
+  #rocket_chat_dart: ^0.0.38
   liquid_pull_to_refresh: ^1.1.0
   square_in_app_payments: ^1.1.0
-  flutter_fab_dialer: ^0.1.1
-  intl: 0.15.7
+  unicorndial: ^1.1.5
+  icons_helper:
+      git: git://github.com/sjmcdowall/icons_helper
+  intl: 0.15.8
 
 dev_dependencies:
   flutter_test:

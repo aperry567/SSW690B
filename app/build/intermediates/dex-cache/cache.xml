@@ -3,6 +3,76 @@
 
     <item
         is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\46.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="b686ff6e4062f364f53d6060723e07d41f038e6b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\48.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\28.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="3ea6d90659c7085a7eab38e53bc179a58beb62e5">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\30.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\23.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="91721ef3500977dd0b81acfed5782e6f1c648a71">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\25.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\44.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d10cb6d75449d128c66a25dddbe9601edfd3b9a5">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\46.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\24.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ef34466ab903f3b40698bf3c43c5232217ade204">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\26.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\16.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fe9f7c9f271ca5d0160d287452a67432633f3d8b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\18.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\6.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="5aef7a2c1e71e219d4ae20e8335543d8c5fd51dc">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\6.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\4.jar"
         jumboMode="false"
         min-sdk-version="16"
@@ -10,6 +80,16 @@
         revision="26.0.2"
         sha1="1d7de643ffead0695044b7577f13a3d74efa174b">
         <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\14.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="9577e4d746c6bad3ad1a3e82ec6af29fca0268cf">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\14.jar" />
     </item>
     <item
         is-multidex="false"
@@ -23,6 +103,16 @@
     </item>
     <item
         is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\37.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="b85cc99f48bea6bd00c347cccf18d54f99288623">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\39.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\11.jar"
         jumboMode="false"
         min-sdk-version="16"
@@ -33,13 +123,33 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\7.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\19.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="7f133783c2585f537d4360f8a52555a7d87ea796">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\7.jar" />
+        sha1="ab18076403cfd45c0230df1b4e8800fc73fa1e92">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\21.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\17.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="563541b6918038354d4d276f95a4dc9191b4dc77">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\19.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\4.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="6f0753c0b94863b96fb25c12e89314a740249d5a">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\4.jar" />
     </item>
     <item
         is-multidex="false"
@@ -63,63 +173,73 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\10.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\9.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="fb787c18185d09295444bb1311f00ec9dddbd540">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\10.jar" />
+        sha1="b3425fda3d89a401555582541a265b6d334db525">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\9.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\2.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\35.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="3192d521148b4797ae65ad15747f293c48709e6a">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\2.jar" />
+        sha1="2cdb379a755f8ad325164eee1ba941d05492c270">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\37.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\processing-tools\runtime-deps\release\desugar_try_with_resources.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\11.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="dfeede25fde82c239dee8378efc8b1af6365c42b">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\16.jar" />
+        sha1="2cf792ebd55e79281254ade2c1f681ef9b2e1a51">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\11.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\5.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\0.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="6b8b0c7ae62bfae224ca2bcc9ba5b63bbf0fa984">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\5.jar" />
+        sha1="4af0edb056a42a2418e16923fbe7adae9f74e97b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\1.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\12.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\20.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="fff4f0153a3896ca2402ea0395a848c1f7068fb3">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\12.jar" />
+        sha1="e5c954462edaf506e3ff99502e4e45e3a5f33416">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\22.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\13.jar"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\18.jar"
         jumboMode="false"
-        min-sdk-version="16"
+        min-sdk-version="21"
         optimize="true"
         revision="26.0.2"
-        sha1="29540c4fd32c5743f764d18c86d0c8309a3f087b">
-        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\13.jar" />
+        sha1="0aa09dca43f00205c62ad0a810c859fa06ef4bab">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\20.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\27.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="5fe367598dd01a1a3107c6f78c51dfc6a04359ea">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\29.jar" />
     </item>
     <item
         is-multidex="false"
@@ -143,6 +263,176 @@
     </item>
     <item
         is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\39.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="0525af4c287f22e83572c7de47999b0fcb3cb109">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\41.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\43.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="27e684f1b94f68557ebd08341c675387e5aec8bd">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\45.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\26.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="373feae7be987bbc277ec617cee19806a5e8ebea">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\28.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\33.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d9836719d889e4cdad05243417043f58cf299c7b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\35.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\8.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="6593be5621fbe3ab4fa57a9e0ca78d4909d687a9">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\5.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="6b8b0c7ae62bfae224ca2bcc9ba5b63bbf0fa984">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\21.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="e9e1b36d5726dddf4fff651c725cef5c4bf5abe3">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\23.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\7.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="7f133783c2585f537d4360f8a52555a7d87ea796">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\7.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="7f133783c2585f537d4360f8a52555a7d87ea796">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\2.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="3192d521148b4797ae65ad15747f293c48709e6a">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\5.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="6b8b0c7ae62bfae224ca2bcc9ba5b63bbf0fa984">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\22.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="5f845fe3704efa069a6df738f13f80c01e719a24">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\24.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\31.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="991a3a118f4fd6e435971446b9524b3db96d6d28">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\33.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\13.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="29540c4fd32c5743f764d18c86d0c8309a3f087b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\13.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\15.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="3111bbaf1cff93e882196058895ecd1f89c45b97">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\15.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\2.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="b51e27b172926043564950bccdea86b23885c070">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\36.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="f632bd8b6f3b9e02065657e67b26769e2ee514c4">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\38.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\15.jar"
         jumboMode="false"
         min-sdk-version="16"
@@ -150,6 +440,146 @@
         revision="26.0.2"
         sha1="3111bbaf1cff93e882196058895ecd1f89c45b97">
         <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\15.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\25.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8a155584d9598ef5f41acec945f6ea8cf348c996">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\27.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\45.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4de42358a9251f959d700b54502260895be77b17">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\47.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\13.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="29540c4fd32c5743f764d18c86d0c8309a3f087b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\13.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\32.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="c3750476a44e1f5075ae362f1fa7e7b566a2792f">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\34.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\29.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="0b576369fae0b7ebc439d920de405d8b881fd1b3">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\31.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\42.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="009ddb53ce3baaf96c94e64b9d7295f4fd1c6d5b">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\44.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\41.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="5d54ffde10754da8ae022d0b170291d7ec955e26">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\43.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\10.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fb787c18185d09295444bb1311f00ec9dddbd540">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\10.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\10.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fb787c18185d09295444bb1311f00ec9dddbd540">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\10.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\12.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fff4f0153a3896ca2402ea0395a848c1f7068fb3">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\12.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\12.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fff4f0153a3896ca2402ea0395a848c1f7068fb3">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\12.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\30.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="2636358022aabf0cb3110fef9a674536257eeec5">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\32.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\38.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="2c803d81225ca6cce719c88518b43757f9b275d2">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\40.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\desugar\release\40.jar"
+        jumboMode="false"
+        min-sdk-version="21"
+        optimize="true"
+        revision="26.0.2"
+        sha1="c0c80dbbfc8e9f67bf989427a95ecf053eb38098">
+        <dex dex="D:\Android\Projects\Doctor On Demand\build\app\intermediates\transforms\preDex\release\42.jar" />
     </item>
 
 </items>
