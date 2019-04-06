@@ -1,7 +1,7 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=D:\Android\flutter
-FLUTTER_APPLICATION_PATH=D:\Android\Projects\Doctor On Demand
-FLUTTER_TARGET=lib/main.dart
+FLUTTER_ROOT=/Applications/flutter
+FLUTTER_APPLICATION_PATH=/Users/saterfij/projects/SSW690B/app
+FLUTTER_TARGET=/Users/saterfij/projects/SSW690B/app/lib/main.dart
 FLUTTER_BUILD_DIR=build
-SYMROOT=${SOURCE_ROOT}/../build\ios
-FLUTTER_FRAMEWORK_DIR=D:\Android\flutter\bin\cache\artifacts\engine\ios
+SYMROOT=${SOURCE_ROOT}/../build/ios
+FLUTTER_FRAMEWORK_DIR=/Applications/flutter/bin/cache/artifacts/engine/ios

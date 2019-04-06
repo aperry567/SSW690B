@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
+import 'package:login/models/list_response.dart';
 
 
 
@@ -22,12 +19,12 @@ class HomeListPage extends StatefulWidget {
 
 class _HomeListPageState extends State<HomeListPage> {
     static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
-    final String sessionID;
+    final String apiURL;
     static const apiAddress = "http://35.207.6.9:8080";
-    _HomeListPageState(this.sessionID){
+    _HomeListPageState(this.apiURL){
 
       getProfile();
-      print(sessionID);
+      print(apiURL);
     }
     bool _is_loading = true;
 
@@ -35,6 +32,7 @@ class _HomeListPageState extends State<HomeListPage> {
     List<Widget> visit_card_list = [];
     List<Widget> exam_card_list = [];
     List<Widget> rx_card_list = [];
+    DefaultTabController tabbar;
     String list_filter = '';
 
     Future<Null> getProfile() async {
@@ -42,7 +40,7 @@ class _HomeListPageState extends State<HomeListPage> {
       visit_card_list = [];
       exam_card_list = [];
       rx_card_list = [];
-      var url = apiAddress + "/api//getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
+      var url = apiAddress + apiURL;
       await http.get(url)
             .then((response) {
           print("Response status: ${response.statusCode}");
@@ -53,49 +51,48 @@ class _HomeListPageState extends State<HomeListPage> {
             });
           }
           else if(response.statusCode == 200){
-            Image _image = Image.asset('assets/alucard.jpg', width: 100,height: 100,fit: BoxFit.fill,);
+            Image defaultImg = Image.asset('assets/alucard.jpg', width: 100,height: 100,fit: BoxFit.fill,);
             Map<String, dynamic> result = jsonDecode(response.body);
+            ListResponse list = ListResponse.fromJson(result);
+            // var child = tabbar.child as TabBar;
             if (this.mounted){
               setState(() {
                 //_doctorLicences_value = result['doctorLicences'];
-                var list_itesms = result['items'];
+                var list_items = list.items;
                 //card_list.add(SizedBox(height: 10,));
-                for(var i = 0; i < list_itesms.length; i++){
-                  var item = list_itesms[i];
-                  var _base64Imag = item['photo'];
-                  if(_base64Imag != null){
+                for(var i = 0; i < list_items.length; i++){
+                  var item = list_items[i];
+                  var _base64Imag = item.photo;
+                  Image _image = defaultImg;
+                  if(_base64Imag != ""){
                     const Base64Codec base64 = Base64Codec();
                     var _imageBytes = base64.decode(_base64Imag);
                     _image = Image.memory(_imageBytes, width: 100, height: 100,fit: BoxFit.fill,);
                   }
                   card_list.add(SizedBox(height: 10,));
-                  card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
-                  switch(item['label']){
+                  card_list.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, apiAddress + item.detailLink));
+                  switch(item.label){
                     case 'Visit':
                       visit_card_list.add(SizedBox(height: 10,));
-                      visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                      visit_card_list.add(ListCard(item.label, item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, apiAddress + item.detailLink));
                       break;
                     case 'Exam':
                       exam_card_list.add(SizedBox(height: 10,));
-                      exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                      exam_card_list.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, apiAddress + item.detailLink));
                       break;
                     case 'Rx':
                       rx_card_list.add(SizedBox(height: 10,));
-                      rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                      rx_card_list.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, apiAddress + item.detailLink));
                       break;
                   }
-                  //print(item['label']);
+                  //print(item.label);
                 }
                 _is_loading = false;
               });
             }
-
-
           }
         });
-
       }
-
 
     List<Widget> widgetList = [];
     Widget build(BuildContext context) {
@@ -155,11 +152,8 @@ class _HomeListPageState extends State<HomeListPage> {
         onRefresh: () => getProfile(),	// refresh callback
         child: list_view_rx,		// scroll view
       );
-
-
-
-
-      final tabbar = DefaultTabController(
+      
+      tabbar = DefaultTabController(
         length: 4,
         child: new Scaffold(
           appBar: new PreferredSize(
@@ -202,9 +196,6 @@ class _HomeListPageState extends State<HomeListPage> {
         ),
       );
 
-
-
-
       Stack stack = new Stack(
         children: widgetList,
       );
@@ -215,9 +206,7 @@ class _HomeListPageState extends State<HomeListPage> {
           child: CircularProgressIndicator(),
         ));
       }
-
       return stack;
-
     }
 
 }

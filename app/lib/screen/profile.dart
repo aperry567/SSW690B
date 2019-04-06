@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:login/screen/login_page.dart';
 
 
 
 class ProfilePage extends StatefulWidget {
-  final String sessionID;
-  ProfilePage(this.sessionID);
+  final String profileURL;
+  ProfilePage(this.profileURL);
   static String tag = 'profile-page';
   @override
-  _ProfilePageState createState() => new _ProfilePageState(sessionID);
+  _ProfilePageState createState() => new _ProfilePageState(profileURL);
 }
 
 
 
 class _ProfilePageState extends State<ProfilePage> {
 
-  final String sessionID;
-  _ProfilePageState(this.sessionID){
+  final String profileURL;
+  _ProfilePageState(this.profileURL){
 
     getProfile();
-    print(sessionID);
+    print(profileURL);
   }
   TextEditingController _controller_name;
   TextEditingController _controller_address;
@@ -60,8 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   Future<void> getProfile() async {
-    var url = "http://35.207.6.9:8080/api/getProfile?sessionID=" + sessionID;
-
+    var url = "http://35.207.6.9:8080" + profileURL;
 
     await http.get(url)
         .then((response) {
@@ -106,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   logout() async {
     JsonEncoder encoder = new JsonEncoder();
-    var url = "http://35.207.6.9:8080/api/logout?sessionID=" + sessionID;
+    var url = "http://35.207.6.9:8080/api/logout?sessionID="; // + sessionID; //TODO: fix so that logout is provided with the authResponse api call
     await http.get(url)
         .then((response) {
       if(response.statusCode == 400)

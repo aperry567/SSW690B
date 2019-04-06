@@ -17,7 +17,8 @@ class ListCard extends StatelessWidget  {
 
   Widget build(BuildContext context) {
     TextStyle _text_style_status;
-    TextStyle _text_style_type = TextStyle(backgroundColor: Color(int.parse(_color)), color: Colors.white,fontWeight: FontWeight.bold);
+    Color bgColor = Color(int.parse(this._color));
+    TextStyle _text_style_type = TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
 
 
     return new GestureDetector(
@@ -62,13 +63,14 @@ class ListCard extends StatelessWidget  {
 
             Container(
               width: 35,
+              color: bgColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text('${_card_type}',style: _text_style_type),
+                      Text(_card_type,style: _text_style_type),
                     ],
                   ),
                 ],

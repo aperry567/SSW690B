@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login/models/auth_response.dart';
 import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -60,9 +61,12 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
         });
       else if(response.statusCode == 200){
         Navigator.push(context, new MaterialPageRoute(
-            builder: (context) =>
-            new HomePage(response.body))
-        );
+          builder: (context) {
+            final json = jsonDecode(response.body);
+            AuthResponse authResponse = new AuthResponse.fromJson(json);
+            return new HomePage(authResponse);
+          }
+        ));
       }
     });
     print(res);
