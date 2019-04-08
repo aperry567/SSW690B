@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/login_page.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:flutter/services.dart';
-
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
