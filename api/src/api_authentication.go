@@ -165,8 +165,8 @@ func dbUserLogin(e string, p string) AuthResponse {
 	dbAuditAction(userID, "Login:Success")
 
 	return AuthResponse{
-		LogoutURL: logoutURL.String(),
-		Nav:       getNav(logoutURL.String(), role),
+		LogoutURL: "/api/logout?sessionID=" + sessionID.String(),
+		Nav:       getNav(sessionID.String(), role),
 	}
 }
 
@@ -425,7 +425,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 		userRmSt, _ := db.Prepare("DELETE FROM `dod`.`USERS` WHERE USER_ID = ?")
 		defer userRmSt.Close()
 		userRmSt.Exec(userID)
-		return f{}, errMsg
+		return AuthResponse{}, errMsg
 	}
 	auth := dbUserLogin(sm.Email, sm.Password)
 

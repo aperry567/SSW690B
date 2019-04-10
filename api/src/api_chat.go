@@ -127,6 +127,7 @@ func dbGetUnreadChats(sessionID string) (ListResponse, error) {
 	}
 	for rows.Next() {
 		var item ListItem
+		item.ScreenType = "detail"
 		var id string
 		if err := rows.Scan(&id, &item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch chat message")

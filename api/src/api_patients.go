@@ -85,7 +85,7 @@ func dbGetPatientRelatedItems(sessionID string, patientID string, filter string)
 
 	for rows.Next() {
 		var item ListItem
-		item.ScreenType = "list"
+		item.ScreenType = "detail"
 		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}
@@ -170,7 +170,7 @@ func dbGetPatients(sessionID string) (ListResponse, error) {
 		item.Label = "Patient"
 		item.LabelColor = LABEL_COLOR_PATIENT
 		item.DetailLink = "/api/getPatientDetail"
-		item.ScreenType = "list"
+		item.ScreenType = "detail"
 		if err := rows.Scan(&id, &item.Photo, &item.Title, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return resp, errors.New("Unable to fetch patient item")
 		}
