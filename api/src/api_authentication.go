@@ -44,6 +44,7 @@ type AuthNav struct {
 
 type AuthResponse struct {
 	LogoutURL string    `json:"logoutURL"`
+	SessionID string    `json:"sessionID"`
 	Nav       []AuthNav `json:"nav"`
 }
 
@@ -167,6 +168,7 @@ func dbUserLogin(e string, p string) AuthResponse {
 	return AuthResponse{
 		LogoutURL: "/api/logout?sessionID=" + sessionID.String(),
 		Nav:       getNav(sessionID.String(), role),
+		SessionID: sessionID.String(),
 	}
 }
 
