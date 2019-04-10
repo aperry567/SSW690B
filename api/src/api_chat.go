@@ -148,6 +148,13 @@ func dbGetUnreadChats(sessionID string) (ListResponse, error) {
 		response.Items = append(response.Items, item)
 	}
 
+	response.Filters = []ListFilter{
+		ListFilter{
+			Title: "Visits with Unread Chats",
+			Value: "",
+		},
+	}
+
 	return response, nil
 }
 
