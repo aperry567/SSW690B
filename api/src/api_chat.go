@@ -21,10 +21,10 @@ type Chat struct {
 	CreatedDateTime string `json:"createdDateTime"`
 }
 type ChatPhoto struct {
-	ID            sql.NullInt64  `json:"id"`
-	Photo         sql.NullString `json:"photo"`
-	Name          sql.NullString `json:"name"`
-	IsCurrentUser bool           `json:"isCurrentUser"`
+	ID            int64  `json:"id"`
+	Photo         string `json:"photo"`
+	Name          string `json:"name"`
+	IsCurrentUser bool   `json:"isCurrentUser"`
 }
 type ChatResponse struct {
 	Chats  []Chat      `json:"chats"`
@@ -42,22 +42,35 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	userID := dbGetUserID(sessionID)
 
 	var response ChatResponse
+	response.Chats = []Chat{}
 
 	// get visit user photos and name
 	// this ensures the user is a part of the visit for security
 	visitSt, _ := db.Prepare("SELECT p.USER_ID, p.PHOTO, p.NAME, d.USER_ID, d.PHOTO, d.NAME FROM dod.VISITS v LEFT OUTER JOIN dod.USERS p on v.PATIENT_USER_ID = p.USER_ID LEFT OUTER JOIN dod.USERS d on v.DOCTOR_USER_ID = p.USER_ID WHERE v.VISIT_ID = ? and (PATIENT_USER_ID = ? or DOCTOR_USER_ID = ?)")
 	var patientInfo ChatPhoto
 	var doctorInfo ChatPhoto
-	visitErr := visitSt.QueryRow(visitID, userID, userID).Scan(&patientInfo.ID, &patientInfo.Photo, &patientInfo.Name, &doctorInfo.ID, &doctorInfo.Photo, &doctorInfo.Name)
+	var docID sql.NullInt64
+	var docPhoto sql.NullString
+	var docName sql.NullString
+	var patientID sql.NullInt64
+	var patientPhoto sql.NullString
+	var patientName sql.NullString
+	visitErr := visitSt.QueryRow(visitID, userID, userID).Scan(&patientID, &patientPhoto, &patientName, &docID, &docPhoto, &docName)
 	defer visitSt.Close()
 	if visitErr != nil {
 		return response, errors.New("Unable to fetch people in chat")
 	}
+	patientInfo.ID = patientID.Int64
+	patientInfo.Photo = patientPhoto.String
+	patientInfo.Name = patientName.String
+	doctorInfo.ID = docID.Int64
+	doctorInfo.Photo = docPhoto.String
+	doctorInfo.Name = docName.String
 
 	// if not onlyUnreadBool then return the photos in the response
 	if timeLastRead == "" {
-		patientInfo.IsCurrentUser = patientInfo.ID.Int64 == int64(userID)
-		doctorInfo.IsCurrentUser = doctorInfo.ID.Int64 == int64(userID)
+		patientInfo.IsCurrentUser = patientInfo.ID == int64(userID)
+		doctorInfo.IsCurrentUser = doctorInfo.ID == int64(userID)
 		response.Photos = []ChatPhoto{patientInfo, doctorInfo}
 	}
 
@@ -127,6 +140,7 @@ func dbGetUnreadChats(sessionID string) (ListResponse, error) {
 	}
 	for rows.Next() {
 		var item ListItem
+		item.ScreenType = "detail"
 		var id string
 		if err := rows.Scan(&id, &item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch chat message")

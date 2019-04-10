@@ -63,11 +63,13 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 		return response, errors.New("Unable to fetch home items")
 	}
 
-	
-	response.Items = []ListItem{}
+	response.Items = append([]ListItem{}, ListItem{
+		Title:      "Find a Doctor",
+		ScreenType: "questionnaire",
+	})
 	for rows.Next() {
 		var item ListItem
-		item.ScreenType = "list"
+		item.ScreenType = "detail"
 		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}
@@ -129,7 +131,7 @@ func dbGetDoctorHomeItems(sessionID string) (ListResponse, error) {
 	response.Items = []ListItem{}
 	for rows.Next() {
 		var item ListItem
-		item.ScreenType = "list"
+		item.ScreenType = "detail"
 		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}

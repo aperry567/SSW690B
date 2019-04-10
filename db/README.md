@@ -16,3 +16,5 @@ Created database scripts to generate tables for the project.
 - visits_chat
 - example for inserting data into a table
 
+
+
