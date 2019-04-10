@@ -1,3 +1,8 @@
 .DS_Store
 socket
 dod-api-server
+api/src/src.exe
+app/.idea
+app/build
+app/.packages
+app/.flutter-plugins

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,4 +21,18 @@ func checkPassword(pw string, phash string) bool {
 		return false
 	}
 	return true
+}
+
+/**
+ * validatePassword
+ *
+ * Rules:
+ * - min 6 characters
+ * - max 16 characters
+ * - at least 1 upper case
+ * - at least 1 lower case
+ * - at least 1 number
+ **/
+func validatePassword(pw string) bool {
+	return len(pw) > 5 && len(pw) < 17 && strings.ContainsAny(pw, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") && strings.ContainsAny(pw, "abcdefghijklmnopqrstuvwxyz") && strings.ContainsAny(pw, "0123456789")
 }
