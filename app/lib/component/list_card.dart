@@ -17,7 +17,10 @@ class ListCard extends StatelessWidget  {
 
   Widget build(BuildContext context) {
     TextStyle _text_style_status;
-    Color bgColor = Color(int.parse(this._color));
+    Color bgColor = Colors.white;
+    if (this._color != "") {
+      bgColor = Color(int.parse(this._color));
+    }
     TextStyle _text_style_type = TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
 
 

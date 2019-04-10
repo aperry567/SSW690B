@@ -87,7 +87,6 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
       onRefresh: () => loadFeed(),	// refresh callback
       child: listView,		// scroll view
     ));
-    widgetList.add(listView);
     Stack stack = new Stack(
       children: widgetList,
     );
@@ -160,15 +159,10 @@ class _HomeListPageState extends State<HomeListPage> {
       List<Tab> tabs = [];
       List<Widget> tabViews = [];
       if (list != null){
-        tabs.add(Tab(text: 'All'));
-        // tabs.add(Tab(text: 'Visit'));
-        // tabs.add(Tab(text: 'Exam'));
-        // tabs.add(Tab(text: 'Prescription'));
-
-        tabViews.add(_HomePageListContainer(url + "&" + list.filters[0].value));
-        // tabViews.add(_HomePageListContainer(url + "&" + list.filters[1].value));
-        // tabViews.add(_HomePageListContainer(url + "&" + list.filters[2].value));
-        // tabViews.add(_HomePageListContainer(url + "&" + list.filters[3].value));
+        for(var i = 0; i < list.filters.length; i++){
+          tabs.add(Tab(text: list.filters[i].title));
+          tabViews.add(_HomePageListContainer(url + "&" + list.filters[i].value));
+        }
       }
       tabbar = DefaultTabController(
         length: tabViews.length,
