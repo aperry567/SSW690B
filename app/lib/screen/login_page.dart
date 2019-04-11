@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'forget_password.dart';
 import 'package:login/models/auth_response.dart';
+import 'package:login/config.dart' as config;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   static const routeName = "/login";
@@ -20,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   login(email, password) async {
     JsonEncoder encoder = new JsonEncoder();
     Map json = {"email": email, "password": password};
-    var url = "http://35.207.6.9:8080/api/login";
+    var url = config.baseURL + "/api/login";
     var res = http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -154,7 +156,25 @@ class _LoginPageState extends State<LoginPage> {
       ),
     ],);
 
-
+    Future<void> dropdownChanged (String value) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("baseURL", value);
+      setState(() {
+          config.baseURL = value;
+      });
+    }
+    List<DropdownMenuItem<String>> dropdownOptions = [
+      DropdownMenuItem<String>(value: "http://127.0.0.1:8080", child: Text("Local")),
+      DropdownMenuItem<String>(value: "http://35.207.6.9:8080", child: Text("Dev")),
+      DropdownMenuItem<String>(value: "http://35.193.54.177:8080", child: Text("UAT")),
+    ];
+    var dropdown = new DropdownButton<String>(
+      items: dropdownOptions,
+      value: config.baseURL,
+      onChanged: dropdownChanged,
+      style: TextStyle(color: Colors.black),
+      
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -173,7 +193,9 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 20.0),
             loginButton,
             forgotLabel,
-            signUpLabel
+            signUpLabel,
+            SizedBox(height: 50.0),
+            dropdown,
           ],
         ),
       ),

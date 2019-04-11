@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
-
+import 'package:login/config.dart' as config;
 
 
 class HomeListPage extends StatefulWidget {
@@ -23,7 +19,6 @@ class HomeListPage extends StatefulWidget {
 class _HomeListPageState extends State<HomeListPage> {
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
   final String sessionID;
-  static const apiAddress = "http://35.207.6.9:8080";
   _HomeListPageState(this.sessionID){
 
     getProfile();
@@ -42,7 +37,7 @@ class _HomeListPageState extends State<HomeListPage> {
     visit_card_list = [];
     exam_card_list = [];
     rx_card_list = [];
-    var url = apiAddress + "/api//getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
+    var url = config.baseURL + "/api/getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
     await http.get(url)
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -69,19 +64,19 @@ class _HomeListPageState extends State<HomeListPage> {
                 _image = Image.memory(_imageBytes, width: 100, height: 100,);
               }
               card_list.add(SizedBox(height: 10,));
-              card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+              card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
               switch(item['label']){
                 case 'Visit':
                   visit_card_list.add(SizedBox(height: 10,));
-                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
                 case 'Exam':
                   exam_card_list.add(SizedBox(height: 10,));
-                  exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
                 case 'Rx':
                   rx_card_list.add(SizedBox(height: 10,));
-                  rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
               }
             }

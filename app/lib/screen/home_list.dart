@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
 import 'package:login/models/list_response.dart';
+import 'package:login/config.dart' as config;
 
 class _HomePageListContainer extends StatefulWidget {
   final String url;
@@ -23,8 +24,6 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
   ListResponse list; 
 
   Image defaultImg = Image.asset('assets/alucard.jpg', width: 100,height: 100,fit: BoxFit.fill,);
-
-  static const apiAddress = "http://35.207.6.9:8080";
 
   _HomePageListContainerState(this.url){
     loadFeed();
@@ -67,10 +66,10 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
         if(_base64Imag != ""){
           const Base64Codec base64 = Base64Codec();
           var _imageBytes = base64.decode(_base64Imag);
-          _image = Image.memory(_imageBytes, width: 100, height: 100,fit: BoxFit.fill,);
+          _image = Image.memory(_imageBytes, width: 100, height: 100, fit: BoxFit.none, alignment: Alignment.topCenter,);
         }
         cardList.add(SizedBox(height: 10,));
-        cardList.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, apiAddress + item.detailLink));
+        cardList.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, config.baseURL + item.detailLink));
       }
     }
     var listView = ListView(
@@ -105,9 +104,7 @@ class HomeListPage extends StatefulWidget {
   
   HomeListPage(
     this.url
-  ) : super(key: ValueKey([url])) {
-    print('==================');
-  }
+  ) : super(key: ValueKey([url]));
   static String tag = 'profile-page';
 
   @override
@@ -115,9 +112,9 @@ class HomeListPage extends StatefulWidget {
 }
 
 class _HomeListPageState extends State<HomeListPage> {
-    static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
+    static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16);
     final String apiURL;
-    static const apiAddress = "http://35.207.6.9:8080";
+
     _HomeListPageState(this.apiURL){
       getProfile();
       print(apiURL);
@@ -129,7 +126,7 @@ class _HomeListPageState extends State<HomeListPage> {
     String url = "";
 
     Future<Null> getProfile() async {
-      url = apiAddress + apiURL;
+      url = config.baseURL + apiURL;
       await http.get(url)
             .then((response) {
           print("Response status: ${response.statusCode}");
@@ -139,6 +136,7 @@ class _HomeListPageState extends State<HomeListPage> {
               _is_loading = false;
             });
           } else if(response.statusCode == 200){
+            // print(response.body);
             Map<String, dynamic> result = jsonDecode(response.body);
             if (this.mounted){
               setState(() {
@@ -168,7 +166,7 @@ class _HomeListPageState extends State<HomeListPage> {
         length: tabViews.length,
         child: new Scaffold(
           appBar: new PreferredSize(
-            preferredSize: Size.fromHeight(35),
+            preferredSize: Size.fromHeight(60),
             child:  Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -178,7 +176,7 @@ class _HomeListPageState extends State<HomeListPage> {
                 ),
                 Container(
                   child: Container(
-                    height: 25,
+                    height: 40,
                     color: Colors.cyan[500],
                     child: new TabBar(
                       indicatorColor: Colors.white,

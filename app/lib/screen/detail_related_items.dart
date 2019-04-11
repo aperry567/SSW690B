@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
 import 'package:unicorndial/unicorndial.dart';
+import 'package:login/config.dart' as config;
 
 
 class DetailRelatedItemsPage extends StatefulWidget {
@@ -37,7 +34,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
   List<Widget> rx_card_list = [];
   String list_filter = '';
   var _updateURL = '';
-  static const apiAddress = "http://35.207.6.9:8080";
 
   Future<Null> getDetail() async {
     card_list = [];
@@ -72,19 +68,19 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
                 _image = Image.memory(_imageBytes, width: 100);
               }
               card_list.add(SizedBox(height: 10,));
-              card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+              card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
               switch(item['label']){
                 case 'Visit':
                   visit_card_list.add(SizedBox(height: 10,));
-                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
                 case 'Exam':
                   exam_card_list.add(SizedBox(height: 10,));
-                  exam_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  exam_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
                 case 'Rx':
                   rx_card_list.add(SizedBox(height: 10,));
-                  rx_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], apiAddress + item['detailLink']));
+                  rx_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink']));
                   break;
               }
             }

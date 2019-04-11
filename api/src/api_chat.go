@@ -121,11 +121,12 @@ func dbGetUnreadChats(sessionID string) (ListResponse, error) {
 	userID, role := dbGetUserIDAndRole(sessionID)
 
 	var response ListResponse
+	response.Items = []ListItem{}
 
 	// get visit user photos and name
 	// this ensures the user is a part of the visit for security
-	queryStr := "SELECT distinct v.VISIT_ID, u.PHOTO, v.VISIT_TIME, CONCAT('Visited ', u.NAME),'Visit', '" + LABEL_COLOR_VISIT + "', v.NOTES, v.VISIT_REASON, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',v.VISIT_ID) FROM dod.VISITS v left outer join dod.VISITS_CHAT c on v.VISIT_ID = c.VISIT_ID left outer join dod.USERS u on u.USER_ID = v.PATIENT_USER_ID where c.USER_ID = ? and c.IS_READ = 0"
-	if role == "doctor" {
+	queryStr := "SELECT distinct v.VISIT_ID, u.PHOTO, v.VISIT_TIME, u.NAME, 'Visit', '" + LABEL_COLOR_VISIT + "', v.NOTES, CONCAT('REASON: ',v.VISIT_REASON), CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',v.VISIT_ID) FROM dod.VISITS v left outer join dod.VISITS_CHAT c on v.VISIT_ID = c.VISIT_ID left outer join dod.USERS u on u.USER_ID = v.PATIENT_USER_ID where c.USER_ID = ? and c.IS_READ = 0"
+	if role == "patient" {
 		queryStr = strings.Replace(queryStr, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
 	visitSt, _ := db.Prepare(queryStr)

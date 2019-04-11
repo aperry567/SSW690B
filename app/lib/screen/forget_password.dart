@@ -3,9 +3,8 @@ import 'package:login/models/auth_response.dart';
 import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
 import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:login/config.dart' as config;
 
 
 class ForgetPassWordPage extends StatefulWidget {
@@ -50,7 +49,7 @@ class _ForgetPassWordPageState extends State<ForgetPassWordPage> {
       "password": _password_value,
     };
 
-    var url = "http://35.207.6.9:8080/api/passwordRest";
+    var url = config.baseURL + "/api/passwordRest";
     var res = await http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");

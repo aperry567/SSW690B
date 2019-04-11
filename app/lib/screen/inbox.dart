@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/chatscreen.dart';
-
+import 'package:login/config.dart' as config;
 
 class InboxPage extends StatelessWidget {
   final sessionID;
@@ -10,7 +10,7 @@ class InboxPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
 
-        body: new ChatScreen("http://35.207.6.9:8080/api/logout?sessionID=" + sessionID)
+        body: new ChatScreen(config.baseURL + "/api/logout?sessionID=" + sessionID)
     );
   }
 }

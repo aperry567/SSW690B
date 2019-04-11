@@ -38,6 +38,12 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 				AddURL: "/api/saveVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=1",
 				AddDetails: []ListFilterAddDetails{
 					ListFilterAddDetails{
+						Label:      "Type of Exam",
+						FieldName:  "title",
+						IsDateTime: false,
+						Required:   true,
+					},
+					ListFilterAddDetails{
 						Label:      "Location",
 						FieldName:  "subtitle",
 						IsDateTime: false,
@@ -49,16 +55,10 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 						IsDateTime: false,
 						Required:   true,
 					},
-					ListFilterAddDetails{
-						Label:      "Instructions",
-						FieldName:  "details",
-						IsDateTime: false,
-						Required:   true,
-					},
 				},
 			},
 			ListFilter{
-				Title:  "Prescriptions",
+				Title:  "Rx",
 				Value:  "filter=2",
 				AddURL: "/api/saveVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=2",
 				AddDetails: []ListFilterAddDetails{
@@ -95,7 +95,7 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	var examSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, `DESC` as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, '', LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		examSelect = strings.Replace(examSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
@@ -250,7 +250,7 @@ func dbGetVisitDetail(sessionID string, visitID string) (DetailResponse, error) 
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
 	if role == "doctor" {
 		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
 	}

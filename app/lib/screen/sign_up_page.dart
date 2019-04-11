@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:login/component/enum_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
+import 'package:login/config.dart' as config;
 
 class SignUpPage extends StatefulWidget {
   static String tag = 'sign-up-page';
@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
       "dob": DateFormat('yyyy-MM-dd').format(_selectedDate),
       "gender": _gender,
     };
-    var url = "http://35.207.6.9:8080/api/signup";
+    var url = config.baseURL + "/api/signup";
     var res = await http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");

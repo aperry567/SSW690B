@@ -17,13 +17,13 @@ func patientNav(s string) []AuthNav {
 	var nav []AuthNav
 
 	nav = append(nav, AuthNav{
-		Title:      "All",
+		Title:      "My Items",
 		Icon:       "home",
 		APIURL:     "/api/getPatientHomeItems?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{
-		Title:      "Messages",
-		Icon:       "mail",
+		Title:      "Unread Chats",
+		Icon:       "chat",
 		APIURL:     "/api/getUnreadChats?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{
@@ -39,13 +39,13 @@ func doctorNav(s string) []AuthNav {
 	var nav []AuthNav
 
 	nav = append(nav, AuthNav{
-		Title:      "All",
+		Title:      "Visits",
 		Icon:       "home",
 		APIURL:     "/api/getDoctorHomeItems?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{
-		Title:      "Messages",
-		Icon:       "mail",
+		Title:      "Unread Chats",
+		Icon:       "chat",
 		APIURL:     "/api/getUnreadChats?sessionID=" + s,
 		ScreenType: "list",
 	}, AuthNav{

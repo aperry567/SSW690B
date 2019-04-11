@@ -19,6 +19,7 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 	userID, role := dbGetUserIDAndRole(sessionID)
 
 	var response ListResponse
+	response.Items = []ListItem{}
 
 	if role != "patient" {
 		return response, errors.New("Must be a patient to use")
@@ -28,9 +29,9 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 	var visitSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE PATIENT_USER_ID = ?"
-	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ?"
-	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL, '" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=',PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS WHERE PATIENT_USER_ID = ?"
+	examSelect = "SELECT u.PHOTO as PHOTO, e.EXAM_TIME as DATETIME, e.`DESC` as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, '' as `DESC`, e.LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',e.EXAM_ID) as `DETAIL_LINK` FROM dod.EXAMS e LEFT OUTER JOIN dod.USERS u on u.USER_ID = e.DOCTOR_USER_ID WHERE e.PATIENT_USER_ID = ?"
+	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ?"
+	prescriptSelect = "SELECT u.PHOTO as PHOTO, p.CREATED_TIME as DATETIME, p.NAME as TITLE, 'Rx' as LABEL, '" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, p.INSTRUCTIONS as `DESC`, CONCAT('Refills: ', p.REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=', p.PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS p LEFT OUTER JOIN dod.USERS u on u.USER_ID = p.DOCTOR_USER_ID WHERE p.PATIENT_USER_ID = ?"
 
 	var selectSt *sql.Stmt
 	var rows *sql.Rows
@@ -53,7 +54,10 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 		defer selectSt.Close()
 	} else {
 		// all
-		selectSt, _ = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
+		selectSt, err = db.Prepare(examSelect + " UNION ALL " + prescriptSelect + " UNION ALL " + visitSelect + " ORDER BY DATETIME DESC")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 		rows, err = selectSt.Query(sessionID, userID, sessionID, userID, sessionID, userID)
 		defer selectSt.Close()
 	}
@@ -91,7 +95,7 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 			Value: "filter=2",
 		},
 		ListFilter{
-			Title: "Prescriptions",
+			Title: "Rx",
 			Value: "filter=3",
 		},
 	)
@@ -106,14 +110,23 @@ func dbGetDoctorHomeItems(sessionID string) (ListResponse, error) {
 	userID, role := dbGetUserIDAndRole(sessionID)
 
 	var response ListResponse
+	response.Items = []ListItem{}
 
 	if role != "doctor" {
 		return response, errors.New("Must be a doctor to use")
 	}
 
+	response.Filters = append(
+		[]ListFilter{},
+		ListFilter{
+			Title: "Patient Visits",
+			Value: "",
+		},
+	)
+
 	var visitSelect string
 
-	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.PATIENT_USER_ID = u.USER_ID WHERE v.DOCTOR_USER_ID = ?"
+	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.PATIENT_USER_ID = u.USER_ID WHERE v.DOCTOR_USER_ID = ?"
 
 	var selectSt *sql.Stmt
 	var rows *sql.Rows

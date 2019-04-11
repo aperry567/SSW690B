@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-
+import 'package:login/config.dart' as config;
 
 class ProfilePage extends StatefulWidget {
   final String profileURL;
@@ -11,8 +10,6 @@ class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => new _ProfilePageState(profileURL);
 }
-
-
 
 class _ProfilePageState extends State<ProfilePage> {
 
@@ -55,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   Future<void> getProfile() async {
-    var url = "http://35.207.6.9:8080" + profileURL;
+    var url = config.baseURL + profileURL;
 
     await http.get(url)
         .then((response) {
@@ -100,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   logout() async {
     JsonEncoder encoder = new JsonEncoder();
-    var url = "http://35.207.6.9:8080/api/logout?sessionID="; // + sessionID; //TODO: fix so that logout is provided with the authResponse api call
+    var url = config.baseURL + "/api/logout?sessionID="; // + sessionID; //TODO: fix so that logout is provided with the authResponse api call
     await http.get(url)
         .then((response) {
       if(response.statusCode == 400)

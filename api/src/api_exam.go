@@ -54,19 +54,17 @@ func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error)
 		fmt.Println(errSt.Error())
 	}
 
-	err := examSt.QueryRow(examID, userID).Scan(&resp.DateTime, &resp.Details, &resp.Subtitle)
+	err := examSt.QueryRow(examID, userID).Scan(&resp.DateTime, &resp.Title, &resp.Subtitle)
 	if err != nil {
 		return resp, errors.New("Unable to find exam")
 	}
-
-	resp.Title = "Exam"
 	resp.Label = "Exam"
 	resp.LabelColor = LABEL_COLOR_EXAM
 
 	if role == "doctor" {
 		resp.SubtitleEditable = true
 		resp.DateTimeEditable = true
-		resp.DetailsEditable = true
+		resp.TitleEditable = true
 		resp.UpdateURL = "/api/updateExam?sessionID=" + sessionID + "&examID=" + examIDstr
 		resp.DeleteURL = "/api/deleteExam?sessionID=" + sessionID + "&examID=" + examIDstr
 	}

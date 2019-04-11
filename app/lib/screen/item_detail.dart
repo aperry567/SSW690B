@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import 'package:login/component/list_card.dart';
 import 'package:unicorndial/unicorndial.dart';
-
+import 'package:login/config.dart' as config;
 
 class ItemDetailPage extends StatefulWidget {
   var result;
@@ -17,8 +11,6 @@ class ItemDetailPage extends StatefulWidget {
   @override
   _ItemDetailPageState createState() => new _ItemDetailPageState(result);
 }
-
-
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
   var result;
@@ -45,7 +37,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   Image _image = Image.asset('assets/alucard.jpg', width: 200, height: 200,);
   var _details = '';
   var _detailsEditable = false;
-  static const apiAddress = "http://35.207.6.9:8080";
   static const disableColor = Colors.grey;
 
   _ItemDetailPageState(this.result){
@@ -56,7 +47,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   update() async {
     JsonEncoder encoder = new JsonEncoder();
     Map json = {"title": _title, "subtitle": _subtitle, "details": _details, "datetime": _datetime};
-    var url = apiAddress + _updateURL;
+    var url = config.baseURL + _updateURL;
     var res = http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -78,7 +69,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   delete() async {
     JsonEncoder encoder = new JsonEncoder();
     Map json = {"title": _title, "subtitle": _subtitle, "details": _details, "datetime": _datetime};
-    var url = apiAddress + _deleteURL;
+    var url = config.baseURL + _deleteURL;
 
     await http.get(url)
         .then((response) {

@@ -33,8 +33,8 @@ class _HomePageState extends State<HomePage> {
         case 'list': {
           _children.add(new HomeListPage(nav.apiURL)); //needs updating to use api url instead of session
           _barNav.add(new BottomNavigationBarItem(
-            icon: Icon(getIconGuessFavorMaterial(name: nav.icon)), //fix to use dynamic icons
-            title: Text(nav.title),
+            icon: Icon(getIconGuessFavorMaterial(name: nav.icon), color: Colors.lightBlue), //fix to use dynamic icons
+            title: Text(nav.title, style: TextStyle(color:Colors.lightBlue)),
           ));
         }
         break;
@@ -42,8 +42,8 @@ class _HomePageState extends State<HomePage> {
         case 'profile': {
           _children.add(ProfilePage(nav.apiURL)); //needs updating to use api url instead of session
           _barNav.add(new BottomNavigationBarItem(
-            icon: Icon(getIconGuessFavorMaterial(name: nav.icon)), //fix to use dynamic icons
-            title: Text(nav.title),
+            icon: Icon(getIconGuessFavorMaterial(name: nav.icon), color: Colors.lightBlue), //fix to use dynamic icons
+            title: Text(nav.title, style: TextStyle(color:Colors.lightBlue)),
           ));
         }
         break;

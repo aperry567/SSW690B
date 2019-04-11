@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:login/screen/home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:login/component/enum_list.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import 'package:login/component/list_card.dart';
 import 'package:login/screen/chatscreen.dart';
 import 'package:login/screen/detail_related_items.dart';
 import 'item_detail.dart';
+import 'package:login/config.dart' as config;
 
 class ItemPage extends StatefulWidget {
   final String detailUrl;
@@ -52,7 +47,6 @@ class _ItemPageState extends State<ItemPage> {
   Image _image = Image.asset('assets/alucard.jpg', width: 200, height: 200,);
   var _details = '';
   var _detailsEditable = false;
-  static const apiAddress = "http://35.207.6.9:8080";
   Map<String, dynamic> result;
 
   Future<Null> getDetail() async {
@@ -193,7 +187,7 @@ class _ItemPageState extends State<ItemPage> {
 
     if(_relatedItemsURL !=  ''){
       //print("aaaaaaaaaaa: " + _relatedItemsURL);
-      _relatedItemsURL = apiAddress + _relatedItemsURL;
+      _relatedItemsURL = config.baseURL + _relatedItemsURL;
       tabHead.add(Text('Related Items'));
       tabBody.add(
         //cards page
@@ -201,7 +195,7 @@ class _ItemPageState extends State<ItemPage> {
       );
     }
     if(_chatURL !=  ''){
-      _chatURL = apiAddress + _chatURL;
+      _chatURL = config.baseURL + _chatURL;
       tabHead.add(Text('Chat'));
       tabBody.add(
         //cards page

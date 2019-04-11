@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/login_page.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:login/config.dart' as config;
 
 void main() {
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
-    runApp(new MyApp());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    SharedPreferences.getInstance().then((SharedPreferences prefs){
+      config.baseURL = prefs.getString("baseURL") ?? config.baseURL;
+      runApp(new MyApp());
+    });
   });
 }
 

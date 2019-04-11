@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/item.dart';
+import 'package:intl/intl.dart';
+
+class MyClipper extends CustomClipper<Rect>{
+  @override
+  Rect getClip(Size size) {
+    return new Rect.fromLTWH(0, 0, 100, 100);
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Rect> oldClipper) {
+    return false;
+  }
+
+}
 
 class ListCard extends StatelessWidget  {
 
@@ -18,11 +32,16 @@ class ListCard extends StatelessWidget  {
   Widget build(BuildContext context) {
     TextStyle _text_style_status;
     Color bgColor = Colors.white;
+    String timeStr = "";
+    if (this._time != "") {
+      DateTime time = DateTime.parse(this._time);
+      timeStr = DateFormat.yMd().add_jm().format(time);
+    }
+    
     if (this._color != "") {
       bgColor = Color(int.parse(this._color));
     }
     TextStyle _text_style_type = TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
-
 
     return new GestureDetector(
       onTap: (){
@@ -41,8 +60,7 @@ class ListCard extends StatelessWidget  {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   _image,
-
-                  SizedBox(height: 8.0),
+                  // SizedBox(height: 8.0),
                   ],
 
               ),
@@ -53,22 +71,24 @@ class ListCard extends StatelessWidget  {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_time != null ? _time : ''),
+                  Text(timeStr, 
+                    style: TextStyle(color: Colors.grey)
+                  ),
                   SizedBox(height: 5.0),
-                  Text(_name != null ? _name : ''),
+                  Text(_name != null ? _name : '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 1.0),
                   Text(_title != null ? _title : ''),
-                  SizedBox(height: 8.0),
-                  Text(_description != null ? _description : '', style: _text_style_description,),
+                  // SizedBox(height: 8.0),
+                  // Text(_description != null ? _description : '', style: _text_style_description,),
                 ],
               ),
             ),
 
             Container(
-              width: 35,
+              width: 38,
               color: bgColor,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

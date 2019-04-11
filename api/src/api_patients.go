@@ -47,9 +47,9 @@ func dbGetPatientRelatedItems(sessionID string, patientID string, filter string)
 	var prescriptSelect string
 	var visitSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, 'Exam' as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, `DESC`, LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=', EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE PATIENT_USER_ID = ? and DOCTOR_USER_ID = ?"
+	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, `DESC` as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, '', LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=', EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE PATIENT_USER_ID = ? and DOCTOR_USER_ID = ?"
 	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=',PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS WHERE PATIENT_USER_ID = ? DOCTOR_USER_ID = ?"
-	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, CONCAT('Visited ', u.NAME) as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, VISIT_REASON as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ? and v.DOCTOR_USER_ID = ?"
+	visitSelect = "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE, CONCAT('/api/getVisitDetail?sessionID=',?,'&visitID=',VISIT_ID) as `DETAIL_LINK` FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.PATIENT_USER_ID = ? and v.DOCTOR_USER_ID = ?"
 
 	var selectSt *sql.Stmt
 	var rows *sql.Rows
@@ -137,6 +137,13 @@ func dbGetPatients(sessionID string) (ListResponse, error) {
 	dbUserClearSessions()
 
 	var resp ListResponse
+	resp.Items = []ListItem{}
+	resp.Filters = []ListFilter{
+		ListFilter{
+			Title: "Patient List",
+			Value: "",
+		},
+	}
 
 	db := getDB()
 	if db == nil {
@@ -167,8 +174,6 @@ func dbGetPatients(sessionID string) (ListResponse, error) {
 	for rows.Next() {
 		var item ListItem
 		var id string
-		item.Label = "Patient"
-		item.LabelColor = LABEL_COLOR_PATIENT
 		item.DetailLink = "/api/getPatientDetail"
 		item.ScreenType = "detail"
 		if err := rows.Scan(&id, &item.Photo, &item.Title, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
