@@ -157,6 +157,7 @@ func dbDeleteExam(sessionID string, examID string) error {
 
 func UpdateExam(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	examID := r.URL.Query().Get("examID")
@@ -191,6 +192,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 
 func GetExamDetail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	examID := r.URL.Query().Get("examID")
@@ -221,6 +223,7 @@ func GetExamDetail(w http.ResponseWriter, r *http.Request) {
 
 func DeleteExam(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	examID := r.URL.Query().Get("examID")

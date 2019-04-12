@@ -217,6 +217,7 @@ func GetPatientRelatedItems(w http.ResponseWriter, r *http.Request) {
 
 func GetPatientDetail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	patientID := r.URL.Query().Get("patientID")
@@ -247,6 +248,7 @@ func GetPatientDetail(w http.ResponseWriter, r *http.Request) {
 
 func GetPatients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 

@@ -362,6 +362,7 @@ func dbCreateVisit(sessionID string, questionID string, doctorID string) (Detail
 
 func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")
@@ -396,6 +397,7 @@ func UpdateVisit(w http.ResponseWriter, r *http.Request) {
 
 func AddVisitRelatedItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")
@@ -435,6 +437,7 @@ func AddVisitRelatedItems(w http.ResponseWriter, r *http.Request) {
 
 func GetVisitRelatedItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")
@@ -466,6 +469,7 @@ func GetVisitRelatedItems(w http.ResponseWriter, r *http.Request) {
 
 func GetVisitDetail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")
@@ -496,6 +500,7 @@ func GetVisitDetail(w http.ResponseWriter, r *http.Request) {
 
 func CreateVisit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {

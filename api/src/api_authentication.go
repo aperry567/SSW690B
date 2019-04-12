@@ -660,6 +660,7 @@ func PasswordResetPost(w http.ResponseWriter, r *http.Request) {
 
 func LoginPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	var input LoginModel
 
@@ -682,6 +683,7 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 
 func LogoutPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {
@@ -695,6 +697,7 @@ func LogoutPost(w http.ResponseWriter, r *http.Request) {
 
 func SignupPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	var input SignupModel
 
@@ -716,6 +719,7 @@ func SignupPost(w http.ResponseWriter, r *http.Request) {
 
 func GetProfileGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {
@@ -740,6 +744,7 @@ func GetProfileGet(w http.ResponseWriter, r *http.Request) {
 
 func UpdateProfilePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	var input UpdateProfileModel
 
@@ -771,6 +776,7 @@ func UpdateProfilePost(w http.ResponseWriter, r *http.Request) {
 
 func GetDoctorSpecialities(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	specialities, err := dbGetDoctorSpecialities()
 

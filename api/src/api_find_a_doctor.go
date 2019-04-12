@@ -122,6 +122,7 @@ func dbFindADoctor(sessionID string, questionID string) (ListResponse, error) {
 
 func GetQuestionnaire(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	questionID := r.URL.Query().Get("questionID")
@@ -148,6 +149,7 @@ func GetQuestionnaire(w http.ResponseWriter, r *http.Request) {
 
 func FindADoctor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {

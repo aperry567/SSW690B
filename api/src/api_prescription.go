@@ -149,6 +149,7 @@ func dbDeletePrescription(sessionID string, prescriptionID string) error {
 
 func UpdatePrescription(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	prescriptionID := r.URL.Query().Get("prescriptionID")
@@ -183,6 +184,7 @@ func UpdatePrescription(w http.ResponseWriter, r *http.Request) {
 
 func GetPrescriptionDetail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	prescriptionID := r.URL.Query().Get("prescriptionID")
@@ -213,6 +215,7 @@ func GetPrescriptionDetail(w http.ResponseWriter, r *http.Request) {
 
 func DeletePrescription(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	prescriptionID := r.URL.Query().Get("prescriptionID")

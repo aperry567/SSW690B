@@ -207,6 +207,7 @@ func dbAddVisitChat(sessionID string, visitID string, message string) error {
 
 func GetVisitChat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {
@@ -245,6 +246,7 @@ func GetVisitChat(w http.ResponseWriter, r *http.Request) {
 
 func GetUnreadChats(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	if sessionID == "" {
@@ -269,6 +271,7 @@ func GetUnreadChats(w http.ResponseWriter, r *http.Request) {
 
 func AddVisitChat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	visitID := r.URL.Query().Get("visitID")

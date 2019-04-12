@@ -156,6 +156,7 @@ func dbGetDoctorHomeItems(sessionID string) (ListResponse, error) {
 
 func GetPatientHomeItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 	listFilter := r.URL.Query().Get("filter")
@@ -182,6 +183,7 @@ func GetPatientHomeItems(w http.ResponseWriter, r *http.Request) {
 
 func GetDoctorHomeItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	defer r.Body.Close()
 
 	sessionID := r.URL.Query().Get("sessionID")
 
