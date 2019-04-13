@@ -75,7 +75,7 @@ class ListCard extends StatelessWidget  {
                     style: TextStyle(color: Colors.grey)
                   ),
                   SizedBox(height: 5.0),
-                  Text(_name != null ? _name : '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(_name != null ? _name : '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   SizedBox(height: 1.0),
                   Text(_title != null ? _title : ''),
                   // SizedBox(height: 8.0),
@@ -85,7 +85,7 @@ class ListCard extends StatelessWidget  {
             ),
 
             Container(
-              width: 38,
+              width: 35,
               color: bgColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

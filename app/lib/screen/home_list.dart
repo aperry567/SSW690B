@@ -80,9 +80,8 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
     );
     widgetList.add(LiquidPullToRefresh(
       showChildOpacityTransition: false,
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.white,
       color:Colors.cyan[500],
-      height: 500,
       onRefresh: () => loadFeed(),	// refresh callback
       child: listView,		// scroll view
     ));
