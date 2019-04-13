@@ -25,7 +25,8 @@ class ListCard extends StatelessWidget  {
   final Image _image;
   final String _color;
   final String _detailUrl;
-  ListCard(this._card_type, this._time, this._name, this._title, this._description, this._image, this._color, this._detailUrl);
+  final String _screenType;
+  ListCard(this._card_type, this._time, this._name, this._title, this._description, this._image, this._color, this._detailUrl, this._screenType);
 
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
 
@@ -47,6 +48,7 @@ class ListCard extends StatelessWidget  {
       onTap: (){
         Navigator.push(context, new MaterialPageRoute(
             builder: (context) =>
+            // _screenType
             new ItemPage(_detailUrl))
         );
       },
