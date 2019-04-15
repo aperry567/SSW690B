@@ -10,7 +10,7 @@ class InboxPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
 
-        body: new ChatScreen(config.baseURL + "/api/logout?sessionID=" + sessionID)
+        body: new ChatScreen(config.baseURL + "/api/logout?sessionID=" + sessionID,'sendURL')//TODO
     );
   }
 }
