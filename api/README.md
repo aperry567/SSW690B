@@ -39,3 +39,6 @@ Windows:
 ## Documentation
 
 Go here to use the swagger ui (http://editor.swagger.io) then go to the menu File -> Import URL and enter (http://35.207.6.9:8080/swagger.yaml)
+
+## This is Tony
+Trying to fix the api #1
