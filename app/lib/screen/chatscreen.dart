@@ -4,6 +4,22 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'dart:async';
+
+
+class Person{
+  String name;
+  String role;
+  Image image;
+  bool isCurrentUser;
+  Person({
+    this.name,
+    this.image,
+    this.isCurrentUser,
+  });
+
+
+}
 
 class ChatScreen extends StatefulWidget {
   final chatURL;
@@ -15,11 +31,37 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
   final chatURL;
   final TextEditingController _chatController = new TextEditingController();
-  final List<ChatMessage> _messages = <ChatMessage>[];
-  ChatScreenState(this.chatURL);
+  List<ChatMessage> _messages = <ChatMessage>[];
 
-  Future<Null> getProfile() async {
+  Image _defaultPhoto = Image.asset('assets/profile.jpg', width: 200, height: 200,);
+  var massages = [];
+  var persons = Map();
+  Timer timer;
 
+  ChatScreenState(this.chatURL){
+    getMessage(null);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getMessage(DateTime.now()));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future<Null> getMessage(dateTime) async {
+    var url;
+    if(dateTime != null){
+      url = chatURL + dateTime.toString();
+    }
+    else{
+      url = chatURL;
+    }
     await http.get(chatURL)
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -30,11 +72,40 @@ class ChatScreenState extends State<ChatScreen> {
         });
       }
       else if(response.statusCode == 200){
+        if(dateTime == null){
+          _messages = <ChatMessage>[];
+        }
         Map<String, dynamic> result = jsonDecode(response.body);
         if (this.mounted){
           setState(() {
-            //_doctorLicences_value = result['doctorLicences'];
+            massages = result['chats'];
+            var photos = result['photos'];
+            var image;
 
+            for(var photo in photos){
+              var base64Imag = photo['photo'];
+              if(base64Imag != ''){
+                const Base64Codec base64 = Base64Codec();
+                var imageBytes = base64.decode(base64Imag);
+                image = Image.memory(imageBytes, width: 200, height: 200,);
+              }
+                var id = photo['id'];
+              Person person = Person(
+                name: photo['name'],
+                image: image != null ? image : _defaultPhoto,
+              );
+              persons[id] = person;
+            }
+            for(var i = 0; i < massages.length; i++){
+              var id = massages[i]['userID'];
+              var name = persons[id].name;
+              var img = persons[id].image;
+              var msg = massages[i]['msg'];
+              print('name: ' + name + ' msg: ' + msg);
+              addMessage(name, img, msg);
+            }
+            //_doctorLicences_value = result['doctorLicences'];
+            //_handleSubmit
           });
         }
 
@@ -42,10 +113,12 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _handleSubmit(String text) {
+  void addMessage(String name, Image image, String text){
     _chatController.clear();
     ChatMessage message = new ChatMessage(
-        text: text
+        name: name,
+        image: image,
+        text: text,
     );
 
     setState(() {
@@ -53,16 +126,21 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _addSomeMessage() {
-    _handleSubmit('Loses the human nature, lose a lot; lost brutal, lose everything.');
-    _handleSubmit('Your lack of fear is based on your ignorance.');
-    _handleSubmit('To civilization by the years, but not for the years to civilization.');
-    _handleSubmit('Come, love, give her a star, go.');
-    _handleSubmit('Ignorance and weakness is not a barrier to existence, but arrogance.');
-    _handleSubmit('We are the gutter bugs, but still need someone to look up at the starry sky.');
-    _handleSubmit('Of course not afraid, she knows that the sun will rise tomorrow.');
-    _handleSubmit('Universe is a dark forest, each civilization are the hunter with a gun, like a ghost like sneak in the woods, gently poke the back side branches, trying not to step to issue a little voice, even breathing carefully: he must be careful, because the forest everywhere with him sneak hunter. If he finds any life, can do only one thing: to shoot and kill. In the forest, the others are hell, is the eternal threat, any exposed the existence of their own life will soon be destroyed, this is the prospect of the civilizations in the universe.');
-    _handleSubmit("If you want to see the real world, you should watch the sky with its view, see the clould by its point and feel the wind by its idea.");
+  void _handleSubmit(String text) {
+
+
+
+    /*
+    _chatController.clear();
+    ChatMessage message = new ChatMessage(
+        image: _defaultPhoto,
+        text: text
+    );
+
+    setState(() {
+      _messages.insert(0, message);
+    });
+    */
   }
 
   Widget _chatEnvironment (){
@@ -98,8 +176,6 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    _addSomeMessage();
     return Column(
       children: <Widget>[
         Flexible(
@@ -107,7 +183,7 @@ class ChatScreenState extends State<ChatScreen> {
             color:Color(0xff0277bd),
             showChildOpacityTransition: false,
             backgroundColor:Colors.white,
-            onRefresh: getProfile,	// refresh callback
+            onRefresh: () => getMessage(null),	// refresh callback
             child: ListView.builder(
               padding: EdgeInsets.all(8.0),
               reverse: true,

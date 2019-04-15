@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:login/screen/item.dart';
 import 'package:intl/intl.dart';
+import 'package:login/screen/questionaire.dart';
 
 class MyClipper extends CustomClipper<Rect>{
   @override
@@ -46,11 +47,22 @@ class ListCard extends StatelessWidget  {
 
     return new GestureDetector(
       onTap: (){
-        Navigator.push(context, new MaterialPageRoute(
-            builder: (context) =>
-            // _screenType
-            new ItemPage(_detailUrl))
-        );
+        if(_screenType == 'detail'){
+          Navigator.push(context, new MaterialPageRoute(
+              builder: (context) =>
+              // _screenType
+              new ItemPage(_detailUrl))
+          );
+        }
+        else if(_screenType == 'questionnaire'){
+          Navigator.push(context, new MaterialPageRoute(
+              builder: (context) =>
+                  Questionaire('/api/getQuestionnaire?sessionID=0c6b22be-5dc1-11e9-8a1a-42010a8e0002', true))
+          );
+        }
+
+
+
       },
     child: Card(
       clipBehavior: Clip.antiAlias,
