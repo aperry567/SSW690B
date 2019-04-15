@@ -70,6 +70,7 @@ func dbGetPatientHomeItems(sessionID string, filter string) (ListResponse, error
 	response.Items = append([]ListItem{}, ListItem{
 		Title:      "Find a Doctor",
 		ScreenType: "questionnaire",
+		DetailLink: "/api/getQuestionnaire?sessionID=" + sessionID,
 	})
 	for rows.Next() {
 		var item ListItem
