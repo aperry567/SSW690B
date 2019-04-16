@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -61,13 +60,11 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	visitErr := visitSt.QueryRow(visitID, userID, userID).Scan(&patientID, &patientPhoto, &patientName, &docID, &docPhoto, &docName)
 	defer visitSt.Close()
 	if visitErr != nil {
-		fmt.Println(visitErr.Error())
 		return response, errors.New("Unable to fetch people in chat")
 	}
 	patientInfo.ID = patientID.Int64
 	patientInfo.Photo = patientPhoto.String
 	patientInfo.Name = patientName.String
-	fmt.Println("doc id: " + string(docID.Int64))
 	doctorInfo.ID = docID.Int64
 	doctorInfo.Photo = docPhoto.String
 	doctorInfo.Name = docName.String
