@@ -26,9 +26,9 @@ tags:
     description: 'Prescriptions for a patient'
   - name: Exams
     description: 'Exams for a patient'
-  - name: Questionnaire
-    description: 'Questionnaire for finding a doctor'
-  - name: Chat
+  - name: Find a Doctor
+    description: 'Methods for finding a doctor'
+  - name: Chats
     description: 'Chats associated to a visit'
 paths:
   /login:
@@ -913,7 +913,7 @@ paths:
   /getQuestionnaire:
     get:
       tags:
-        - Questionnaire
+        - Find a Doctor
       parameters:
         - in: query
           name: sessionID
@@ -952,7 +952,7 @@ paths:
   /getVisitChat:
     get:
       tags:
-        - Chat
+        - Chats
       parameters:
         - in: query
           name: sessionID
@@ -978,6 +978,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  addChatURL:
+                    type: string
                   chats:
                     type: array
                     items:
@@ -1013,7 +1015,7 @@ paths:
   /findADoctor:
     get:
       tags:
-        - Visits
+        - Find a Doctor
       parameters:
         - in: query
           name: sessionID
@@ -1040,7 +1042,7 @@ paths:
   /addVisitChat:
     post:
       tags:
-        - Visits
+        - Chats
       parameters:
         - in: query
           name: sessionID
@@ -1061,6 +1063,60 @@ paths:
       responses:
         '200':
           description: chat message added to visit
+        '400':
+          description: Invalid request data or internal error
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /createVisit:
+    get:
+      tags:
+        - Visits
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: doctorID
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: questionID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: visit created with initial chat message
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/DetailsResponse"
+        '400':
+          description: Invalid request data or internal error
+        '401':
+          description: User is not signed in.  Return to login screen.
+  /getUnreadChats:
+    get:
+      tags:
+        - Chats
+      parameters:
+        - in: query
+          name: sessionID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: visit created with initial chat message
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ListResponse"
         '400':
           description: Invalid request data or internal error
         '401':
@@ -1142,7 +1198,7 @@ components:
     AuthResponse:
       type: object
       properties:
-        logoutURL:
+        sessionID:
           type: string
         nav:
           type: array
