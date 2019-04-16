@@ -24,24 +24,23 @@ class Person{
 
 class ChatScreen extends StatefulWidget {
   final chatURL;
-  final sendURL;
-  ChatScreen(this.chatURL, this.sendURL);
+  ChatScreen(this.chatURL);
   @override
-  State createState() => new ChatScreenState(chatURL, sendURL);
+  State createState() => new ChatScreenState(chatURL);
 }
 
 class ChatScreenState extends State<ChatScreen> {
   final chatURL;
-  final sendURL;
+
   final TextEditingController _chatController = new TextEditingController();
   List<ChatMessage> _messages = <ChatMessage>[];
-
+  String _sendURL;
   Image _defaultPhoto = Image.asset('assets/profile.jpg', width: 200, height: 200,);
   var massages = [];
   var persons = Map();
   Timer timer;
 
-  ChatScreenState(this.chatURL, this.sendURL){
+  ChatScreenState(this.chatURL){
     getMessage(null);
   }
 
@@ -59,12 +58,10 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future<Null> sendMessage(text) async {
-    Map json = {
-      "value": text,
-    };
-    JsonEncoder encoder = new JsonEncoder();
-
-    var res = await http.post(sendURL, body: encoder.convert(json))
+    String json = text;
+    //JsonEncoder encoder = new JsonEncoder();
+    //var res = await http.post(_sendURL, body: encoder.convert(json))
+    var res = await http.post(_sendURL, body: text)
         .then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -80,6 +77,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future<Null> getMessage(dateTime) async {
     var url;
+
     if(dateTime != null){
       url = chatURL + '&timeLastRead=' +dateTime;
     }
@@ -103,34 +101,39 @@ class ChatScreenState extends State<ChatScreen> {
         Map<String, dynamic> result = jsonDecode(response.body);
         if (this.mounted){
           setState(() {
+            _sendURL = result['addChatURL'];
+            print(_sendURL);
             massages = result['chats'];
             var photos = result['photos'];
-            if(massages.length != 0){
               var image;
-              for(var photo in photos){
-                var base64Imag = photo['photo'];
-                if(base64Imag != ''){
-                  const Base64Codec base64 = Base64Codec();
-                  var imageBytes = base64.decode(base64Imag);
-                  image = Image.memory(imageBytes, width: 200, height: 200,);
+              if(photos != null) {
+                for (var photo in photos) {
+                  var base64Imag = photo['photo'];
+                  if (base64Imag != '') {
+                    const Base64Codec base64 = Base64Codec();
+                    var imageBytes = base64.decode(base64Imag);
+                    image = Image.memory(imageBytes, width: 200, height: 200,);
+                  }
+                  var id = photo['id'];
+                  Person person = Person(
+                    name: photo['name'] == null ? 'null' : photo['name'],
+                    image: image == null ? _defaultPhoto : image,
+                  );
+                  persons[id] = person;
                 }
-                var id = photo['id'];
-                Person person = Person(
-                  name: photo['name'],
-                  image: image != null ? image : _defaultPhoto,
-                );
-                persons[id] = person;
               }
-              for(var i = 0; i < massages.length; i++){
-                var id = massages[i]['userID'];
-                var name = persons[id].name;
-                var img = persons[id].image;
-                var msg = massages[i]['msg'];
-                print('name: ' + name + ' msg: ' + msg);
-                addMessage(name, img, msg);
+              if(massages != null){
+                if(massages.length != 0){
+                  for(var i = 0; i < massages.length; i++){
+                    var id = massages[i]['userID'];
+                    var name = persons[id].name;
+                    var img = persons[id].image;
+                    var msg = massages[i]['msg'];
+                    addMessage(name, img, msg);
+                  }
+                  //_doctorLicences_value = result['doctorLicences'];
+                  //_handleSubmit
               }
-              //_doctorLicences_value = result['doctorLicences'];
-              //_handleSubmit
             }
           });
         }

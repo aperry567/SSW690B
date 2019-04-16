@@ -37,6 +37,7 @@ class _HomeListPageState extends State<HomeListPage> {
     visit_card_list = [];
     exam_card_list = [];
     rx_card_list = [];
+
     var url = config.baseURL + "/api/getPatientHomeItems?sessionID=" + sessionID + "&listFilter=" + '';
     await http.get(url)
         .then((response) {

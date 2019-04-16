@@ -316,7 +316,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-
                   SizedBox(width: 30,),
                   Container(
                     width: 350,
