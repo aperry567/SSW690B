@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -48,7 +49,7 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 
 	// get visit user photos and name
 	// this ensures the user is a part of the visit for security
-	visitSt, _ := db.Prepare("SELECT p.USER_ID, p.PHOTO, p.NAME, d.USER_ID, d.PHOTO, d.NAME FROM dod.VISITS v LEFT OUTER JOIN dod.USERS p on v.PATIENT_USER_ID = p.USER_ID LEFT OUTER JOIN dod.USERS d on v.DOCTOR_USER_ID = p.USER_ID WHERE v.VISIT_ID = ? and (PATIENT_USER_ID = ? or DOCTOR_USER_ID = ?)")
+	visitSt, _ := db.Prepare("SELECT p.USER_ID, p.PHOTO, p.NAME, d.USER_ID, d.PHOTO, d.NAME FROM dod.VISITS v LEFT OUTER JOIN dod.USERS p on v.PATIENT_USER_ID = p.USER_ID LEFT OUTER JOIN dod.USERS d on v.DOCTOR_USER_ID = d.USER_ID WHERE v.VISIT_ID = ? and (v.PATIENT_USER_ID = ? or v.DOCTOR_USER_ID = ?)")
 	var patientInfo ChatPhoto
 	var doctorInfo ChatPhoto
 	var docID sql.NullInt64
@@ -60,11 +61,13 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	visitErr := visitSt.QueryRow(visitID, userID, userID).Scan(&patientID, &patientPhoto, &patientName, &docID, &docPhoto, &docName)
 	defer visitSt.Close()
 	if visitErr != nil {
+		fmt.Println(visitErr.Error())
 		return response, errors.New("Unable to fetch people in chat")
 	}
 	patientInfo.ID = patientID.Int64
 	patientInfo.Photo = patientPhoto.String
 	patientInfo.Name = patientName.String
+	fmt.Println("doc id: " + string(docID.Int64))
 	doctorInfo.ID = docID.Int64
 	doctorInfo.Photo = docPhoto.String
 	doctorInfo.Name = docName.String
