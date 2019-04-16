@@ -27,8 +27,9 @@ type ChatPhoto struct {
 	IsCurrentUser bool   `json:"isCurrentUser"`
 }
 type ChatResponse struct {
-	Chats  []Chat      `json:"chats"`
-	Photos []ChatPhoto `json:"photos"`
+	Chats      []Chat      `json:"chats"`
+	Photos     []ChatPhoto `json:"photos"`
+	AddChatURL string      `json:"addChatURL"`
 }
 
 /**dbGetVisitChat
@@ -43,10 +44,11 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 
 	var response ChatResponse
 	response.Chats = []Chat{}
+	response.AddChatURL = "/api/addVisitChat?sessionID=" + sessionID + "&visitID=" + visitID
 
 	// get visit user photos and name
 	// this ensures the user is a part of the visit for security
-	visitSt, _ := db.Prepare("SELECT p.USER_ID, p.PHOTO, p.NAME, d.USER_ID, d.PHOTO, d.NAME FROM dod.VISITS v LEFT OUTER JOIN dod.USERS p on v.PATIENT_USER_ID = p.USER_ID LEFT OUTER JOIN dod.USERS d on v.DOCTOR_USER_ID = p.USER_ID WHERE v.VISIT_ID = ? and (PATIENT_USER_ID = ? or DOCTOR_USER_ID = ?)")
+	visitSt, _ := db.Prepare("SELECT p.USER_ID, p.PHOTO, p.NAME, d.USER_ID, d.PHOTO, d.NAME FROM dod.VISITS v LEFT OUTER JOIN dod.USERS p on v.PATIENT_USER_ID = p.USER_ID LEFT OUTER JOIN dod.USERS d on v.DOCTOR_USER_ID = d.USER_ID WHERE v.VISIT_ID = ? and (v.PATIENT_USER_ID = ? or v.DOCTOR_USER_ID = ?)")
 	var patientInfo ChatPhoto
 	var doctorInfo ChatPhoto
 	var docID sql.NullInt64
