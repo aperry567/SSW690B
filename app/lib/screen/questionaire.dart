@@ -84,6 +84,45 @@ class _QuestionaireState extends State<Questionaire>{
               )
             ],
           ),
+          bottomNavigationBar: BottomAppBar(
+            child: Row(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [BoxShadow(color: Colors.grey.withAlpha(200))]),
+                  height: 50.0,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Center(
+                        child: Text( 'Back',
+                          style: TextStyle(fontSize: 20.0, color: Colors.cyan),
+                        )),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [BoxShadow(color: Colors.grey.withAlpha(200))]),
+                  height: 50.0,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, new MaterialPageRoute(
+                          builder: (context) =>
+                              Questionaire('/api/getQuestionnaire?sessionID=0c6b22be-5dc1-11e9-8a1a-42010a8e0002', false))
+                      );
+                    },
+                    child: Center(
+                        child: Text( 'Next',
+                          style: TextStyle(fontSize: 20.0, color: Colors.cyan),
+                        )),
+                  ),
+                ),
+              ],
+            )
+          ),
         );
     }
 
@@ -142,7 +181,8 @@ class QuestionnaireStartPage extends StatelessWidget{
                     style: TextStyle(fontSize: 20.0, color: Colors.cyan),
                   )),
             ),
-          )),
+          ),
+      ),
     );
 
     return Scaffold(

@@ -35,6 +35,7 @@ class _ItemPageState extends State<ItemPage> {
   bool is_editing = false;
   var _relatedItemsURL = '';
   var _chatURL = '';
+  var _sendURL = '';
   var _title = '';
   var _titleEditable = false;
   var _subtitle = '';
@@ -66,6 +67,8 @@ class _ItemPageState extends State<ItemPage> {
             _labelColor = Color(int.parse(result['labelColor']));
             _relatedItemsURL = result['relatedItemsURL'];
             _chatURL = result['chatURL'];
+            //TODO
+            //_sendURL = result['sendURL'];
             _is_loading = false;
           });
         }
@@ -199,7 +202,7 @@ class _ItemPageState extends State<ItemPage> {
       tabHead.add(Text('Chat'));
       tabBody.add(
         //cards page
-        ChatScreen(_chatURL),
+        ChatScreen(_chatURL, _sendURL),
       );
     }
 

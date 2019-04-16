@@ -3,8 +3,9 @@ import 'package:login/screen/chatmessage.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
+
 
 
 class Person{
@@ -23,13 +24,15 @@ class Person{
 
 class ChatScreen extends StatefulWidget {
   final chatURL;
-  ChatScreen(this.chatURL);
+  final sendURL;
+  ChatScreen(this.chatURL, this.sendURL);
   @override
-  State createState() => new ChatScreenState(chatURL);
+  State createState() => new ChatScreenState(chatURL, sendURL);
 }
 
 class ChatScreenState extends State<ChatScreen> {
   final chatURL;
+  final sendURL;
   final TextEditingController _chatController = new TextEditingController();
   List<ChatMessage> _messages = <ChatMessage>[];
 
@@ -38,14 +41,15 @@ class ChatScreenState extends State<ChatScreen> {
   var persons = Map();
   Timer timer;
 
-  ChatScreenState(this.chatURL){
+  ChatScreenState(this.chatURL, this.sendURL){
     getMessage(null);
   }
 
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getMessage(DateTime.now()));
+    DateFormat dateFormat = new DateFormat('yyyy-MM-dd hh:mm:ss');
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getMessage(dateFormat.format(DateTime.now())));
   }
 
   @override
@@ -54,21 +58,42 @@ class ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
+  Future<Null> sendMessage(text) async {
+    Map json = {
+      "value": text,
+    };
+    JsonEncoder encoder = new JsonEncoder();
+
+    var res = await http.post(sendURL, body: encoder.convert(json))
+        .then((response) {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      if(response.statusCode == 400)
+        setState(() {
+
+        });
+      else if(response.statusCode == 200){
+        getMessage(null);
+      }
+    });
+  }
+
   Future<Null> getMessage(dateTime) async {
     var url;
     if(dateTime != null){
-      url = chatURL + dateTime.toString();
+      url = chatURL + '&timeLastRead=' +dateTime;
     }
     else{
       url = chatURL;
     }
-    await http.get(chatURL)
+    print(url);
+    await http.get(url)
         .then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       if(response.statusCode == 400) {
         setState(() {
-
+          print('Denied');
         });
       }
       else if(response.statusCode == 200){
@@ -80,67 +105,55 @@ class ChatScreenState extends State<ChatScreen> {
           setState(() {
             massages = result['chats'];
             var photos = result['photos'];
-            var image;
-
-            for(var photo in photos){
-              var base64Imag = photo['photo'];
-              if(base64Imag != ''){
-                const Base64Codec base64 = Base64Codec();
-                var imageBytes = base64.decode(base64Imag);
-                image = Image.memory(imageBytes, width: 200, height: 200,);
-              }
+            if(massages.length != 0){
+              var image;
+              for(var photo in photos){
+                var base64Imag = photo['photo'];
+                if(base64Imag != ''){
+                  const Base64Codec base64 = Base64Codec();
+                  var imageBytes = base64.decode(base64Imag);
+                  image = Image.memory(imageBytes, width: 200, height: 200,);
+                }
                 var id = photo['id'];
-              Person person = Person(
-                name: photo['name'],
-                image: image != null ? image : _defaultPhoto,
-              );
-              persons[id] = person;
+                Person person = Person(
+                  name: photo['name'],
+                  image: image != null ? image : _defaultPhoto,
+                );
+                persons[id] = person;
+              }
+              for(var i = 0; i < massages.length; i++){
+                var id = massages[i]['userID'];
+                var name = persons[id].name;
+                var img = persons[id].image;
+                var msg = massages[i]['msg'];
+                print('name: ' + name + ' msg: ' + msg);
+                addMessage(name, img, msg);
+              }
+              //_doctorLicences_value = result['doctorLicences'];
+              //_handleSubmit
             }
-            for(var i = 0; i < massages.length; i++){
-              var id = massages[i]['userID'];
-              var name = persons[id].name;
-              var img = persons[id].image;
-              var msg = massages[i]['msg'];
-              print('name: ' + name + ' msg: ' + msg);
-              addMessage(name, img, msg);
-            }
-            //_doctorLicences_value = result['doctorLicences'];
-            //_handleSubmit
           });
         }
 
       }
     });
+
   }
 
   void addMessage(String name, Image image, String text){
-    _chatController.clear();
     ChatMessage message = new ChatMessage(
         name: name,
         image: image,
         text: text,
     );
-
     setState(() {
       _messages.insert(0, message);
     });
   }
 
   void _handleSubmit(String text) {
-
-
-
-    /*
     _chatController.clear();
-    ChatMessage message = new ChatMessage(
-        image: _defaultPhoto,
-        text: text
-    );
-
-    setState(() {
-      _messages.insert(0, message);
-    });
-    */
+    sendMessage(text);
   }
 
   Widget _chatEnvironment (){
@@ -160,12 +173,10 @@ class ChatScreenState extends State<ChatScreen> {
             new Container(
               margin: const EdgeInsets.symmetric(horizontal: 4.0),
               child: IconButton(
-                icon: Icon(Icons.send),
-
+                icon: Icon(Icons.send, color: Colors.blue,),
                 onPressed: ()=> _handleSubmit(_chatController.text),
-
               ),
-            )
+            ),
           ],
         ),
 
