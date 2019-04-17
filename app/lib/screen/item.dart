@@ -187,7 +187,6 @@ class _ItemPageState extends State<ItemPage> {
 
     if(_relatedItemsURL !=  ''){
       //print("aaaaaaaaaaa: " + _relatedItemsURL);
-      _relatedItemsURL = config.baseURL + _relatedItemsURL;
       tabHead.add(Text('Related Items'));
       tabBody.add(
         //cards page
@@ -195,7 +194,6 @@ class _ItemPageState extends State<ItemPage> {
       );
     }
     if(_chatURL !=  ''){
-      _chatURL = config.baseURL + _chatURL;
       tabHead.add(Text('Chat'));
       tabBody.add(
         //cards page

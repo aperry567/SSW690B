@@ -5,8 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
-
-
+import 'package:login/config.dart' as config;
 
 class Person{
   String name;
@@ -76,13 +75,13 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future<Null> getMessage(dateTime) async {
-    var url;
+    var url = config.baseURL;
 
     if(dateTime != null){
-      url = chatURL + '&timeLastRead=' +dateTime;
+      url += chatURL + '&timeLastRead=' +dateTime;
     }
     else{
-      url = chatURL;
+      url += chatURL;
     }
     print(url);
     await http.get(url)

@@ -40,8 +40,9 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
     visit_card_list = [];
     exam_card_list = [];
     rx_card_list = [];
-
-    await http.get(url)
+    String requestURL = config.baseURL + url;
+    print("detail related items url: " + requestURL);
+    await http.get(requestURL)
         .then((response) {
       //print("Response status: ${response.statusCode}");
       //print("Response body: ${response.body}");
