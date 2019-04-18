@@ -23,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     JsonEncoder encoder = new JsonEncoder();
     Map json = {"email": email, "password": password};
     var url = config.baseURL + "/api/login";
+    print("login url: " + url);
     var res = http.post(url, body: encoder.convert(json))
         .then((response) {
       print("Response status: ${response.statusCode}");
