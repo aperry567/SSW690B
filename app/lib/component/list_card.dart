@@ -47,7 +47,8 @@ class ListCard extends StatelessWidget  {
 
     return new GestureDetector(
       onTap: (){
-        if(_screenType == 'detail'){
+        print(_screenType);
+        if(_screenType == 'list' ||  _screenType == 'detail'){
           Navigator.push(context, new MaterialPageRoute(
               builder: (context) =>
               // _screenType

@@ -18,19 +18,27 @@ class ItemPage extends StatefulWidget {
 
 class _ItemPageState extends State<ItemPage> {
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
-
   TabController _tabController;
   final String detailUrl;
 
-  _ItemPageState(this.detailUrl){
-    if(this.detailUrl != null){
-      getDetail();
+  _ItemPageState(this.detailUrl);
 
+
+  @override
+  void initState() {
+    tabHead = [];
+    tabBody = [];
+    if(detailUrl != null){
+      getDetail();
     }
+    super.initState();
   }
+
   bool _is_loading = true;
   List<Widget> tabHead = [];
   List<Widget> tabBody = [];
+  TabBar _tabbar;
+
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
   bool is_editing = false;
   var _relatedItemsURL = '';
@@ -48,6 +56,8 @@ class _ItemPageState extends State<ItemPage> {
   var _details = '';
   var _detailsEditable = false;
   Map<String, dynamic> result;
+  List<Widget> widgetList = [];
+  DefaultTabController tabbarController;
 
   Future<Null> getDetail() async {
     await http.get(detailUrl)
@@ -66,180 +76,74 @@ class _ItemPageState extends State<ItemPage> {
             _labelColor = Color(int.parse(result['labelColor']));
             _relatedItemsURL = result['relatedItemsURL'];
             _chatURL = result['chatURL'];
+
+            tabHead.add(Text('Detail'));
+            tabBody.add(ItemDetailPage(result));
+
+            if(_relatedItemsURL !=  ''){
+              //print("aaaaaaaaaaa: " + _relatedItemsURL);
+              tabHead.add(Text('Related Items'));
+              tabBody.add(
+                //cards page
+                DetailRelatedItemsPage(_relatedItemsURL, _labelColor),
+              );
+            }
+            if(_chatURL !=  ''){
+              tabHead.add(Text('Chat'));
+              tabBody.add(
+                //cards page
+                ChatScreen(_chatURL),
+              );
+            }
+
             _is_loading = false;
+
+            _tabbar = new TabBar(
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                labelStyle: _textStyleWhite,
+                tabs: tabHead);
+
+            tabbarController = DefaultTabController(
+              length: tabBody.length,
+              child: new Scaffold(
+                appBar: new PreferredSize(
+                    preferredSize: Size.fromHeight(35),
+                    child:  Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: 30,
+                          color: _labelColor,
+                        ),
+                        Container(
+                          child: Container(
+                            height: 25,
+                            color: _labelColor,
+                            child: _tabbar,
+                          ),
+                        )
+                      ],
+                    )
+                ),
+                body: TabBarView(
+                  children: tabBody,
+                ),
+              ),
+            );
+
+            widgetList.add(tabbarController);
           });
+
         }
       }
     });
-
   }
 
-  List<Widget> widgetList = [];
-
   Widget build(BuildContext context) {
-    tabHead = [];
-    tabBody = [];
-
-    final title_row = new Row(
-        children: <Widget>[
-          Text('Title'),
-          new Container(
-            child:new Flexible(
-              child: TextField(
-
-                autofocus: false,
-                enabled: _titleEditable && is_editing,
-                decoration: InputDecoration(
-                  hintText: _title,
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-                ),
-                onChanged: (String value){
-                  setState(() {
-
-                  });
-                },
-              ),
-            ),//flexible
-          ),//container
-        ]
-    );
-
-    final subtitle_row  = new Row(
-        children: <Widget>[
-          Text('Subtitle'),
-          new Container(
-            child:new Flexible(
-              child: TextField(
-
-                autofocus: false,
-                enabled: _subtitleEditable && is_editing,
-                decoration: InputDecoration(
-                  hintText: _subtitle,
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-                ),
-                onChanged: (String value){
-                  setState(() {
-
-                  });
-                },
-              ),
-            ),//flexible
-          ),//container
-        ]
-    );
-
-    final datetime_row = new Row(
-        children: <Widget>[
-          Text('Date Time'),
-          new Container(
-            child:new Flexible(
-              child: TextField(
-
-                autofocus: false,
-                enabled: _datetimeEditable && is_editing,
-                decoration: InputDecoration(
-                  hintText: _datetime,
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-                ),
-                onChanged: (String value){
-                  setState(() {
-
-                  });
-                },
-              ),
-            ),//flexible
-          ),//container
-        ]
-    );
-
-    final detail_row = new Row(
-        children: <Widget>[
-          Text('Detail'),
-          new Container(
-            child:new Flexible(
-              child: TextField(
-
-                autofocus: false,
-                enabled: _detailsEditable && is_editing,
-                decoration: InputDecoration(
-                  hintText: _details,
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-                ),
-                onChanged: (String value){
-                  setState(() {
-
-                  });
-                },
-              ),
-            ),//flexible
-          ),//container
-        ]
-    );
-
-
-    tabHead.add(Text('Detail'));
-    tabBody.add(ItemDetailPage(result));
-
-    if(_relatedItemsURL !=  ''){
-      //print("aaaaaaaaaaa: " + _relatedItemsURL);
-      tabHead.add(Text('Related Items'));
-      tabBody.add(
-        //cards page
-        DetailRelatedItemsPage(_relatedItemsURL, _labelColor),
-      );
-    }
-    if(_chatURL !=  ''){
-      tabHead.add(Text('Chat'));
-      tabBody.add(
-        //cards page
-        ChatScreen(_chatURL),
-      );
-    }
-
-
-    final tabbar = DefaultTabController(
-      length: tabBody.length,
-      child: new Scaffold(
-        appBar: new PreferredSize(
-            preferredSize: Size.fromHeight(35),
-            child:  Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  color: _labelColor,
-                ),
-                Container(
-                  child: Container(
-                    height: 25,
-                    color: _labelColor,
-                    child: new TabBar(
-                      indicatorColor: Colors.white,
-                      labelColor: Colors.white,
-                      labelStyle: _textStyleWhite,
-                      tabs: tabHead,
-                    ),
-                  ),
-                )
-              ],
-            )
-        ),
-        body: TabBarView(
-          children: tabBody,
-        ),
-      ),
-    );
-
     Stack stack = new Stack(
       children: widgetList,
     );
-
-    widgetList.add(tabbar);
 
     if (_is_loading) {
       widgetList.add(Center(
@@ -247,7 +151,6 @@ class _ItemPageState extends State<ItemPage> {
       ));
     }
     return stack;
-
   }
 
 }

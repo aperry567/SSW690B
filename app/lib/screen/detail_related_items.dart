@@ -18,7 +18,10 @@ class DetailRelatedItemsPage extends StatefulWidget {
 
 
 
-class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
+class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
   final String url;
   final _labelColor;
@@ -52,6 +55,8 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
         });
       }
       else if(response.statusCode == 200){
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
         Image _image = Image.asset('assets/logo.png', width: 100,);
         Map<String, dynamic> result = jsonDecode(response.body);
         if (this.mounted){
@@ -59,7 +64,7 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> {
             //_doctorLicences_value = result['doctorLicences'];
             _updateURL = result['updateURL'];
             var list_itesms = result['items'];
-            //card_list.add(SizedBox(height: 10,));
+            card_list.add(SizedBox(height: 10,));
             for(var i = 0; i < list_itesms.length; i++){
               var item = list_itesms[i];
               var _base64Imag = item['photo'];

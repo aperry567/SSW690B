@@ -114,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget build(BuildContext context) {
-
+    print(123);
     _controller_name = new TextEditingController(text: _name_value);
     _controller_address = new TextEditingController(text: _address_value);
     _controller_city = new TextEditingController(text: _city_value);
@@ -124,8 +124,6 @@ class _ProfilePageState extends State<ProfilePage> {
     _controller_phone = new TextEditingController(text: _phone_value);
 
     List<Widget> widgetList = [];
-
-
 
     final photo = Container(
       child: CircleAvatar(
@@ -145,7 +143,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // the controller is updated.
             controller: _controller_name,
             autofocus: false,
-            enabled: false,
+            enabled: true,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
@@ -326,10 +324,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ]
         )
         ),
-    );
-
-    Stack stack = new Stack(
-      children: widgetList,
     );
 
     widgetList.add(screen);

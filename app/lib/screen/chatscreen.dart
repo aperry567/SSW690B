@@ -28,7 +28,10 @@ class ChatScreen extends StatefulWidget {
   State createState() => new ChatScreenState(chatURL);
 }
 
-class ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final chatURL;
 
   final TextEditingController _chatController = new TextEditingController();
@@ -100,8 +103,7 @@ class ChatScreenState extends State<ChatScreen> {
         Map<String, dynamic> result = jsonDecode(response.body);
         if (this.mounted){
           setState(() {
-            _sendURL = result['addChatURL'];
-            print(_sendURL);
+            _sendURL = config.baseURL + result['addChatURL'];
             massages = result['chats'];
             var photos = result['photos'];
               var image;
@@ -149,7 +151,7 @@ class ChatScreenState extends State<ChatScreen> {
         text: text,
     );
     setState(() {
-      _messages.insert(0, message);
+      _messages.add(message);
     });
   }
 

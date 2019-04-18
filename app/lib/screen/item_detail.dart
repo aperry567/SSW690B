@@ -12,10 +12,13 @@ class ItemDetailPage extends StatefulWidget {
   _ItemDetailPageState createState() => new _ItemDetailPageState(result);
 }
 
-class _ItemDetailPageState extends State<ItemDetailPage> {
+class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
   var result;
 
-  TextStyle _text_style_type;
+  TextStyle _text_style_type = TextStyle(color: Colors.white, backgroundColor: Colors.black , fontWeight: FontWeight.bold, fontSize: 12);
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
   bool is_editing = false;
@@ -38,10 +41,17 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   var _details = '';
   var _detailsEditable = false;
   static const disableColor = Colors.grey;
+  var childButtons = List<UnicornButton>();
 
   _ItemDetailPageState(this.result){
+    print('item-detail constructor');
+  }
 
-    //print(url);
+  @override
+  void initState() {
+    print('item-detail init');
+    super.initState();
+    parse();
   }
 
   update() async {
@@ -53,11 +63,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
       if(response.statusCode == 401) {
-        setState(() { //setState动态更新
-          print("Update failed");
-          is_editing = false;
-          //TODO
-        });
+
       }
       else if(response.statusCode == 200){
         Map<String, dynamic> result = jsonDecode(response.body);
@@ -73,24 +79,22 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
     await http.get(url)
         .then((response) {
-      if(response.statusCode == 400)
-        setState(() {
-          print('Delete Failed');
-          //TODO
-        });
+      if(response.statusCode == 400) {
+
+      }
+
       else if(response.statusCode == 200){
         Navigator.pop(context);
         if (this.mounted){
-          setState(() {
-          });
+
         }
       }
     });
   }
 
   parse(){
-    if(result != null)
-    setState(() {
+    print('item-detail parse');
+    if(result != null){
       _deleteURL = result['deleteURL'];
       _updateURL = result['updateURL'];
       _title = result['title'];
@@ -110,32 +114,23 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
         var _imageBytes = base64.decode(_base64Imag);
         _image = Image.memory(_imageBytes, width: 200, height: 200,);
       }
-    });
-  }
 
-  Widget build(BuildContext context) {
-    parse();
+      _text_style_type = TextStyle(color: Colors.white, backgroundColor: _labelColor , fontWeight: FontWeight.bold, fontSize: 12);
 
-    var childButtons = List<UnicornButton>();
-    childButtons.add(UnicornButton(
-        currentButton: FloatingActionButton(
-          heroTag: null,
-          backgroundColor:  _updateURL == '' ? disableColor :Colors.blue,
-          foregroundColor: Colors.white,
-          mini: true,
-          child: Icon(Icons.mode_edit),
-          onPressed: () {
-            setState(() {
-              if(_updateURL != ''){
-                is_editing = true;
-              }
-            });
-          },
-        )));
+      childButtons.add(UnicornButton(
+          currentButton: FloatingActionButton(
+            heroTag: null,
+            backgroundColor:  _updateURL == '' ? disableColor :Colors.blue,
+            foregroundColor: Colors.white,
+            mini: true,
+            child: Icon(Icons.mode_edit),
+            onPressed: () {
 
+            },
+          )));
 
-    childButtons.add(UnicornButton(
-        currentButton: FloatingActionButton(
+      childButtons.add(UnicornButton(
+          currentButton: FloatingActionButton(
             heroTag: null,
             backgroundColor: _deleteURL == '' ? disableColor : Colors.redAccent,
             foregroundColor: Colors.white,
@@ -147,8 +142,16 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               }
 
             },
-        )));
+          )));
+    }
+    else{
+      print("Error: the item => item_detail(result), result == null!");
+    }
 
+  }
+
+  Widget build(BuildContext context) {
+    print('item-detail build');
     final title_row = new Row(
         children: <Widget>[
           Text('Title'),
@@ -157,6 +160,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               child: TextField(
 
                 autofocus: false,
+
                 enabled: _titleEditable && is_editing,
                 decoration: InputDecoration(
                   hintText: _title,
@@ -164,9 +168,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
                 onChanged: (String value) {
-                  setState(() {
 
-                  });
                 },
               ),
             ), //flexible
@@ -189,9 +191,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
                 onChanged: (String value) {
-                  setState(() {
 
-                  });
                 },
               ),
             ), //flexible
@@ -215,9 +215,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
                 onChanged: (String value) {
-                  setState(() {
 
-                  });
                 },
               ),
             ), //flexible
@@ -240,9 +238,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
                 onChanged: (String value) {
-                  setState(() {
 
-                  });
                 },
               ),
             ), //flexible
@@ -289,10 +285,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       ),
       );
 
-
-
-
-
     return Scaffold(
       floatingActionButton: UnicornDialer(
           backgroundColor: Color.fromRGBO(255, 255, 255, 0.6),
@@ -303,12 +295,12 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           childButtons: childButtons),
       body: Card(
           clipBehavior: Clip.antiAlias,
-          child: Column(
+          child: ListView(
             children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Text('${_label}',style: _text_style_type),
+                  Text('$_label',style: _text_style_type),
                 ],
               ),
               _image,

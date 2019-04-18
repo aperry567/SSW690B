@@ -33,7 +33,6 @@ class ChatMessage extends StatelessWidget {
                 new Container(
                   width: 310,
                   child: new Text(text),
-
                 )
               ],
             )

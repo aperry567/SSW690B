@@ -13,21 +13,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Widget> _children;
+  List<BottomNavigationBarItem> _barNav;
+
   final AuthResponse authNav;
-  _HomePageState(this.authNav);
-  int _currentIndex = 0;
-
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Widget> _children = [];
-    final List<BottomNavigationBarItem> _barNav = [];
+  _HomePageState(this.authNav){
+    _children = [];
+    _barNav = [];
     authNav.nav.forEach((nav){
       switch(nav.screenType) {
         case 'list': {
@@ -49,6 +41,17 @@ class _HomePageState extends State<HomePage> {
         break;
       }
     });
+  }
+  int _currentIndex = 0;
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final logo = Container(
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
@@ -62,7 +65,6 @@ class _HomePageState extends State<HomePage> {
       currentIndex: _currentIndex, // new
       items: _barNav,
     );
-
 
     return Scaffold(
       backgroundColor: Colors.white,

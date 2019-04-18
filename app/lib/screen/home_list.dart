@@ -12,13 +12,16 @@ class _HomePageListContainer extends StatefulWidget {
   _HomePageListContainer(
     this.url
   ) : super(key: ValueKey([url]));
-  static String tag = 'profile-page';
+
 
   @override
   _HomePageListContainerState createState() => new _HomePageListContainerState(url);
 }
 
-class _HomePageListContainerState extends State<_HomePageListContainer> {
+class _HomePageListContainerState extends State<_HomePageListContainer> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final String url;
   bool isLoading = true;
   ListResponse list; 
@@ -27,13 +30,13 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
 
   _HomePageListContainerState(this.url){
     loadFeed();
-    print("_homepage List - " + this.url);
+    //print("_homepage List - " + this.url);
   }
 
   Future<Null> loadFeed() async {
     await http.get(this.url)
         .then((response) {
-      print("_homepage List - Response status: ${response.statusCode}");
+      //print("_homepage List - Response status: ${response.statusCode}");
       // print("Response body: ${response.body}");
       if(response.statusCode == 400) {
         setState(() {
@@ -52,12 +55,14 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
     });
   }
 
+
   Widget build(BuildContext context) {
     List<Widget> widgetList = [];
     List<Widget> cardList = [];
+
     if (list != null) {
-      print("building this thing");
       var listItems = list.items;
+
       cardList.add(SizedBox(height: 10,));
       for(var i = 0; i < listItems.length; i++){
         var item = listItems[i];
@@ -84,7 +89,8 @@ class _HomePageListContainerState extends State<_HomePageListContainer> {
       color:Colors.cyan[500],
       onRefresh: () => loadFeed(),	// refresh callback
       child: listView,		// scroll view
-    ));
+      )
+    );
     Stack stack = new Stack(
       children: widgetList,
     );
@@ -115,7 +121,7 @@ class _HomeListPageState extends State<HomeListPage> {
     final String apiURL;
 
     _HomeListPageState(this.apiURL){
-      getProfile();
+      getHomeItem();
       print(apiURL);
     }
     bool _is_loading = true;
@@ -124,7 +130,7 @@ class _HomeListPageState extends State<HomeListPage> {
     ListResponse list;
     String url = "";
 
-    Future<Null> getProfile() async {
+    Future<Null> getHomeItem() async {
       url = config.baseURL + apiURL;
       await http.get(url)
             .then((response) {
