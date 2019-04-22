@@ -95,6 +95,9 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	// get the opposite person's photo
 	var photo string
 	photoSelect := "select u.PHOTO from dod.VISITS v left outer join dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID where v.VISIT_ID = ?"
+	if role == "doctor" {
+		photoSelect = strings.Replace(photoSelect, "DOCTOR_USER_ID", "PATIENT_USER_ID", 1)
+	}
 	photoSt, errs := db.Prepare(photoSelect)
 	defer photoSt.Close()
 	if errs != nil {
