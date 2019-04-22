@@ -966,10 +966,10 @@ paths:
           schema:
             type: string
         - in: query
-          name: timeLastRead
+          name: unreadOnly
           schema:
-            type: string
-            example: "2019-03-30 13:13:00"
+            type: boolean
+            example: false
       responses:
         '200':
           description: chats for the visit returned
@@ -979,6 +979,8 @@ paths:
                 type: object
                 properties:
                   addChatURL:
+                    type: string
+                  unreadChatsURL:
                     type: string
                   chats:
                     type: array

@@ -92,14 +92,24 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 		response.Filters[2].AddDetails = nil
 	}
 
+	// get the opposite person's photo
+	var photo string
+	photoSelect := "select u.PHOTO from dod.VISITS v left outer join dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID where v.VISIT_ID = ?"
+	photoSt, errs := db.Prepare(photoSelect)
+	defer photoSt.Close()
+	if errs != nil {
+		panic(errs.Error())
+	}
+	photoSt.QueryRow(userID).Scan(&photo)
+
 	var examSelect string
 	var prescriptSelect string
 
-	examSelect = "SELECT '' as PHOTO, EXAM_TIME as DATETIME, `DESC` as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, '', LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	examSelect = "SELECT EXAM_TIME as DATETIME, `DESC` as TITLE, 'Exam' as LABEL, '" + LABEL_COLOR_EXAM + "' as LABEL_COLOR, '', LOCATION as SUBTITLE, CONCAT('/api/getExamDetail?sessionID=',?,'&examID=',EXAM_ID) as DETAIL_LINK FROM dod.EXAMS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		examSelect = strings.Replace(examSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
-	prescriptSelect = "SELECT '' as PHOTO, CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=',PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
+	prescriptSelect = "SELECT CREATED_TIME as DATETIME, NAME as TITLE, 'Rx' as LABEL,'" + LABEL_COLOR_PRESCRIPTION + "' as LABEL_COLOR, INSTRUCTIONS as `DESC`, CONCAT('Refills: ', REFILLS) as SUBTITLE, CONCAT('/api/getPrescriptionDetail?sessionID=',?,'&prescriptionID=',PRESCRIPTION_ID) as DETAIL_LINK FROM dod.PRESCRIPTIONS WHERE VISIT_ID = ? and PATIENT_USER_ID = ?"
 	if role == "doctor" {
 		prescriptSelect = strings.Replace(prescriptSelect, "PATIENT_USER_ID", "DOCTOR_USER_ID", 1)
 	}
@@ -135,7 +145,8 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 	for rows.Next() {
 		var item ListItem
 		item.ScreenType = "list"
-		if err := rows.Scan(&item.Photo, &item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
+		item.Photo = photo
+		if err := rows.Scan(&item.DateTime, &item.Title, &item.Label, &item.LabelColor, &item.Details, &item.Subtitle, &item.DetailLink); err != nil {
 			return response, errors.New("Unable to fetch home item")
 		}
 		response.Items = append(response.Items, item)

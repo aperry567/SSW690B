@@ -1,7 +1,6 @@
 /*
  * Doctors on Demand API
  */
-
 package main
 
 import (
@@ -11,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type Chat struct {
@@ -27,16 +25,17 @@ type ChatPhoto struct {
 	IsCurrentUser bool   `json:"isCurrentUser"`
 }
 type ChatResponse struct {
-	Chats      []Chat      `json:"chats"`
-	Photos     []ChatPhoto `json:"photos"`
-	AddChatURL string      `json:"addChatURL"`
+	Chats          []Chat      `json:"chats"`
+	Photos         []ChatPhoto `json:"photos"`
+	AddChatURL     string      `json:"addChatURL"`
+	UnreadChatsURL string      `json:"unreadChatsURL"`
 }
 
 /**dbGetVisitChat
 onlyUnread will not return the photos part of the response as it's assumed the ui already has this and just wants any new messages
 calling this api will always set the messages to read for the alternate person who sent them
 **/
-func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (ChatResponse, error) {
+func dbGetVisitChat(sessionID string, visitID string, unreadOnly bool) (ChatResponse, error) {
 	dbUserClearSessions()
 
 	db := getDB()
@@ -44,7 +43,9 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 
 	var response ChatResponse
 	response.Chats = []Chat{}
+	response.Photos = []ChatPhoto{}
 	response.AddChatURL = "/api/addVisitChat?sessionID=" + sessionID + "&visitID=" + visitID
+	response.UnreadChatsURL = "/api/getVisitChat?sessionID=" + sessionID + "&visitID=" + visitID + "&unreadOnly=true"
 
 	// get visit user photos and name
 	// this ensures the user is a part of the visit for security
@@ -70,7 +71,7 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	doctorInfo.Name = docName.String
 
 	// if not onlyUnreadBool then return the photos in the response
-	if timeLastRead == "" {
+	if unreadOnly != true {
 		patientInfo.IsCurrentUser = patientInfo.ID == int64(userID)
 		doctorInfo.IsCurrentUser = doctorInfo.ID == int64(userID)
 		response.Photos = []ChatPhoto{patientInfo, doctorInfo}
@@ -80,15 +81,11 @@ func dbGetVisitChat(sessionID string, visitID string, timeLastRead string) (Chat
 	var rows *sql.Rows
 	var chatErr error
 	chatQuery := "SELECT USER_ID, MSG, CREATED_DT, IS_READ FROM dod.VISITS_CHAT where VISIT_ID = ?"
-	if timeLastRead != "" {
-		chatQuery += " and CREATED_DT > ?"
+	if unreadOnly == true {
+		chatQuery += " and IS_READ = 0 and USER_ID != ?"
 	}
 	chatSt, _ := db.Prepare(chatQuery + " ORDER BY CREATED_DT ASC")
-	if timeLastRead != "" {
-		rows, chatErr = chatSt.Query(visitID, timeLastRead)
-	} else {
-		rows, chatErr = chatSt.Query(visitID)
-	}
+	rows, chatErr = chatSt.Query(visitID, userID)
 
 	defer chatSt.Close()
 	if chatErr != nil {
@@ -173,20 +170,16 @@ func dbAddVisitChat(sessionID string, visitID string, message string) error {
 	defer db.Close()
 
 	//fetch user_id and role
-	userID, role := dbGetUserIDAndRole(sessionID)
+	userID := dbGetUserID(sessionID)
 	if userID == 0 {
 		return errors.New("Bad Session")
 	}
 
-	if role != "patient" {
-		return errors.New("Can only be used by patients")
-	}
-
 	//validate visit for user
 	var id string
-	visitSt, _ := db.Prepare("SELECT VISIT_ID FROM dod.VISITS where VISIT_ID = ? and PATIENT_USER_ID = ?")
+	visitSt, _ := db.Prepare("SELECT VISIT_ID FROM dod.VISITS where VISIT_ID = ? and PATIENT_USER_ID = ? or DOCTOR_USER_ID = ?")
 	defer visitSt.Close()
-	err = visitSt.QueryRow(visitID, userID).Scan(&id)
+	err = visitSt.QueryRow(visitID, userID, userID).Scan(&id)
 	if err != nil && err == sql.ErrNoRows {
 		return errors.New("You cannot chat on this visit")
 	}
@@ -223,15 +216,9 @@ func GetVisitChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timeLastRead := r.URL.Query().Get("timeLastRead")
-	if timeLastRead != "" {
-		_, err := time.Parse("2006-01-02 15:04:05", timeLastRead)
-		if err != nil {
-			http.Error(w, "Invalid timeLastRead format YYYY-MM-DD hh:mm:ss", 400)
-		}
-	}
+	unreadOnly := r.URL.Query().Get("unreadOnly") == "true"
 
-	output, err := dbGetVisitChat(sessionID, visitID, timeLastRead)
+	output, err := dbGetVisitChat(sessionID, visitID, unreadOnly)
 
 	if err != nil {
 		if err.Error() == "Bad Session" {
