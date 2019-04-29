@@ -191,9 +191,9 @@ func dbAddVisitRelatedItems(sessionID string, visitID string, filter string, req
 	if filter == "1" {
 		//validate values
 		if req.Subtitle == "" {
-			return errors.New("Loocation is required")
+			return errors.New("Location is required")
 		}
-		if req.Details == "" {
+		if req.Title == "" {
 			return errors.New("Instructions are required")
 		}
 		if req.DateTime == "" {
@@ -204,7 +204,7 @@ func dbAddVisitRelatedItems(sessionID string, visitID string, filter string, req
 			return errors.New("Invalid Exam Time format YYYY-MM-DD hh:mm:ss")
 		}
 		relatedItemSt, _ := db.Prepare("insert into `dod`.`EXAMS` (PATIENT_USER_ID, DOCTOR_USER_ID, VISIT_ID, EXAM_TIME, `DESC`, LOCATION) values (?, ?, ?, ?, ?, ?)")
-		_, err = relatedItemSt.Exec(patientID, userID, visitID, req.DateTime, req.Details, req.Subtitle)
+		_, err = relatedItemSt.Exec(patientID, userID, visitID, req.DateTime, req.Title, req.Subtitle)
 		defer relatedItemSt.Close()
 		if err != nil {
 			return errors.New("Unable to save Exam")
@@ -264,9 +264,10 @@ func dbGetVisitDetail(sessionID string, visitID string) (DetailResponse, error) 
 	}
 
 	//build query string
-	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.`PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO as PHOTO, VISIT_TIME as DATETIME, u.NAME as TITLE,'Visit' as LABEL, '" + LABEL_COLOR_VISIT + "' as LABEL_COLOR, NOTES as `DESC`, CONCAT('Reason: ', VISIT_REASON) as SUBTITLE FROM dod.VISITS v LEFT OUTER JOIN dod.USERS u on v.DOCTOR_USER_ID = u.USER_ID WHERE v.VISIT_ID = ? AND v.PATIENT_USER_ID = ?"
 	if role == "doctor" {
-		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
+		getQueryStr = strings.Replace(getQueryStr, "v.DOCTOR_USER_ID = u.USER_ID", "v.PATIENT_USER_ID = u.USER_ID", 1)
+		getQueryStr = strings.Replace(getQueryStr, "v.PATIENT_USER_ID = ?", "v.DOCTOR_USER_ID = ?", 1)
 	}
 	visitSt, _ := db.Prepare(getQueryStr)
 	defer visitSt.Close()

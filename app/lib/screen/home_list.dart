@@ -5,6 +5,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:login/component/list_card.dart';
 import 'package:login/models/list_response.dart';
 import 'package:login/config.dart' as config;
+import 'package:unicorndial/unicorndial.dart';
 
 class _HomePageListContainer extends StatefulWidget {
   final String url;
@@ -106,23 +107,36 @@ class _HomePageListContainerState extends State<_HomePageListContainer> with Aut
 
 class HomeListPage extends StatefulWidget {
   final String url;
+  final bool isTopScreen;
+  final labelColor;
   
   HomeListPage(
-    this.url
+    this.url,
+    this.isTopScreen,
+    this.labelColor
   ) : super(key: ValueKey([url]));
   static String tag = 'profile-page';
 
   @override
-  _HomeListPageState createState() => new _HomeListPageState(url);
+  _HomeListPageState createState() => new _HomeListPageState(url, isTopScreen, labelColor);
 }
 
 class _HomeListPageState extends State<HomeListPage> {
     static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16);
     final String apiURL;
+    final bool isTopScreen;
+    double spacerHeight = 10;
+    double tabHeight = 30;
+    final labelColor;
+    final _formKey = GlobalKey<FormState>();
 
-    _HomeListPageState(this.apiURL){
+    _HomeListPageState(this.apiURL, this.isTopScreen, this.labelColor){
       getHomeItem();
       print(apiURL);
+      if (this.isTopScreen) {
+        spacerHeight = 30;
+        tabHeight = 40;
+      }
     }
     bool _is_loading = true;
 
@@ -133,26 +147,48 @@ class _HomeListPageState extends State<HomeListPage> {
     Future<Null> getHomeItem() async {
       url = config.baseURL + apiURL;
       await http.get(url)
-            .then((response) {
-          print("Response status: ${response.statusCode}");
-          print("Response body: ${response.body}");
-          if(response.statusCode == 400) {
+          .then((response) {
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        if(response.statusCode == 400) {
+          setState(() {
+            _is_loading = false;
+          });
+        } else if(response.statusCode == 200){
+          // print(response.body);
+          Map<String, dynamic> result = jsonDecode(response.body);
+          if (this.mounted){
             setState(() {
+              list = ListResponse.fromJson(result);
               _is_loading = false;
             });
-          } else if(response.statusCode == 200){
-            // print(response.body);
-            Map<String, dynamic> result = jsonDecode(response.body);
-            if (this.mounted){
-              setState(() {
-                list = ListResponse.fromJson(result);
-                _is_loading = false;
-              });
-            }
           }
-        });
-      }
+        }
+      });
+    }
 
+    String addItemResponseError = "";
+    Future<Null> addItem(addURL) async {
+      var url = config.baseURL + addURL;
+      print(url);
+      print(addItemData['title']);
+      JsonEncoder encoder = new JsonEncoder();
+      await http.post(url, body: encoder.convert(addItemData))
+          .then((response) {
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        if(response.statusCode == 400) {
+          addItemResponseError = response.body;
+          _formKey.currentState.validate();
+          print("Item Detail Save Error: " + response.body);
+        } else if (response.statusCode == 200) {
+          getHomeItem();
+          Navigator.pop(_formKey.currentContext);
+        }
+      });
+    }
+
+    Map<String, String> addItemData = new Map<String, String>();
     List<Widget> widgetList = [];
     Widget build(BuildContext context) {
       Stack(
@@ -161,28 +197,129 @@ class _HomeListPageState extends State<HomeListPage> {
 
       List<Tab> tabs = [];
       List<Widget> tabViews = [];
+      List<ListFilter> addItems = [];
+      
+      List<UnicornButton> childButtons = [];
       if (list != null){
-        for(var i = 0; i < list.filters.length; i++){
-          tabs.add(Tab(text: list.filters[i].title));
-          tabViews.add(_HomePageListContainer(url + "&" + list.filters[i].value));
+        for(var filter in list.filters){
+          tabs.add(Tab(text: filter.title));
+          tabViews.add(_HomePageListContainer(url + "&" + filter.value));
+          if (filter.addURL != "" && filter.addDetails != null) {
+            addItems.add(filter);
+            childButtons.add(UnicornButton(
+              hasLabel: true,
+              labelText: filter.title,
+              currentButton: FloatingActionButton(
+                heroTag: null,
+                backgroundColor: labelColor,
+                foregroundColor: Colors.white,
+                mini: true,
+                child: Icon(Icons.description),
+                onPressed: () {
+                  addItemData = new Map<String,String>();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      print("builder called");
+                      List<Widget> formItems = [];
+                      
+                      formItems.add(Padding(
+                        padding: EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                          child: FormField(
+                            builder: (FormFieldState<String> field) {
+                              String err = addItemResponseError;
+                              if (err != "") {
+                                err = "Error: " + err;
+                              }
+                              return Text(err, style: TextStyle(color: Colors.red));
+                            }
+                          ),
+                      ));
+
+                      for (var formDetail in filter.addDetails) {
+                        formItems.add(Padding(
+                          padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+                          child: Text(formDetail.label),
+                        ));
+                        formItems.add(Padding(
+                          padding: EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+                          child: TextFormField(
+                            autocorrect: true,
+                            autofocus: false,
+                            validator: (value) {
+                              if (value == "") {
+                                return "Cannot be blank";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) => addItemData[formDetail.fieldName] = value,
+                          ),
+                        ));
+                      }
+                      formItems.add(Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              print("Adding Item: " + filter.title);
+                              _formKey.currentState.save();
+                              addItem(filter.addURL);
+                            }
+                          },
+                          padding: EdgeInsets.all(12),
+                          color: Colors.lightBlueAccent,
+                          child: Text('Add', style: TextStyle(color: Colors.white)),
+                        )
+                      ));
+                      return AlertDialog(
+                        content: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: formItems
+                          ),
+                        ),
+                      );
+                    }
+                  );
+                },
+              )
+            ));
+          }
         }
+      }
+      UnicornDialer buttons;
+      if (childButtons.length > 0) {
+        buttons = UnicornDialer(
+          backgroundColor: Color.fromRGBO(255, 255, 255, 0.6),
+          parentButtonBackground: labelColor,
+          parentHeroTag: null,
+          orientation: UnicornOrientation.VERTICAL,
+          parentButton: Icon(Icons.add),
+          childButtons: childButtons,
+        );
       }
       tabbar = DefaultTabController(
         length: tabViews.length,
         child: new Scaffold(
+          floatingActionButton: buttons,
           appBar: new PreferredSize(
             preferredSize: Size.fromHeight(60),
             child:  Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  height: 30,
-                  color: Colors.cyan[500],
+                  height: spacerHeight,
+                  color: labelColor,
                 ),
                 Container(
                   child: Container(
-                    height: 40,
-                    color: Colors.cyan[500],
+                    height: tabHeight,
+                    color: labelColor,
                     child: new TabBar(
                       indicatorColor: Colors.white,
                       labelColor: Colors.white,
@@ -210,6 +347,7 @@ class _HomeListPageState extends State<HomeListPage> {
           child: CircularProgressIndicator(),
         ));
       }
+      
       return stack;
     }
 

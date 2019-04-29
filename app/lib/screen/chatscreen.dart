@@ -81,10 +81,10 @@ class ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMix
     var url = config.baseURL;
 
     if(dateTime != null){
-      url += chatURL + '&timeLastRead=' +dateTime;
+      url += chatURL + '&unreadOnly=true';
     }
     else{
-      url += chatURL;
+      url += chatURL + '&unreadOnly=false';
     }
     print(url);
     await http.get(url)

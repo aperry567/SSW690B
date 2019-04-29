@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     authNav.nav.forEach((nav){
       switch(nav.screenType) {
         case 'list': {
-          _children.add(new HomeListPage(nav.apiURL)); //needs updating to use api url instead of session
+          _children.add(new HomeListPage(nav.apiURL, true, Colors.cyan[500])); //needs updating to use api url instead of session
           _barNav.add(new BottomNavigationBarItem(
             icon: Icon(getIconGuessFavorMaterial(name: nav.icon), color: Colors.lightBlue), //fix to use dynamic icons
             title: Text(nav.title, style: TextStyle(color:Colors.lightBlue)),

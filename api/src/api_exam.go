@@ -15,7 +15,7 @@ import (
 )
 
 type UpdateExamRequest struct {
-	Details  string `json:"details"`
+	Title    string `json:"title"`
 	Subtitle string `json:"subtitle"`
 	DateTime string `json:"dateTime"`
 }
@@ -43,9 +43,10 @@ func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error)
 	}
 
 	//build query string
-	getQueryStr := "SELECT `EXAM_TIME`, `DESC`, `LOCATION` FROM dod.EXAMS WHERE `EXAM_ID` = ? AND `PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO, e.EXAM_TIME, e.DESC, e.LOCATION FROM dod.EXAMS e LEFT OUTER JOIN dod.USERS u on e.DOCTOR_USER_ID = u.USER_ID WHERE e.EXAM_ID = ? and e.PATIENT_USER_ID = ?"
 	if role == "doctor" {
-		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
+		getQueryStr = strings.Replace(getQueryStr, "e.DOCTOR_USER_ID = u.USER_ID", "e.PATIENT_USER_ID = u.USER_ID", 1)
+		getQueryStr = strings.Replace(getQueryStr, "e.PATIENT_USER_ID = ?", "e.DOCTOR_USER_ID = ?", 1)
 	}
 	examSt, errSt := db.Prepare(getQueryStr)
 	defer examSt.Close()
@@ -54,7 +55,7 @@ func dbGetExamDetail(sessionID string, examIDstr string) (DetailResponse, error)
 		fmt.Println(errSt.Error())
 	}
 
-	err := examSt.QueryRow(examID, userID).Scan(&resp.DateTime, &resp.Title, &resp.Subtitle)
+	err := examSt.QueryRow(examID, userID).Scan(&resp.Photo, &resp.DateTime, &resp.Title, &resp.Subtitle)
 	if err != nil {
 		return resp, errors.New("Unable to find exam")
 	}
@@ -92,9 +93,8 @@ func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error 
 	if role != "doctor" {
 		return errors.New("Can only be used by doctors")
 	}
-
-	if req.Details == "" {
-		return errors.New("Details cannot be empty")
+	if req.Title == "" {
+		return errors.New("Title cannot be empty")
 	}
 
 	if req.DateTime == "" {
@@ -112,7 +112,7 @@ func dbUpdateExam(sessionID string, examID string, req UpdateExamRequest) error 
 
 	//build query string
 	examSt, _ := db.Prepare("update dod.`EXAMS` set `DESC` = ?, LOCATION = ?, EXAM_TIME = ? where `EXAM_ID` = ? and DOCTOR_USER_ID = ?")
-	_, err = examSt.Exec(req.Details, req.Subtitle, req.DateTime, examID, userID)
+	_, err = examSt.Exec(req.Title, req.Subtitle, req.DateTime, examID, userID)
 	defer examSt.Close()
 	if err != nil {
 		return errors.New("Unable to update exam")

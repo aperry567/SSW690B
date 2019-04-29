@@ -8,6 +8,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,15 +43,17 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string) (Detail
 	}
 
 	//build query string
-	getQueryStr := "SELECT CREATED_TIME, `NAME`, `INSTRUCTIONS`, CONCAT('Refills: ', REFILLS) FROM dod.PRESCRIPTIONS WHERE `PRESCRIPTION_ID` = ? AND `PATIENT_USER_ID` = ?"
+	getQueryStr := "SELECT u.PHOTO, p.CREATED_TIME, p.NAME, p.INSTRUCTIONS, CONCAT('Refills: ', p.REFILLS) FROM dod.PRESCRIPTIONS p LEFT OUTER JOIN dod.USERS u on p.DOCTOR_USER_ID = u.USER_ID WHERE p.PRESCRIPTION_ID = ? and p.PATIENT_USER_ID = ?"
 	if role == "doctor" {
-		getQueryStr = strings.Replace(getQueryStr, "`PATIENT_USER_ID`", "`DOCTOR_USER_ID`", 1)
+		getQueryStr = strings.Replace(getQueryStr, "p.DOCTOR_USER_ID = u.USER_ID", "p.PATIENT_USER_ID = u.USER_ID", 1)
+		getQueryStr = strings.Replace(getQueryStr, "p.PATIENT_USER_ID = ?", "p.DOCTOR_USER_ID = ?", 1)
 	}
 	prescriptionSt, _ := db.Prepare(getQueryStr)
 	defer prescriptionSt.Close()
 
-	err := prescriptionSt.QueryRow(prescriptionID, userID).Scan(&resp.DateTime, &resp.Title, &resp.Details, &resp.Subtitle)
+	err := prescriptionSt.QueryRow(prescriptionID, userID).Scan(&resp.Photo, &resp.DateTime, &resp.Title, &resp.Details, &resp.Subtitle)
 	if err != nil {
+		fmt.Println(err.Error())
 		return resp, errors.New("Unable to find prescription")
 	}
 
@@ -61,7 +64,8 @@ func dbGetPrescriptionDetail(sessionID string, prescriptionIDstr string) (Detail
 		resp.TitleEditable = true
 		resp.SubtitleEditable = true
 		resp.DetailsEditable = true
-		resp.UpdateURL = "/api/UpdatePrescription?sessionID=" + sessionID + "&prescriptionID=" + prescriptionIDstr
+		resp.UpdateURL = "/api/updatePrescription?sessionID=" + sessionID + "&prescriptionID=" + prescriptionIDstr
+		resp.DeleteURL = "/api/deletePrescription?sessionID=" + sessionID + "&prescriptionID=" + prescriptionIDstr
 	}
 
 	return resp, nil

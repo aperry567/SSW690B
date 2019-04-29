@@ -58,7 +58,7 @@ class ListCard extends StatelessWidget  {
         else if(_screenType == 'questionnaire'){
           Navigator.push(context, new MaterialPageRoute(
               builder: (context) =>
-                  Questionaire('/api/getQuestionnaire?sessionID=0c6b22be-5dc1-11e9-8a1a-42010a8e0002', true))
+                  Questionaire(_detailUrl, true))
           );
         }
 

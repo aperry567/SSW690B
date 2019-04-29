@@ -1,8 +1,8 @@
 class ListFilterAddDetails {
   final String label;
   final String fieldName;
-  final String required;
-  final String isDateTime;
+  final bool required;
+  final bool isDateTime;
 
   ListFilterAddDetails({this.label, this.fieldName, this.required, this.isDateTime});
 
@@ -25,7 +25,7 @@ class ListFilter {
   ListFilter({this.title, this.value, this.addURL, this.addDetails});
 
   factory ListFilter.fromJson(Map<String, dynamic> json) {
-    var jsonList = json['items'] as List;
+    var jsonList = json['addDetails'] as List;
     List<ListFilterAddDetails> list;
     if (jsonList != null) {
       list = jsonList.map((i) => ListFilterAddDetails.fromJson(i)).toList();

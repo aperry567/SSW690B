@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:login/screen/chatscreen.dart';
 import 'package:login/screen/detail_related_items.dart';
+import 'package:login/screen/home_list.dart';
 import 'item_detail.dart';
 import 'package:login/config.dart' as config;
 
@@ -85,7 +86,7 @@ class _ItemPageState extends State<ItemPage> {
               tabHead.add(Text('Related Items'));
               tabBody.add(
                 //cards page
-                DetailRelatedItemsPage(_relatedItemsURL, _labelColor),
+                HomeListPage(_relatedItemsURL, false, _labelColor),
               );
             }
             if(_chatURL !=  ''){

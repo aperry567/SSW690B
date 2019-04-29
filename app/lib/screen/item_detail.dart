@@ -18,7 +18,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
 
   var result;
 
-  TextStyle _text_style_type = TextStyle(color: Colors.white, backgroundColor: Colors.black , fontWeight: FontWeight.bold, fontSize: 12);
+  TextStyle _text_style_type = TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
   static const TextStyle _textStyleWhite = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12);
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
   bool is_editing = false;
@@ -41,8 +41,11 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
   var _details = '';
   var _detailsEditable = false;
   static const disableColor = Colors.grey;
-  var childButtons = List<UnicornButton>();
-
+  final RegExp dateTimeRegExp = new RegExp(
+    r"\d\d\d\d[-]\d\d[-]\d\d[ ]\d\d[:]\d\d[:]\d\d",
+    caseSensitive: false,
+    multiLine: false,
+  );
   _ItemDetailPageState(this.result){
     print('item-detail constructor');
   }
@@ -54,9 +57,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
     parse();
   }
 
-  update() async {
+  update(titleValue, subtitleValue, datetimeValue, detailsValue) async {
     JsonEncoder encoder = new JsonEncoder();
-    Map json = {"title": _title, "subtitle": _subtitle, "details": _details, "datetime": _datetime};
+    Map json = {"title": titleValue, "subtitle": subtitleValue, "datetime": datetimeValue, "details": detailsValue};
     var url = config.baseURL + _updateURL;
     var res = http.post(url, body: encoder.convert(json))
         .then((response) {
@@ -65,9 +68,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
       if(response.statusCode == 401) {
 
       }
-      else if(response.statusCode == 200){
-        Map<String, dynamic> result = jsonDecode(response.body);
-        Navigator.pop(context);
+      else if(response.statusCode == 400) {
+        print("Item Detail Save Error: " + response.body);
       }
     });
   }
@@ -114,35 +116,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
         var _imageBytes = base64.decode(_base64Imag);
         _image = Image.memory(_imageBytes, width: 200, height: 200,);
       }
-
-      _text_style_type = TextStyle(color: Colors.white, backgroundColor: _labelColor , fontWeight: FontWeight.bold, fontSize: 12);
-
-      childButtons.add(UnicornButton(
-          currentButton: FloatingActionButton(
-            heroTag: null,
-            backgroundColor:  _updateURL == '' ? disableColor :Colors.blue,
-            foregroundColor: Colors.white,
-            mini: true,
-            child: Icon(Icons.mode_edit),
-            onPressed: () {
-
-            },
-          )));
-
-      childButtons.add(UnicornButton(
-          currentButton: FloatingActionButton(
-            heroTag: null,
-            backgroundColor: _deleteURL == '' ? disableColor : Colors.redAccent,
-            foregroundColor: Colors.white,
-            mini: true,
-            child: Icon(Icons.delete_forever),
-            onPressed: () {
-              if(_deleteURL != '') {
-                delete();
-              }
-
-            },
-          )));
     }
     else{
       print("Error: the item => item_detail(result), result == null!");
@@ -152,23 +125,65 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
 
   Widget build(BuildContext context) {
     print('item-detail build');
+    var childButtons = List<UnicornButton>();
+    childButtons.add(UnicornButton(
+      currentButton: FloatingActionButton(
+        heroTag: null,
+        backgroundColor:  _updateURL == '' ? disableColor :Colors.blue,
+        foregroundColor: Colors.white,
+        mini: true,
+        child: Icon(Icons.mode_edit),
+        onPressed: () {
+          print("edit icon clicked");
+          setState(() {
+            is_editing = true;
+          });
+        },
+      )
+    ));
+    if (_deleteURL != null && _deleteURL != "") {
+      childButtons.add(UnicornButton(
+        currentButton: FloatingActionButton(
+          heroTag: null,
+          backgroundColor: _deleteURL == '' ? disableColor : Colors.redAccent,
+          foregroundColor: Colors.white,
+          mini: true,
+          child: Icon(Icons.delete_forever),
+          onPressed: () {
+            if(_deleteURL != '') {
+              delete();
+            }
+
+          },
+        )
+      ));
+    }
+
+    String titleValue = _title;
+    bool titleValid = true;
     final title_row = new Row(
         children: <Widget>[
           Text('Title'),
           new Container(
             child: new Flexible(
-              child: TextField(
-
+              child: TextFormField(
                 autofocus: false,
-
+                autocorrect: true,
+                autovalidate: true,
                 enabled: _titleEditable && is_editing,
                 decoration: InputDecoration(
-                  hintText: _title,
                   contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
-                onChanged: (String value) {
-
+                initialValue: _title,
+                validator: (value) {
+                  if (value == "") {
+                    titleValid = false;
+                    return "Cannot be blank";
+                  }
+                  titleValue = value;
+                  print("title: " + titleValue);
+                  titleValid = true;
+                  return null;
                 },
               ),
             ), //flexible
@@ -176,22 +191,30 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
         ]
     );
 
+    String subtitleValue = _subtitle;
+    bool subtitleValid = true;
     final subtitle_row = new Row(
         children: <Widget>[
           Text('Subtitle'),
           new Container(
             child: new Flexible(
-              child: TextField(
-
+              child: TextFormField(
                 autofocus: false,
+                autocorrect: true,
+                autovalidate: true,
                 enabled: _subtitleEditable && is_editing,
                 decoration: InputDecoration(
-                  hintText: _subtitle,
                   contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
-                onChanged: (String value) {
-
+                initialValue: _subtitle,
+                validator: (value) {
+                  if (value == "") {
+                    subtitleValid = false;
+                    return "Cannot be blank";
+                  }
+                  subtitleValue = value;
+                  subtitleValid = true;
+                  return null;
                 },
               ),
             ), //flexible
@@ -199,46 +222,65 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
         ]
     );
 
+    String datetimeValue = _datetime;
+    bool datetimeValid = true;
     final datetime_row = new Row(
         children: <Widget>[
           Text('Date Time'),
           new Container(
             child: new Flexible(
-              child: TextField(
-
+              child: TextFormField(
                 autofocus: false,
+                autocorrect: true,
+                autovalidate: true,
                 enabled: _datetimeEditable && is_editing,
                 decoration: InputDecoration(
-                  hintText: _datetime,
                   contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
-                onChanged: (String value) {
-
-                },
+                initialValue: _datetime,
+                validator: (value) {
+                  if (value == "") {
+                    datetimeValid = false;
+                    return "Cannot be blank";
+                  }
+                  if (!dateTimeRegExp.hasMatch(value)){
+                    datetimeValid = false;
+                    return "Expected format:  YYYY-mm-dd hh:mm:ss";
+                  }
+                  datetimeValue = value;
+                  datetimeValid = true;
+                  return null;
+                }
               ),
             ), //flexible
           ), //container
         ]
     );
 
+    String detailValue = _details;
+    bool detailValid = true;
     final detail_row = new Row(
         children: <Widget>[
           Text('Detail'),
           new Container(
             child: new Flexible(
-              child: TextField(
-
+              child: TextFormField(
                 autofocus: false,
+                autocorrect: true,
+                autovalidate: true,
                 enabled: _detailsEditable && is_editing,
                 decoration: InputDecoration(
-                  hintText: _details,
                   contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  //border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
                 ),
-                onChanged: (String value) {
-
+                initialValue: _details,
+                validator: (value) {
+                  if (value == "") {
+                    detailValid = false;
+                    return "Cannot be blank";
+                  }
+                  detailValid = true;
+                  detailValue = value;
+                  return null;
                 },
               ),
             ), //flexible
@@ -250,7 +292,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
       offstage: !is_editing,
       child:Row(
         mainAxisAlignment: MainAxisAlignment.center,
-
+        
         children: <Widget>[
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -259,7 +301,17 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
                 borderRadius: BorderRadius.circular(24),
               ),
               onPressed: () {
+                if (!titleValid || !subtitleValid || !datetimeValid || !detailValid) { return; }
 
+                print("item detail: saved");
+                print("title: " + titleValue);
+                print("subtitle: " + subtitleValue);
+                print("datetime: " + datetimeValue);
+                print("details: " + detailValue);
+                update(titleValue, subtitleValue, datetimeValue, detailValue);
+                setState(() {
+                  is_editing = false;
+                });
               },
               padding: EdgeInsets.all(12),
               color: Colors.lightBlueAccent,
@@ -274,7 +326,10 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
                 borderRadius: BorderRadius.circular(24),
               ),
               onPressed: () {
-                is_editing = false;
+                setState(() {
+                  is_editing = false;
+                  
+                });
               },
               padding: EdgeInsets.all(12),
               color: Colors.redAccent,
@@ -283,16 +338,21 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
           ),
         ],
       ),
-      );
-
+    );
+    
+    var floatingButtons = UnicornDialer(
+      backgroundColor: Color.fromRGBO(255, 255, 255, 0.6),
+      parentButtonBackground: _labelColor,
+      parentHeroTag: null,
+      orientation: UnicornOrientation.VERTICAL,
+      parentButton: Icon(Icons.add),
+      childButtons: childButtons
+    );
+    if (!_titleEditable && !_subtitleEditable && !_datetimeEditable && !_detailsEditable) {
+      floatingButtons = null;
+    }
     return Scaffold(
-      floatingActionButton: UnicornDialer(
-          backgroundColor: Color.fromRGBO(255, 255, 255, 0.6),
-          parentButtonBackground: _labelColor,
-          parentHeroTag: null,
-          orientation: UnicornOrientation.VERTICAL,
-          parentButton: Icon(Icons.add),
-          childButtons: childButtons),
+      floatingActionButton: floatingButtons,
       body: Card(
           clipBehavior: Clip.antiAlias,
           child: ListView(
@@ -300,7 +360,21 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Text('$_label',style: _text_style_type),
+                  Container(
+                    width: 35,
+                    color: _labelColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text(_label, style: _text_style_type),
+                          ]
+                        )
+                      ]
+                    )
+                  )
                 ],
               ),
               _image,
