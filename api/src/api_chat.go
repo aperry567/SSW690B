@@ -83,11 +83,15 @@ func dbGetVisitChat(sessionID string, visitID string, unreadOnly bool) (ChatResp
 	chatQuery := "SELECT USER_ID, MSG, CREATED_DT, IS_READ FROM dod.VISITS_CHAT where VISIT_ID = ?"
 	if unreadOnly == true {
 		chatQuery += " and IS_READ = 0 and USER_ID != ?"
+		chatSt, _ := db.Prepare(chatQuery + " ORDER BY CREATED_DT ASC")
+		rows, chatErr = chatSt.Query(visitID, userID)
+		defer chatSt.Close()
+	} else {
+		chatSt, _ := db.Prepare(chatQuery + " ORDER BY CREATED_DT ASC")
+		rows, chatErr = chatSt.Query(visitID)
+		defer chatSt.Close()
 	}
-	chatSt, _ := db.Prepare(chatQuery + " ORDER BY CREATED_DT ASC")
-	rows, chatErr = chatSt.Query(visitID, userID)
 
-	defer chatSt.Close()
 	if chatErr != nil {
 		return response, errors.New("Unable to fetch chats")
 	}
