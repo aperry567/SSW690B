@@ -35,7 +35,7 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 			ListFilter{
 				Title:  "Exams",
 				Value:  "filter=1",
-				AddURL: "/api/saveVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=1",
+				AddURL: "/api/addVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=1",
 				AddDetails: []ListFilterAddDetails{
 					ListFilterAddDetails{
 						Label:      "Type of Exam",
@@ -60,7 +60,7 @@ func dbGetVisitRelatedItems(sessionID string, visitID string, filter string) (Li
 			ListFilter{
 				Title:  "Rx",
 				Value:  "filter=2",
-				AddURL: "/api/saveVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=2",
+				AddURL: "/api/addVisitRelatedItems?sessionID=" + sessionID + "&visitID=" + visitID + "&filter=2",
 				AddDetails: []ListFilterAddDetails{
 					ListFilterAddDetails{
 						Label:      "Medication Name",
