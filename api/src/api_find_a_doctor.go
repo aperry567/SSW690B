@@ -110,11 +110,11 @@ func dbFindADoctor(sessionID string, questionID string) (ListResponse, error) {
 		var id string
 		item.Label = "Doctor"
 		item.LabelColor = LABEL_COLOR_DOCTOR
-		item.DetailLink = "/api/createVisit?questionID=" + questionID + "&sessionID=" + sessionID + "&doctorID=" + id
 		item.ScreenType = "detail"
 		if err := rows.Scan(&id, &item.Title, &item.Subtitle, &item.Photo); err != nil {
 			return resp, errors.New("Unable to fetch doctor")
 		}
+		item.DetailLink = "/api/createVisit?questionID=" + questionID + "&sessionID=" + sessionID + "&doctorID=" + id
 		resp.Items = append(resp.Items, item)
 	}
 	return resp, nil
