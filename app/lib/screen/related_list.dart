@@ -65,19 +65,19 @@ class _HomeListPageState extends State<HomeListPage> {
                 _image = Image.memory(_imageBytes, width: 100, height: 100,);
               }
               card_list.add(SizedBox(height: 10,));
-              card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+              card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], false));
               switch(item['label']){
                 case 'Visit':
                   visit_card_list.add(SizedBox(height: 10,));
-                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], true));
                   break;
                 case 'Exam':
                   exam_card_list.add(SizedBox(height: 10,));
-                  exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+                  exam_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], true));
                   break;
                 case 'Rx':
                   rx_card_list.add(SizedBox(height: 10,));
-                  rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+                  rx_card_list.add(ListCard(item['label'],  item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], true));
                   break;
               }
             }

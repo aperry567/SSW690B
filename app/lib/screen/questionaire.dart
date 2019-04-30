@@ -3,30 +3,39 @@ import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:login/config.dart' as config;
+import 'home_list.dart';
+import 'doctor_list.dart';
 
+class Question{
+  String question;
+  String moreQuestionsURL;
+
+}
 
 class Questionaire extends StatefulWidget {
   final url;
-  final bool isFirstPage;
-  Questionaire(this.url, this.isFirstPage);
+  Questionaire(this.url);
   @override
-  _QuestionaireState createState() => new _QuestionaireState(url, isFirstPage);
+  _QuestionaireState createState() => new _QuestionaireState(url);
 }
 
 class _QuestionaireState extends State<Questionaire>{
   final url;
-  final bool isFirstPage;
-  _QuestionaireState(this.url, this.isFirstPage);
+  _QuestionaireState(this.url);
 
-  String _question = "Error: no question?";
   AnimationController _animateController;
+
+  List<Widget> questionList = [];
 
   void initState() {
     // TODO: implement initState
     super.initState();
+    getQuestions(url);
   }
 
-  Future<Null> getMessage(dateTime) async {
+  Future<Null> getQuestions(url) async {
+    print(url);
     await http.get(url)
         .then((response) {
       print("Response status: ${response.statusCode}");
@@ -37,10 +46,49 @@ class _QuestionaireState extends State<Questionaire>{
         });
       }
       else if(response.statusCode == 200){
-        Map<String, dynamic> result = jsonDecode(response.body);
+        List<dynamic> result = jsonDecode(response.body);
         if (this.mounted){
           setState(() {
-            _question = result[0]['question'];
+            for(var i=0; i<result.length; i++) {
+              print(result[i]['question']);
+              questionList.add(
+                  GestureDetector(
+                    //child: Text(result['question'], style: TextStyle(color: Colors.black, fontSize: 20),),
+                      child: Card(
+                        elevation: 8.0,
+                        margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                        child: Container(
+                          decoration: BoxDecoration(color: Colors.grey[200]),
+                          child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                              title: Text(
+                                result[i]['question'],
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              ),
+                              trailing:
+                              Icon(Icons.keyboard_arrow_right, color: Colors.blueGrey, size: 30.0)),
+                        ),
+                      ),
+                    onTap: (){
+                        if(result[i]['moreQuestionsURL'] != ''){
+                          print("moreQuestions");
+                          Navigator.push(context, new MaterialPageRoute(
+                              builder: (context) =>
+                                  Questionaire(config.baseURL + result[i]['moreQuestionsURL']))
+                          );
+                        }
+                        else if(result[i]['findDoctorURL'] != ''){
+                          print("findDoctor");
+                          Navigator.push(context, new MaterialPageRoute(
+                              builder: (context) =>
+                                  DoctorListPage(config.baseURL + result[i]['findDoctorURL']))
+                          );
+                        }
+
+                    },
+                  )
+              );
+            }
           });
         }
 
@@ -50,147 +98,22 @@ class _QuestionaireState extends State<Questionaire>{
 
   @override
   Widget build(BuildContext context){
-    if(isFirstPage){
-      return QuestionnaireStartPage();
-    }
-    else{
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Center(
-                  child: FlutterLogo(
-                    colors: Colors.cyan,
-                    size: 100.0,
-                  )
-              ),
-              SizedBox( height: 50,),
-              Text(
-                _question,
-                style: TextStyle(
-                    color: Colors.cyan[500],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  'two buttons',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              )
-            ],
-          ),
-          bottomNavigationBar: BottomAppBar(
-            child: Row(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [BoxShadow(color: Colors.grey.withAlpha(200))]),
-                  height: 50.0,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Center(
-                        child: Text( 'Back',
-                          style: TextStyle(fontSize: 20.0, color: Colors.cyan),
-                        )),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [BoxShadow(color: Colors.grey.withAlpha(200))]),
-                  height: 50.0,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(context, new MaterialPageRoute(
-                          builder: (context) =>
-                              Questionaire('/api/getQuestionnaire?sessionID=0c6b22be-5dc1-11e9-8a1a-42010a8e0002', false))
-                      );
-                    },
-                    child: Center(
-                        child: Text( 'Next',
-                          style: TextStyle(fontSize: 20.0, color: Colors.cyan),
-                        )),
-                  ),
-                ),
-              ],
-            )
-          ),
-        );
-    }
-
-  }
-}
-
-class QuestionnaireStartPage extends StatelessWidget{
-
-
-  @override
-  Widget build(BuildContext context) {
-    final questionRow = Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Center(
-              child: FlutterLogo(
-                colors: Colors.cyan,
-                size: 100.0,
-              )
-          ),
-          SizedBox( height: 50,),
-          Text(
-            "What's the problem?",
-            style: TextStyle(
-                color: Colors.cyan[500],
-                fontWeight: FontWeight.bold,
-                fontSize: 30.0),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'Please anwser this 2 minutes survey, to help us find you a specialist.',
-              style: TextStyle(
-                fontSize: 16.0,
-              ),
-            ),
+          SizedBox(height: 100,),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: questionList,
           )
+
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.grey.withAlpha(200))]),
-            height: 50.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(context, new MaterialPageRoute(
-                    builder: (context) =>
-                        Questionaire('/api/getQuestionnaire?sessionID=0c6b22be-5dc1-11e9-8a1a-42010a8e0002', false))
-                );
-              },
-              child: Center(
-                  child: Text( 'Continue',
-                    style: TextStyle(fontSize: 20.0, color: Colors.cyan),
-                  )),
-            ),
-          ),
-      ),
     );
 
-    return Scaffold(
-        backgroundColor: Colors.white,
-        body: questionRow
-    );
   }
-
 }
 
 

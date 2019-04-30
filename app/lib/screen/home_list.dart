@@ -75,7 +75,7 @@ class _HomePageListContainerState extends State<_HomePageListContainer> with Aut
           _image = Image.memory(_imageBytes, width: 100, height: 100, fit: BoxFit.none, alignment: Alignment.topCenter,);
         }
         cardList.add(SizedBox(height: 10,));
-        cardList.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, config.baseURL + item.detailLink, item.screenType));
+        cardList.add(ListCard(item.label,  item.dateTime, item.title, item.subtitle, item.details, _image,item.labelColor, config.baseURL + item.detailLink, item.screenType, false));
       }
     }
     var listView = ListView(

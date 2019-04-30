@@ -34,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
       else if(response.statusCode == 200){
-
         final json = jsonDecode(response.body);
         AuthResponse authResponse = new AuthResponse.fromJson(json);
         Navigator.push(context, new MaterialPageRoute(
@@ -55,15 +54,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
 
-    FocusNode passFocus = new FocusNode();
-    FocusNode loginFocus = new FocusNode();
     final email = TextField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
-      maxLines: 1,
-      onSubmitted: (String value) {
-        FocusScope.of(context).requestFocus(passFocus);
-      },
+
       decoration: InputDecoration(
         hintText: 'Email',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -81,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
     final password = TextField(
       autofocus: false,
       obscureText: true,
-      focusNode: passFocus,
       decoration: InputDecoration(
         hintText: 'Password',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),

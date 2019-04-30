@@ -3,6 +3,7 @@ import 'package:login/screen/item.dart';
 import 'package:intl/intl.dart';
 import 'package:login/screen/questionaire.dart';
 
+
 class MyClipper extends CustomClipper<Rect>{
   @override
   Rect getClip(Size size) {
@@ -27,11 +28,13 @@ class ListCard extends StatelessWidget  {
   final String _color;
   final String _detailUrl;
   final String _screenType;
-  ListCard(this._card_type, this._time, this._name, this._title, this._description, this._image, this._color, this._detailUrl, this._screenType);
+  final bool _hideImage;
+  ListCard(this._card_type, this._time, this._name, this._title, this._description, this._image, this._color, this._detailUrl, this._screenType, this._hideImage);
 
   static const TextStyle _text_style_description = TextStyle(backgroundColor: Colors.white, color: Colors.black26);
 
   Widget build(BuildContext context) {
+    print(_hideImage);
     TextStyle _text_style_status;
     Color bgColor = Colors.white;
     String timeStr = "";
@@ -58,7 +61,7 @@ class ListCard extends StatelessWidget  {
         else if(_screenType == 'questionnaire'){
           Navigator.push(context, new MaterialPageRoute(
               builder: (context) =>
-                  Questionaire(_detailUrl, true))
+                  Questionaire(_detailUrl))
           );
         }
 
@@ -68,17 +71,11 @@ class ListCard extends StatelessWidget  {
     child: Card(
       clipBehavior: Clip.antiAlias,
       child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _image,
-                  // SizedBox(height: 8.0),
-                  ],
-
-              ),
+            _hideImage ? Container() : Container(
+              child: _image,
             ),
             SizedBox(width: 10,),
             Container(
@@ -103,10 +100,11 @@ class ListCard extends StatelessWidget  {
               width: 35,
               color: bgColor,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       Text(_card_type,style: _text_style_type),
                     ],

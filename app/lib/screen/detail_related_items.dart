@@ -74,19 +74,15 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
                 _image = Image.memory(_imageBytes, width: 100);
               }
               card_list.add(SizedBox(height: 10,));
-              card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+              card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], false));
               switch(item['label']){
-                case 'Visit':
-                  visit_card_list.add(SizedBox(height: 10,));
-                  visit_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
-                  break;
                 case 'Exam':
                   exam_card_list.add(SizedBox(height: 10,));
-                  exam_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+                  exam_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], true));
                   break;
                 case 'Rx':
                   rx_card_list.add(SizedBox(height: 10,));
-                  rx_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType']));
+                  rx_card_list.add(ListCard(item['label'], item['dateTime'], item['title'], item['subtitle'], item['details'], _image,item['labelColor'], config.baseURL + item['detailLink'], item['screenType'], true));
                   break;
               }
             }
@@ -139,11 +135,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
       children: card_list,
     );
 
-    final list_view_visit = ListView(
-      shrinkWrap: true,
-      padding: EdgeInsets.only(left: 24.0, right: 24.0),
-      children: visit_card_list,
-    );
 
     final list_view_exam = ListView(
       shrinkWrap: true,
@@ -165,12 +156,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
       child: list_view,		// scroll view
     );
 
-    final liquid1 = LiquidPullToRefresh(
-      showChildOpacityTransition: false,
-      color:_labelColor,
-      onRefresh: () => getDetail(),	// refresh callback
-      child: list_view_visit,		// scroll view
-    );
 
     final liquid2 = LiquidPullToRefresh(
       showChildOpacityTransition: false,
@@ -191,7 +176,7 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
 
 
     final tabbar = DefaultTabController(
-      length: 4,
+      length: 3,
       child: new Scaffold(
         floatingActionButton: UnicornDialer(
             //onMainButtonPressed: ,
@@ -216,7 +201,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
                       labelStyle: _textStyleWhite,
                       tabs: [
                         Tab(text: 'All'),
-                        Tab(text: 'Visit'),
                         Tab(text: 'Exam'),
                         Tab(text: 'Prescription'),
                       ],
@@ -229,7 +213,6 @@ class _DetailRelatedItemsPageState extends State<DetailRelatedItemsPage> with Au
         body: TabBarView(
           children: [
               liquid0,
-              liquid1,
               liquid2,
               liquid3,
           ],
