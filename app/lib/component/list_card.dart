@@ -36,7 +36,7 @@ class ListCard extends StatelessWidget  {
   Widget build(BuildContext context) {
     print(_hideImage);
     TextStyle _text_style_status;
-    Color bgColor = Colors.white;
+    Color bgColor = Colors.black;
     String timeStr = "";
     if (this._time != "") {
       DateTime time = DateTime.parse(this._time);
@@ -46,7 +46,7 @@ class ListCard extends StatelessWidget  {
     if (this._color != "") {
       bgColor = Color(int.parse(this._color));
     }
-    TextStyle _text_style_type = TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
+    TextStyle _text_style_type = TextStyle(color: Colors.white,fontWeight: FontWeight.bold, backgroundColor: bgColor);
 
     return new GestureDetector(
       onTap: (){
