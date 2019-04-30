@@ -96,20 +96,22 @@ class ListCard extends StatelessWidget  {
               ),
             ),
 
-            Container(
-              width: 35,
-              color: bgColor,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Column(
+            Expanded(
+              child: Container(
+                alignment: Alignment.topRight,
+                //color: bgColor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Column(
 
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(_card_type,style: _text_style_type),
-                    ],
-                  ),
-                ],
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Text(_card_type,style: _text_style_type),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
