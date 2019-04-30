@@ -28,6 +28,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
   var _deleteURL = '';
   var _updateURL = '';
 
+  var errMessage = "";
   var _title = '';
   var _titleEditable = false;
   var _subtitle = '';
@@ -49,6 +50,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
   _ItemDetailPageState(this.result){
     print('item-detail constructor');
   }
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -67,36 +69,70 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
       print("Response body: ${response.body}");
       if(response.statusCode == 401) {
 
-      }
-      else if(response.statusCode == 400) {
+      } else if(response.statusCode == 400) {
+        setState(() {
+          errMessage = response.body;
+        });
         print("Item Detail Save Error: " + response.body);
+      } else {
+        setState(() {
+          errMessage = "";
+          is_editing = false;
+        });
       }
     });
   }
 
-  delete() async {
-    JsonEncoder encoder = new JsonEncoder();
-    Map json = {"title": _title, "subtitle": _subtitle, "details": _details, "datetime": _datetime};
-    var url = config.baseURL + _deleteURL;
+  void confirmDelete() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Delete Item?"),
+          content: new Text("The item will be deleted and not recoverable.  Are you sure you want to do this?"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Accept"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                delete();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  delete() async {
+    var url = config.baseURL + _deleteURL;
     await http.get(url)
         .then((response) {
-      if(response.statusCode == 400) {
-
-      }
-
-      else if(response.statusCode == 200){
+      if (response.statusCode == 400) {
+        setState(() {
+          errMessage = response.body;
+        });
+        print("Item Detail Save Error: " + response.body);
+      } else if (response.statusCode == 200) {
+        setState(() {
+          errMessage = "";
+        });
         Navigator.pop(context);
-        if (this.mounted){
-
-        }
       }
     });
   }
 
   parse(){
-    print('item-detail parse');
     if(result != null){
+      print('item-detail parse' + result['details']);
       _deleteURL = result['deleteURL'];
       _updateURL = result['updateURL'];
       _title = result['title'];
@@ -125,6 +161,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
 
   Widget build(BuildContext context) {
     print('item-detail build');
+    if (!is_editing) {
+      errMessage = "";
+    }
     var childButtons = List<UnicornButton>();
     childButtons.add(UnicornButton(
       currentButton: FloatingActionButton(
@@ -150,10 +189,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
           mini: true,
           child: Icon(Icons.delete_forever),
           onPressed: () {
-            if(_deleteURL != '') {
-              delete();
-            }
-
+            confirmDelete();
           },
         )
       ));
@@ -161,31 +197,32 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
 
     String titleValue = _title;
     bool titleValid = true;
+    var titleField = TextFormField(
+      autofocus: false,
+      autocorrect: true,
+      autovalidate: true,
+      enabled: _titleEditable && is_editing,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+      ),
+      initialValue: _title,
+      validator: (value) {
+        if (value == "") {
+          titleValid = false;
+          return "Cannot be blank";
+        }
+        titleValue = value;
+        print("title: " + titleValue);
+        titleValid = true;
+        return null;
+      },
+    );
     final title_row = new Row(
         children: <Widget>[
           Text('Title'),
           new Container(
             child: new Flexible(
-              child: TextFormField(
-                autofocus: false,
-                autocorrect: true,
-                autovalidate: true,
-                enabled: _titleEditable && is_editing,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                ),
-                initialValue: _title,
-                validator: (value) {
-                  if (value == "") {
-                    titleValid = false;
-                    return "Cannot be blank";
-                  }
-                  titleValue = value;
-                  print("title: " + titleValue);
-                  titleValid = true;
-                  return null;
-                },
-              ),
+              child: titleField,
             ), //flexible
           ), //container
         ]
@@ -259,30 +296,31 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
 
     String detailValue = _details;
     bool detailValid = true;
+    var detailField = TextFormField(
+      autofocus: false,
+      autocorrect: true,
+      autovalidate: true,
+      enabled: _detailsEditable && is_editing,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+      ),
+      initialValue: _details,
+      validator: (value) {
+        if (value == "") {
+          detailValid = false;
+          return "Cannot be blank";
+        }
+        detailValid = true;
+        detailValue = value;
+        return null;
+      },
+    );
     final detail_row = new Row(
         children: <Widget>[
           Text('Detail'),
           new Container(
             child: new Flexible(
-              child: TextFormField(
-                autofocus: false,
-                autocorrect: true,
-                autovalidate: true,
-                enabled: _detailsEditable && is_editing,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                ),
-                initialValue: _details,
-                validator: (value) {
-                  if (value == "") {
-                    detailValid = false;
-                    return "Cannot be blank";
-                  }
-                  detailValid = true;
-                  detailValue = value;
-                  return null;
-                },
-              ),
+              child: detailField,
             ), //flexible
           ), //container
         ]
@@ -303,15 +341,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
               onPressed: () {
                 if (!titleValid || !subtitleValid || !datetimeValid || !detailValid) { return; }
 
-                print("item detail: saved");
-                print("title: " + titleValue);
-                print("subtitle: " + subtitleValue);
-                print("datetime: " + datetimeValue);
-                print("details: " + detailValue);
                 update(titleValue, subtitleValue, datetimeValue, detailValue);
-                setState(() {
-                  is_editing = false;
-                });
               },
               padding: EdgeInsets.all(12),
               color: Colors.lightBlueAccent,
@@ -326,9 +356,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
                 borderRadius: BorderRadius.circular(24),
               ),
               onPressed: () {
+                _formKey.currentState.reset();
                 setState(() {
                   is_editing = false;
-                  
                 });
               },
               padding: EdgeInsets.all(12),
@@ -385,19 +415,24 @@ class _ItemDetailPageState extends State<ItemDetailPage> with AutomaticKeepAlive
                   SizedBox(width: 30,),
                   Container(
                     width: 350,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        title_row,
-                        SizedBox(height: 10),
-                        subtitle_row,
-                        SizedBox(height: 10),
-                        datetime_row,
-                        SizedBox(height: 10),
-                        detail_row,
-                        SizedBox(height: 50),
-                        editButtons,
-                      ],
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(errMessage, style: TextStyle(color: Colors.red)),
+                          SizedBox(height: 10),
+                          title_row,
+                          SizedBox(height: 10),
+                          subtitle_row,
+                          SizedBox(height: 10),
+                          datetime_row,
+                          SizedBox(height: 10),
+                          detail_row,
+                          SizedBox(height: 50),
+                          editButtons,
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -303,46 +303,48 @@ class _HomeListPageState extends State<HomeListPage> {
           childButtons: childButtons,
         );
       }
-      tabbar = DefaultTabController(
-        length: tabViews.length,
-        child: new Scaffold(
-          floatingActionButton: buttons,
-          appBar: new PreferredSize(
-            preferredSize: Size.fromHeight(60),
-            child:  Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  height: spacerHeight,
-                  color: labelColor,
-                ),
-                Container(
-                  child: Container(
-                    height: tabHeight,
+      if (tabViews.length > 0) {
+        tabbar = DefaultTabController(
+          length: tabViews.length,
+          child: new Scaffold(
+            floatingActionButton: buttons,
+            appBar: new PreferredSize(
+              preferredSize: Size.fromHeight(60),
+              child:  Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    height: spacerHeight,
                     color: labelColor,
-                    child: new TabBar(
-                      indicatorColor: Colors.white,
-                      labelColor: Colors.white,
-                      labelStyle: _textStyleWhite,
-                      tabs: tabs,
-                    ),
                   ),
-                )
-              ],
-            )
+                  Container(
+                    child: Container(
+                      height: tabHeight,
+                      color: labelColor,
+                      child: new TabBar(
+                        indicatorColor: Colors.white,
+                        labelColor: Colors.white,
+                        labelStyle: _textStyleWhite,
+                        tabs: tabs,
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ),
+            body: TabBarView(
+              children: tabViews,
+            ),
           ),
-          body: TabBarView(
-            children: tabViews,
-          ),
-        ),
-      );
+        );
+        widgetList.add(tabbar);
+      }
 
       Stack stack = new Stack(
         children: widgetList,
       );
-
-      widgetList.add(tabbar);
-      if (_is_loading) {
+      
+      if (_is_loading || tabViews.length == 0) {
         widgetList.add(Center(
           child: CircularProgressIndicator(),
         ));
