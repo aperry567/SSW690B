@@ -106,8 +106,8 @@ func dbGetVisitChat(sessionID string, visitID string, unreadOnly bool) (ChatResp
 		response.Chats = append(response.Chats, chat)
 	}
 
-	//update is reads not from the current user to read
-	updateSt, _ := db.Prepare("UPDATE dod.VISITS_CHAT set IS_READ = 1 where VISIT_ID = ? and USER_ID != ?")
+	//update is reads
+	updateSt, _ := db.Prepare("UPDATE dod.VISITS_CHAT set IS_READ = 1 where VISIT_ID = ? and USER_ID = ?")
 	_, updateErr := updateSt.Exec(visitID, userID)
 	defer updateSt.Close()
 	if updateErr != nil {
