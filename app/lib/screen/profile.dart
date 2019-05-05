@@ -106,16 +106,17 @@ class _ProfilePageState extends State<ProfilePage> {
             _secret_anwser_value = result['secretAnswer'];
             //_doctorLicenses_value = result['doctorLicences'];
 
-            for(var i=0; i< specialitiesList.length; i++){
-              if(specialitiesList[i].id == result['doctorSpecialities'][0])
-                _specialty_hint = specialitiesList[i].name;
-              _doctor_specialty_value = specialitiesList[i];
+            if(role == 'doctor'){
+              for(var i=0; i< specialitiesList.length; i++){
+                if(specialitiesList[i].id == result['doctorSpecialities'][0])
+                  _specialty_hint = specialitiesList[i].name;
+                _doctor_specialty_value = specialitiesList[i];
+              }
+              _doctorLicensesList = result['doctorLicences'];
+              _doctor_ID_value = _doctorLicensesList[0]['license'];
+              _doctor_state_hint = _doctorLicensesList[0]['state'].toUpperCase();
             }
-            _doctorLicensesList = result['doctorLicences'];
-            _doctor_ID_value = _doctorLicensesList[0]['license'];
-            _doctor_state_hint = _doctorLicensesList[0]['state'].toUpperCase();
-
-
+            
             _is_loading = false;
           });
         }
