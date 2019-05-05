@@ -71,14 +71,14 @@ class _QuestionaireState extends State<Questionaire>{
                       ),
                     onTap: (){
                         if(result[i]['moreQuestionsURL'] != ''){
-                          print("moreQuestions");
+                          Navigator.pop(context);
                           Navigator.push(context, new MaterialPageRoute(
                               builder: (context) =>
                                   Questionaire(config.baseURL + result[i]['moreQuestionsURL']))
                           );
                         }
                         else if(result[i]['findDoctorURL'] != ''){
-                          print("findDoctor");
+                          Navigator.pop(context);
                           Navigator.push(context, new MaterialPageRoute(
                               builder: (context) =>
                                   DoctorListPage(config.baseURL + result[i]['findDoctorURL']))
