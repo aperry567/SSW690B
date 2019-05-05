@@ -116,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _doctor_ID_value = _doctorLicensesList[0]['license'];
               _doctor_state_hint = _doctorLicensesList[0]['state'].toUpperCase();
             }
-            
+
             _is_loading = false;
           });
         }
