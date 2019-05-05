@@ -297,7 +297,7 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	if sm.PostalCode == "" {
 		return AuthResponse{}, errors.New("Postal Code is required")
 	}
-	if sm.PharmacyLocation == "" {
+	if sm.PharmacyLocation == "" && sm.Role == "patient" {
 		return AuthResponse{}, errors.New("Pharmacy Location is required")
 	}
 	if sm.Password == "" {
@@ -317,9 +317,6 @@ func dbUserSignup(sm SignupModel) (AuthResponse, error) {
 	}
 	if sm.Phone == "" {
 		return AuthResponse{}, errors.New("Phone is required")
-	}
-	if sm.DOB == "" {
-		return AuthResponse{}, errors.New("DOB is required")
 	}
 	if sm.DOB == "" {
 		return AuthResponse{}, errors.New("DOB is required")
