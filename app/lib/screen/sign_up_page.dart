@@ -16,6 +16,11 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+
+  _SignUpPageState(){
+    getSpecialities();
+  }
+
   bool _switchSelected = false; //维护单选开关状态
 
   bool errorSwitch = false;
@@ -51,6 +56,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
   var _doctorLicences_value;
 
+  String _specialty_hint = "Specialty";
+  List<Speciality> specialitiesList = [];
+  Speciality _doctor_specialty_value;
+
   showDialogMenu(){
     return showDialog(context: context,
         barrierDismissible: true,
@@ -75,6 +84,31 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           );
         });
+  }
+
+  Future<void> getSpecialities() async {
+    var url = config.baseURL + '/api/getDoctorSpecialities';
+    await http.get(url)
+        .then((response) {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      if(response.statusCode == 400)
+        setState(() {
+
+        });
+      else if(response.statusCode == 200){
+        List<dynamic> result = jsonDecode(response.body);
+        if (this.mounted){
+          setState(() {
+            print(result);
+            for(var i=0; i<result.length; i++){
+              specialitiesList.add(Speciality(result[i]['id'], result[i]['name']));
+            }
+            print(specialitiesList);
+          });
+        }
+      }
+    });
   }
 
   Future takePhoto() async {
@@ -138,6 +172,7 @@ class _SignUpPageState extends State<SignUpPage> {
       "secretAnswer": _secret_anwser_value,
       "pharmacyLocation" : _pharmacy_location_value,
       "doctorLicences": _doctorLicences_value,
+      "doctorSpecialities": [1],
       "dob": DateFormat('yyyy-MM-dd').format(_selectedDate),
       "gender": _gender,
     };
@@ -387,17 +422,20 @@ class _SignUpPageState extends State<SignUpPage> {
       },
     );
 
-    final pharmacyLocation = TextField(
-      keyboardType: TextInputType.text,
-      autofocus: false,
-      decoration: InputDecoration(
-        hintText: "Your pharmacy's location",
-        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+    final pharmacyLocation = Offstage(
+      offstage: _switchSelected,
+      child: TextField(
+        keyboardType: TextInputType.text,
+        autofocus: false,
+        decoration: InputDecoration(
+          hintText: "Your pharmacy's location",
+          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+        ),
+        onChanged: (text)  {
+          _pharmacy_location_value = text;
+        },
       ),
-      onChanged: (text)  {
-        _pharmacy_location_value = text;
-      },
     );
 
     final dobSelection = Column(
@@ -497,6 +535,27 @@ class _SignUpPageState extends State<SignUpPage> {
                   value: state,
                   child: new Text(
                     state.name,
+                    style: new TextStyle(color: Colors.black),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],),
+          Row(children: <Widget>[
+            SizedBox(width: 18.0,),
+            new DropdownButton<Speciality>(
+              hint: Text(_specialty_hint),
+              value: _doctor_specialty_value,
+              onChanged: (Speciality newValue) {
+                setState(() {
+                  _doctor_specialty_value = newValue;
+                });
+              },
+              items: specialitiesList.map((Speciality specialty) {
+                return new DropdownMenuItem<Speciality>(
+                  value: specialty,
+                  child: new Text(
+                    specialty.name,
                     style: new TextStyle(color: Colors.black),
                   ),
                 );

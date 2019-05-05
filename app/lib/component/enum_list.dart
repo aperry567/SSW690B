@@ -3,6 +3,13 @@ class USState{
   final String name;
 }
 
+class Speciality{
+  const Speciality(this.id, this.name);
+  final int id;
+  final String name;
+
+}
+
 class SecretQuestion{
   const SecretQuestion(this.name);
   final String name;
