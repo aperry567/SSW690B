@@ -74,7 +74,6 @@ class _ProfilePageState extends State<ProfilePage> {
             for(var i=0; i<result.length; i++){
               specialitiesList.add(Speciality(result[i]['id'], result[i]['name']));
             }
-            print(specialitiesList);
           });
         }
       }
@@ -110,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
             for(var i=0; i< specialitiesList.length; i++){
               if(specialitiesList[i].id == result['doctorSpecialities'][0])
                 _specialty_hint = specialitiesList[i].name;
+              _doctor_specialty_value = specialitiesList[i];
             }
             _doctorLicensesList = result['doctorLicences'];
             _doctor_ID_value = _doctorLicensesList[0]['license'];

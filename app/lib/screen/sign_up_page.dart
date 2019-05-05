@@ -176,6 +176,7 @@ class _SignUpPageState extends State<SignUpPage> {
       "dob": DateFormat('yyyy-MM-dd').format(_selectedDate),
       "gender": _gender,
     };
+    print(base64Image);
     var url = config.baseURL + "/api/signup";
     var res = await http.post(url, body: encoder.convert(json))
         .then((response) {
